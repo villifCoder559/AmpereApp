@@ -12,7 +12,6 @@ import { Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogExampleComponent } from './dialog-example/dialog-example.component';
 import { MatTooltip } from '@angular/material/tooltip';
-
 /*TODO List:
   1)Enable scroll page OK
   2)Fix validator foreach textarea OK
