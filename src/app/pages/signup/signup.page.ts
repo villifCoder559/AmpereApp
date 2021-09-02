@@ -16,7 +16,8 @@ import { MatTooltip } from '@angular/material/tooltip';
   1)Enable scroll page OK
   2)Fix validator foreach textarea OK
   3)Import contact from contacts of device TEST OK
-  3.1)Improve html of Contacts tab 
+  3.1)Improve html of Contacts tab OK
+  3.2)Save data untill 4 phase
   4)Make the connection device page
 */
 
