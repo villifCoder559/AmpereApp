@@ -1,0 +1,29 @@
+.example-stepper {
+    margin-top: 8px;
+  }
+  
+.mat-form-field {
+  margin-top: 16px;
+}
+body {
+  font-family: Roboto, Arial, sans-serif;
+  margin: 0;
+  padding: 30px;
+} 
+.version-info {
+  font-size: 8pt;
+  float: right;
+  margin: 8px;
+}
+ion-content{
+  --ion-background-color: #FAFAFA;
+}
+mat-stepper{
+  background-color: #FAFAFA;
+}
+#emergency_contacts mat-card{
+  margin-top: 5px;
+}
+#matcardResize{
+  width: 201px;
+}

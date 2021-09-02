@@ -1,5 +1,7 @@
 {
   "name": "Ampere",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

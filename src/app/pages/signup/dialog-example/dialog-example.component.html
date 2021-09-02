@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>Hi </h1>
+<div mat-dialog-content>
+  <mat-selection-list [(ngModel)]="selectedOptions" #contacts [multiple]="false">
+    <mat-list-option *ngFor="let contact of myContacts" [value]="contact" (click)="save_data()">
+      <div mat-line>{{contact.name}}</div>
+      <div mat-line>{{contact.number}}</div>
+    </mat-list-option>
+  </mat-selection-list>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+</div>
