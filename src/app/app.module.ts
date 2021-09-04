@@ -11,12 +11,14 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import {Contacts} from '@ionic-native/contacts'
+import { BLE } from '@ionic-native/ble/ngx'
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [MatInputModule,MatIconModule,MatSelectModule,BrowserModule, BrowserAnimationsModule,MatFormFieldModule,
             IonicModule.forRoot(), AppRoutingModule,HttpClientModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },Contacts],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },Contacts,BLE],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
