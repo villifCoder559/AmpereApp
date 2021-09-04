@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { StepperOrientation } from '@angular/material/stepper';
 import { interval, Observable, timer } from 'rxjs';
@@ -12,13 +12,15 @@ import { Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogExampleComponent } from './dialog-example/dialog-example.component';
 import { MatTooltip } from '@angular/material/tooltip';
+import { BLE } from '@ionic-native/ble/ngx'
 /*TODO List:
   1)Enable scroll page OK
   2)Fix validator foreach textarea OK
   3)Import contact from contacts of device TEST OK
   3.1)Improve html of Contacts tab OK
-  3.2)Save data untill 4 phase
-  4)Make the connection device page
+  3.2)Password & confirm_psw, add hide/not-hide_psw button OK
+  4)Start page about connection device 
+  5)Save data untill 4 phase
 */
 
 export interface DialogData {
@@ -59,17 +61,26 @@ export class SignupPage implements OnInit {
     allergies: '',
     medications: ''
   }
-  constructor(public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts) {
+  constructor(public ble:BLE,public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts) {
     this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
       .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
   }
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   required = Validators.required;
   @ViewChild('tooltip') tooltip: MatTooltip;
+
+  zeroFormGroup = this._formBuilder.group({
+    email: ['', Validators.email],
+    psw: ['', [Validators.required]],
+    confirm_psw: ['', [Validators.required]]
+  }, {
+    validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
+  })
+
+
   firstFormGroup = this._formBuilder.group({
     name: ['', Validators.required],
     surname: ['', Validators.required],
-    email: ['', Validators.email],
     phoneNumber: ['', Validators.required],
     password: ['', Validators.required],
     confirm_psw: ['', Validators.required],
@@ -122,6 +133,7 @@ export class SignupPage implements OnInit {
   ];
   ngOnInit() {
   }
+
   triggerResize() {
     this.ngZone.onStable.pipe(take(1))
       .subscribe(() => this.autosize.resizeToFitContent(true));
@@ -240,5 +252,37 @@ export class SignupPage implements OnInit {
   show_tooltip() {
     this.tooltip.show();
     interval(2000).subscribe(() => { this.tooltip.hide(); })
+  }
+  devices:any[] = [];
+  scan(){
+    this.ble.scan([],10).subscribe(
+      device => this.onDeviceDiscovered(device)
+    );
+  }
+  onDeviceDiscovered(device){
+    console.log('Discovered' + JSON.stringify(device,null,2));
+    this.ngZone.run(()=>{
+      this.devices.push(device)
+      console.log(device)
+    })
+  }
+}
+class ValidatePassword {
+  static ConfirmValidator(name: string, checkName: string): ValidatorFn {
+    return (controls: AbstractControl) => {
+      const control = controls.get(name);
+      const checkControl = controls.get(checkName);
+      if (checkControl.errors && !checkControl.errors.matching) {
+        return null;
+      }
+      if (control.value !== checkControl.value) {
+        controls.get(checkName).setErrors({ matching: true });
+        return { matching: true }
+      }
+      else {
+        controls.get(checkName).setErrors(null)
+        return null
+      }
+    }
   }
 }

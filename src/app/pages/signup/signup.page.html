@@ -1,5 +1,31 @@
 <ion-content>
   <mat-stepper [linear]="false" [orientation]="(stepperOrientation | async)!">
+    <mat-step [stepControl]="zeroFormGroup" label="Set login credentials">
+      <form id="login_credential" [formGroup]="zeroFormGroup">
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="" required>
+        </mat-form-field>
+        <mat-form-field appearance="fill" id="matcardResize">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required>
+          <button mat-icon-button matSuffix (click)="hidepsw = !hidepsw">
+            <mat-icon>{{hidepsw ? 'visibility' : 'visibility_off'}}</mat-icon>
+          </button>
+        </mat-form-field>
+        <mat-form-field appearance="fill" id="matcardResize">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput [type]="hide?'text':'password'" formControlName="confirm_psw" placeholder="" required>
+          <button mat-icon-button matSuffix (click)="hide = !hide">
+            <mat-icon>{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match</mat-error>
+        </mat-form-field>
+        <div>
+          <button mat-button matStepperNext (click)="click_next()">Next</button>
+        </div>
+      </form>
+    </mat-step>
     <mat-step [stepControl]="firstFormGroup" label="Set Personal Information">
       <form id="personal_information" [formGroup]="firstFormGroup">
         <mat-form-field appearance="fill">
@@ -10,18 +36,7 @@
           <mat-label>Surname</mat-label>
           <input matInput required formControlName="surname" placeholder="Surname">
         </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Email</mat-label>
-          <input matInput type="email"  formControlName="email" placeholder="email" required>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="password" placeholder="" required>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Confirm Password</mat-label>
-          <input matInput type="password" required formControlName="confirm_psw" placeholder="">
-        </mat-form-field>
+
         <mat-form-field appearance="fill">
           <mat-label>Phone number</mat-label>
           <input matInput type="number" maxlength="15" required formControlName="phoneNumber" placeholder="">
@@ -51,12 +66,14 @@
         </mat-form-field>
         <mat-form-field appearance="fill" id="matcardResize">
           <mat-label>Height</mat-label>
-          <input matInput maxlength="3" (keypress)="onlyNumbersAllowed($event)" (ionInput)="onlyNumbersAllowed($event)" formControlName="height" placeholder="">
+          <input matInput maxlength="3" (keypress)="onlyNumbersAllowed($event)" (ionInput)="onlyNumbersAllowed($event)"
+            formControlName="height" placeholder="">
           <span matSuffix>cm</span>
         </mat-form-field>
         <mat-form-field appearance="fill" id="matcardResize">
           <mat-label>Weight</mat-label>
-          <input matInput maxlength="3" (keypress)="onlyNumbersAllowed($event)" (ionInput)="onlyNumbersAllowed($event)" type="text" formControlName="weight" placeholder="">
+          <input matInput maxlength="3" (keypress)="onlyNumbersAllowed($event)" (ionInput)="onlyNumbersAllowed($event)"
+            type="text" formControlName="weight" placeholder="">
           <span matSuffix>Kg</span>
         </mat-form-field>
         <mat-form-field appearance="fill">
@@ -73,16 +90,20 @@
         <mat-form-field appearance="fill" hintLabel="Max 200 characters">
           <mat-label>Purpose</mat-label>
           <textarea #purpose matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-            cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="Medical Emergency,Personal safety,..."
-            formControlName="purpose" ></textarea>
+            cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="Medical Emergency, Personal safety,..."
+            formControlName="purpose"></textarea>
           <mat-hint align="end">{{purpose.value?.length || 0}}/200</mat-hint>
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>PIN</mat-label>
-          <input type="text" required (keypress)="onlyNumbersAllowed($event)" (ionInput)="onlyNumbersAllowed($event)" matInput formControlName="pin" placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()" #tooltip="matTooltip" matTooltip="Use to cancel emergency call">
-
+          <input type="text" required (keypress)="onlyNumbersAllowed($event)" (ionInput)="onlyNumbersAllowed($event)"
+            matInput formControlName="pin" placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()"
+            #tooltip="matTooltip" matTooltip="Use to cancel emergency call">
         </mat-form-field>
-
+        <div>
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-button matStepperNext (click)="click_next()">Next</button>
+        </div>
       </form>
     </mat-step>
     <mat-step [stepControl]="secondFormGroup" label="Set Medical Information">
@@ -102,8 +123,7 @@
         <mat-form-field appearance="fill" hintLabel="Max 200 characters">
           <mat-label>Medications</mat-label>
           <textarea #medications matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-            cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder=""
-            formControlName="medications"></textarea>
+            cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="" formControlName="medications"></textarea>
           <mat-hint align="end">{{medications.value?.length || 0}}/200</mat-hint>
         </mat-form-field>
         <div>
@@ -202,7 +222,7 @@
     </mat-step>
 
     <mat-step [stepControl]="fourthFormGroup" label="Public Emergency Contacts">
-      <form [formGroup]="fourthFormGroup">
+      <form id="public_contacts" [formGroup]="fourthFormGroup">
         <mat-card appearance="fill">
           <mat-label>Would you like to contact the following numbers?(without direct responsibility)</mat-label><br>
           <mat-checkbox value="113">113</mat-checkbox><br>
@@ -218,7 +238,23 @@
 
     <mat-step>
       <ng-template matStepLabel>Connect device</ng-template>
-      <p></p>
+      <mat-card appearance="fill">
+        <mat-card-title style="text-align: center; padding-bottom: 10px;">Pairing</mat-card-title>
+        <mat-card-subtitle>Press your smart jewerly and then press the button below to pair it with the app
+        </mat-card-subtitle>
+        <mat-card-content style="text-align: center;">
+          <button mat-fab color="primary" (click)="scan()">
+            <mat-icon>bluetooth</mat-icon>
+          </button>
+          <mat-selection-list #BLEdevice [multiple]="false">
+            <mat-card ion-item *ngFor="let device of devices" [value]="device">
+              <p>{{device.name || 'Unnamed'}}</p>
+              <p>{{device.id}}</p>
+              <p> RSSI: {{device.rssi}}</p>
+            </mat-card>
+          </mat-selection-list>
+        </mat-card-content>
+      </mat-card>
       <div>
         <button mat-button matStepperPrevious>Back</button>
       </div>
