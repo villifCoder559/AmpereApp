@@ -4,7 +4,7 @@
       <form id="login_credential" [formGroup]="zeroFormGroup">
         <mat-form-field appearance="fill">
           <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="" required>
+          <input matInput type="email" (click)="log()" formControlName="email" placeholder="" required>
         </mat-form-field>
         <mat-form-field appearance="fill" id="matcardResize">
           <mat-label>Password</mat-label>
@@ -110,8 +110,8 @@
       <form id="medical_information" [formGroup]="secondFormGroup">
         <mat-card appearance="fill" id="matcardResize">
           <mat-card-title>Disabilities</mat-card-title>
-          <mat-checkbox>Vision impaired</mat-checkbox><br>
-          <mat-checkbox>Wheelchair user</mat-checkbox>
+          <mat-checkbox (click)="toggle_checkbox_disabilities(0)"  [checked]="user_data.disabilities[0]">Vision impaired</mat-checkbox><br>
+          <mat-checkbox (click)="toggle_checkbox_disabilities(1)" [checked]="user_data.disabilities[1]">Wheelchair user</mat-checkbox>
         </mat-card>
         <mat-form-field appearance="fill" hintLabel="Max 200 characters">
           <mat-label>Allergies</mat-label>
@@ -225,9 +225,9 @@
       <form id="public_contacts" [formGroup]="fourthFormGroup">
         <mat-card appearance="fill">
           <mat-label>Would you like to contact the following numbers?(without direct responsibility)</mat-label><br>
-          <mat-checkbox value="113">113</mat-checkbox><br>
-          <mat-checkbox value="115">115</mat-checkbox><br>
-          <mat-checkbox value="118">118</mat-checkbox>
+          <mat-checkbox value="113" (click)="toggle_checkbox_public_emergency_contacts(113)">113</mat-checkbox><br>
+          <mat-checkbox value="115" (click)="toggle_checkbox_public_emergency_contacts(115)">115</mat-checkbox><br>
+          <mat-checkbox value="118" (click)="toggle_checkbox_public_emergency_contacts(118)">118</mat-checkbox>
         </mat-card>
         <div>
           <button mat-button matStepperPrevious>Back</button>
@@ -239,24 +239,40 @@
     <mat-step>
       <ng-template matStepLabel>Connect device</ng-template>
       <mat-card appearance="fill">
-        <mat-card-title style="text-align: center; padding-bottom: 10px;">Pairing</mat-card-title>
+        <mat-card-title>Pairing</mat-card-title>
         <mat-card-subtitle>Press your smart jewerly and then press the button below to pair it with the app
         </mat-card-subtitle>
         <mat-card-content style="text-align: center;">
-          <button mat-fab color="primary" (click)="scan()">
+          <button style="margin: 10px;" mat-fab color="primary" (click)="scan()">
             <mat-icon>bluetooth</mat-icon>
           </button>
-          <mat-selection-list #BLEdevice [multiple]="false">
-            <mat-card ion-item *ngFor="let device of devices" [value]="device">
-              <p>{{device.name || 'Unnamed'}}</p>
-              <p>{{device.id}}</p>
-              <p> RSSI: {{device.rssi}}</p>
+          <ion-list *ngFor="let device of devices;let i=index" style="padding: 0px; background-color: transparent;">
+            <ion-item-sliding>
+              <ion-item >
+                <ion-label>
+                  <h2>{{device.name || 'Unnamed'}}</h2>
+                  <h3>{{device.id}}</h3>
+                  <p> RSSI: {{device.rssi}}</p>
+                </ion-label>
+              </ion-item>
+              <ion-item-options side="end" (ionSwipe)="delete(device,i)">
+                <ion-item-option color="danger" (click)="delete(device,i)" expandable>
+                  <ion-icon name="trash-outline">
+                  </ion-icon>
+                </ion-item-option>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ion-list>
+          <!-- <mat-selection-list #BLEdevice [multiple]="false">
+            <mat-card ion-item>
+
             </mat-card>
-          </mat-selection-list>
+          </mat-selection-list> -->
         </mat-card-content>
       </mat-card>
       <div>
         <button mat-button matStepperPrevious>Back</button>
+        <button mat-button (click)="register_user()">Done</button>
       </div>
     </mat-step>
   </mat-stepper>
