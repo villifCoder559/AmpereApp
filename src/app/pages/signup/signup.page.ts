@@ -12,20 +12,31 @@ import { Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogExampleComponent } from './dialog-example/dialog-example.component';
 import { MatTooltip } from '@angular/material/tooltip';
-import { BLE } from '@ionic-native/ble/ngx'
+import { BLE } from '@ionic-native/ble/ngx';
+import * as bcrypt from 'bcryptjs';
+import { AlertController } from '@ionic/angular';
+import { MatGridTileHeaderCssMatStyler } from '@angular/material/grid-list';
 /*TODO List:
+  0)Fix mat-icon offline, allow device localization, app working in background
   1)Enable scroll page OK
   2)Fix validator foreach textarea OK
   3)Import contact from contacts of device TEST OK
   3.1)Improve html of Contacts tab OK
   3.2)Password & confirm_psw, add hide/not-hide_psw button OK
-  4)Start page about connection device 
-  5)Save data untill 4 phase
+  4)Start page about connection device OK
+  5)Save data untill 4 phase OK
+  6)Restyle ion list
+  7)Start to make the page after sign-in
 */
 
-export interface DialogData {
+export interface Emergency_Contact {
   number: string;
   name: string;
+}
+export interface Device {
+  name: string,
+  id: string,
+  rssi: string
 }
 @Component({
   selector: 'app-signup',
@@ -54,14 +65,19 @@ export class SignupPage implements OnInit {
     city: '',
     height: '',
     weight: '',
-    etnicity: '',
+    ethnicity: '',
     description: '',
     purpose: '',
     pin: '',
     allergies: '',
-    medications: ''
+    medications: '',
+    password: '',
+    disabilities: [false, false],
+    emergency_contacts: [null, null, null, null, null],
+    public_emergency_contacts: { 113: false, 115: false, 118: false},
+    paired_devices: [null, null]
   }
-  constructor(public ble:BLE,public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts) {
+  constructor(private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts) {
     this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
       .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
   }
@@ -77,7 +93,9 @@ export class SignupPage implements OnInit {
     validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
   })
 
-
+  log(){
+    console.log(this.user_data.email)
+  }
   firstFormGroup = this._formBuilder.group({
     name: ['', Validators.required],
     surname: ['', Validators.required],
@@ -144,7 +162,6 @@ export class SignupPage implements OnInit {
     if (input.key >= 0 && input.key <= 9)
       return true
     return false
-
   }
   add_Contact() {
     if (this.countNumberContactsDone < 5) {
@@ -253,20 +270,93 @@ export class SignupPage implements OnInit {
     this.tooltip.show();
     interval(2000).subscribe(() => { this.tooltip.hide(); })
   }
-  devices:any[] = [];
-  scan(){
-    this.ble.scan([],10).subscribe(
+  devices: any[] = [{ name: 'device1', id: '12sd', rssi: 'AB14' }, { name: 'dfsffg', id: '45ds', rssi: 'RT74' }];
+  paired_devices: any[] = [null, null];
+
+  scan() {
+    this.ble.scan([], 10).subscribe(
       device => this.onDeviceDiscovered(device)
     );
   }
-  onDeviceDiscovered(device){
-    console.log('Discovered' + JSON.stringify(device,null,2));
-    this.ngZone.run(()=>{
+  onDeviceDiscovered(device) {
+    console.log('Discovered' + JSON.stringify(device, null, 2));
+    this.ngZone.run(() => {
       this.devices.push(device)
       console.log(device)
     })
   }
+
+  async pair_device(device) {
+    var free_index = this.pair_device == null ? 0 : 1;
+    if (this.paired_devices[free_index] != null) {
+      var msg = 'You have already pair 2 smart jewelries, delete once if you want to add a new';
+      for (var i = 0; i < this.pair_device.length; i++) {
+        if (device.id == this.pair_device[i])
+          msg = "This device has already been registred!"
+      }
+      const alert = await this.alertController.create({
+        cssClass: '',
+        header: 'Alert',
+        subHeader: 'Subtitle',
+        message: msg,
+        buttons: ['OK']
+      });
+
+      await alert.present();
+      const { role } = await alert.onDidDismiss();
+      console.log('onDidDismiss resolved with role', role);
+    }
+    else
+      this.paired_devices[free_index] = device
+  }
+  delete(device, index) {
+    console.log('delete pos ' + index + " -> " + device.id)
+    //this.paired_devices.splice(index,1);
+  }
+  register_user() {
+    this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password').value, 10);
+    this.user_data.email = this.zeroFormGroup.get('email').value;
+    this.user_data.name = this.firstFormGroup.get('name').value;
+    this.user_data.surname = this.firstFormGroup.get('surname').value;
+    this.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber').value;
+    this.user_data.birthdate = this.firstFormGroup.get('birthdate').value;
+    this.user_data.gender = this.firstFormGroup.get('gender').value;
+    this.user_data.birthdate = this.firstFormGroup.get('birthdate').value;
+    this.user_data.address = this.firstFormGroup.get('address').value;
+    this.user_data.locality = this.firstFormGroup.get('locality').value;
+    this.user_data.city = this.firstFormGroup.get('city').value;
+    this.user_data.height = this.firstFormGroup.get('height').value;
+    this.user_data.weight = this.firstFormGroup.get('weight').value;
+    this.user_data.ethnicity = this.firstFormGroup.get('ethnicity').value;
+    this.user_data.description = this.firstFormGroup.get('description').value;
+    this.user_data.purpose = this.firstFormGroup.get('purpose').value;
+    this.user_data.pin = this.firstFormGroup.get('pin').value;
+    // this.user_data.disabilities saved thanks toogle_checkbox(i)
+    this.user_data.allergies = this.secondFormGroup.get('allergies').value;
+    this.user_data.medications = this.secondFormGroup.get('medications').value;
+    for (var i = 0; i < this.user_data.emergency_contacts.length; i++) {
+      var index = i + '';
+      var mat_card_number = "contact" + (index) + "number";
+      var mat_card_name = "contact" + (index) + "name";
+      var contact: Emergency_Contact;
+      contact.name = this.thirdFormGroup.get(mat_card_name).value;
+      contact.number = this.thirdFormGroup.get(mat_card_number).value
+      if (contact.name !== '' && contact.number !== '') {
+        this.user_data.emergency_contacts[i] = contact;
+      }
+    }
+    this.user_data.paired_devices=this.paired_devices;
+  }
+  toggle_checkbox_disabilities(index) {
+    this.user_data.disabilities[index] = !this.user_data.disabilities[index];
+  }
+  toggle_checkbox_public_emergency_contacts(id){
+    this.user_data.public_emergency_contacts[id]=!this.user_data.public_emergency_contacts[id];
+  }
 }
+
+
+
 class ValidatePassword {
   static ConfirmValidator(name: string, checkName: string): ValidatorFn {
     return (controls: AbstractControl) => {
