@@ -243,19 +243,19 @@
         <mat-card-subtitle>Press your smart jewerly and then press the button below to pair it with the app
         </mat-card-subtitle>
         <mat-card-content style="text-align: center;">
-          <button style="margin: 10px;" mat-fab color="primary" (click)="scan()">
+          <button style="margin: 13px;" mat-fab color="primary" (click)="scan()">
             <mat-icon>bluetooth</mat-icon>
           </button>
-          <ion-list *ngFor="let device of devices;let i=index" style="padding: 0px; background-color: transparent;">
+          <ion-list *ngFor="let device of devices;let i=index" style="padding: 0px;">
             <ion-item-sliding>
-              <ion-item >
-                <ion-label>
+              <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;">
+                <ion-label style="background-color: white; margin: 0px;">
                   <h2>{{device.name || 'Unnamed'}}</h2>
                   <h3>{{device.id}}</h3>
                   <p> RSSI: {{device.rssi}}</p>
                 </ion-label>
               </ion-item>
-              <ion-item-options side="end" (ionSwipe)="delete(device,i)">
+              <ion-item-options side="end" (ionSwipe)="delete(device,i)" style="background-color: white;">
                 <ion-item-option color="danger" (click)="delete(device,i)" expandable>
                   <ion-icon name="trash-outline">
                   </ion-icon>

@@ -17,7 +17,6 @@ import * as bcrypt from 'bcryptjs';
 import { AlertController } from '@ionic/angular';
 import { MatGridTileHeaderCssMatStyler } from '@angular/material/grid-list';
 /*TODO List:
-  0)Fix mat-icon offline, allow device localization, app working in background
   1)Enable scroll page OK
   2)Fix validator foreach textarea OK
   3)Import contact from contacts of device TEST OK
@@ -27,7 +26,10 @@ import { MatGridTileHeaderCssMatStyler } from '@angular/material/grid-list';
   5)Save data untill 4 phase OK
   6)Restyle ion list
   7)Start to make the page after sign-in
-*/
+
+  
+  0)Fix mat-icon offline, allow device localization, app working in background
+  */
 
 export interface Emergency_Contact {
   number: string;
