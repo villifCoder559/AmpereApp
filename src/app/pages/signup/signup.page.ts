@@ -24,10 +24,9 @@ import { MatGridTileHeaderCssMatStyler } from '@angular/material/grid-list';
   3.2)Password & confirm_psw, add hide/not-hide_psw button OK
   4)Start page about connection device OK
   5)Save data untill 4 phase OK
-  6)Restyle ion list
-  7)Start to make the page after sign-in
+  6)Restyle ion list OK
+  7)Start to make the page after sign-in 
 
-  
   0)Fix mat-icon offline, allow device localization, app working in background
   */
 
@@ -76,7 +75,7 @@ export class SignupPage implements OnInit {
     password: '',
     disabilities: [false, false],
     emergency_contacts: [null, null, null, null, null],
-    public_emergency_contacts: { 113: false, 115: false, 118: false},
+    public_emergency_contacts: { 113: false, 115: false, 118: false },
     paired_devices: [null, null]
   }
   constructor(private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts) {
@@ -95,7 +94,7 @@ export class SignupPage implements OnInit {
     validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
   })
 
-  log(){
+  log() {
     console.log(this.user_data.email)
   }
   firstFormGroup = this._formBuilder.group({
@@ -316,44 +315,45 @@ export class SignupPage implements OnInit {
     //this.paired_devices.splice(index,1);
   }
   register_user() {
-    this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password').value, 10);
-    this.user_data.email = this.zeroFormGroup.get('email').value;
-    this.user_data.name = this.firstFormGroup.get('name').value;
-    this.user_data.surname = this.firstFormGroup.get('surname').value;
-    this.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber').value;
-    this.user_data.birthdate = this.firstFormGroup.get('birthdate').value;
-    this.user_data.gender = this.firstFormGroup.get('gender').value;
-    this.user_data.birthdate = this.firstFormGroup.get('birthdate').value;
-    this.user_data.address = this.firstFormGroup.get('address').value;
-    this.user_data.locality = this.firstFormGroup.get('locality').value;
-    this.user_data.city = this.firstFormGroup.get('city').value;
-    this.user_data.height = this.firstFormGroup.get('height').value;
-    this.user_data.weight = this.firstFormGroup.get('weight').value;
-    this.user_data.ethnicity = this.firstFormGroup.get('ethnicity').value;
-    this.user_data.description = this.firstFormGroup.get('description').value;
-    this.user_data.purpose = this.firstFormGroup.get('purpose').value;
-    this.user_data.pin = this.firstFormGroup.get('pin').value;
+    // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
+    this.user_data.email = this.zeroFormGroup.get('email')?.value;
+    console.log(this.firstFormGroup.get('name')?.value)
+    this.user_data.name = this.firstFormGroup.get('name')?.value;
+    this.user_data.surname = this.firstFormGroup.get('surname')?.value;
+    this.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
+    this.user_data.birthdate = this.firstFormGroup.get('birthdate')?.value;
+    this.user_data.gender = this.firstFormGroup.get('gender')?.value;
+    this.user_data.birthdate = this.firstFormGroup.get('birthdate')?.value;
+    this.user_data.address = this.firstFormGroup.get('address')?.value;
+    this.user_data.locality = this.firstFormGroup.get('locality')?.value;
+    this.user_data.city = this.firstFormGroup.get('city')?.value;
+    this.user_data.height = this.firstFormGroup.get('height')?.value;
+    this.user_data.weight = this.firstFormGroup.get('weight')?.value;
+    this.user_data.ethnicity = this.firstFormGroup.get('ethnicity')?.value;
+    this.user_data.description = this.firstFormGroup.get('description')?.value;
+    this.user_data.purpose = this.firstFormGroup.get('purpose')?.value;
+    this.user_data.pin = this.firstFormGroup.get('pin')?.value;
     // this.user_data.disabilities saved thanks toogle_checkbox(i)
-    this.user_data.allergies = this.secondFormGroup.get('allergies').value;
-    this.user_data.medications = this.secondFormGroup.get('medications').value;
+    this.user_data.allergies = this.secondFormGroup.get('allergies')?.value;
+    this.user_data.medications = this.secondFormGroup.get('medications')?.value;
     for (var i = 0; i < this.user_data.emergency_contacts.length; i++) {
       var index = i + '';
-      var mat_card_number = "contact" + (index) + "number";
       var mat_card_name = "contact" + (index) + "name";
-      var contact: Emergency_Contact;
-      contact.name = this.thirdFormGroup.get(mat_card_name).value;
-      contact.number = this.thirdFormGroup.get(mat_card_number).value
+      var mat_card_number = "contact" + (index) + "number";
+      var contact: Emergency_Contact = { name: '', number: '' };
+      contact.name = this.thirdFormGroup.get(mat_card_name)?.value;
+      contact.number = this.thirdFormGroup.get(mat_card_number)?.value
       if (contact.name !== '' && contact.number !== '') {
         this.user_data.emergency_contacts[i] = contact;
       }
     }
-    this.user_data.paired_devices=this.paired_devices;
+    this.user_data.paired_devices = this.paired_devices;
   }
   toggle_checkbox_disabilities(index) {
     this.user_data.disabilities[index] = !this.user_data.disabilities[index];
   }
-  toggle_checkbox_public_emergency_contacts(id){
-    this.user_data.public_emergency_contacts[id]=!this.user_data.public_emergency_contacts[id];
+  toggle_checkbox_public_emergency_contacts(id) {
+    this.user_data.public_emergency_contacts[id] = !this.user_data.public_emergency_contacts[id];
   }
 }
 
