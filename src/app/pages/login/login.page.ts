@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
-
+import { SharedDataService } from '../../data/shared-data.service'
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -17,7 +17,8 @@ export class LoginPage implements OnInit {
     private authService: AuthenticationService,
     private alertController: AlertController,
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private sharedData:SharedDataService
   ) { }
 
   ngOnInit() {
@@ -35,7 +36,8 @@ export class LoginPage implements OnInit {
     this.authService.login(this.credentials.value).subscribe(
       async (res) => {
         await loading.dismiss();
-        this.router.navigateByUrl('/tabs', { replaceUrl: true });
+        this.sharedData.setIs_logged(true);
+        this.router.navigateByUrl('/menu/homepage', { replaceUrl: true });
       },
       async (res) => {
         await loading.dismiss();
