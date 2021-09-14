@@ -1,6 +1,21 @@
+<ion-header>
+  <mat-toolbar class="toolbar">
+    <button mat-icon-button (click)="go_back()" *ngIf="!logged">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <ion-buttons slot="start" *ngIf="logged">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <span *ngIf="!logged">Registration Form</span>
+    <span *ngIf="logged">Profile</span>
+    <ion-buttons class="slot-end" *ngIf="logged" (click)="register_user()">
+      <ion-button>Save</ion-button>
+    </ion-buttons>
+  </mat-toolbar>
+</ion-header>
 <ion-content>
   <mat-stepper [linear]="false" [orientation]="(stepperOrientation | async)!">
-    <mat-step [stepControl]="zeroFormGroup" label="Set login credentials">
+    <mat-step [stepControl]="zeroFormGroup" label="Set login credentials" *ngIf="!logged">
       <form id="login_credential" [formGroup]="zeroFormGroup">
         <mat-form-field appearance="fill">
           <mat-label>Email</mat-label>
@@ -110,8 +125,10 @@
       <form id="medical_information" [formGroup]="secondFormGroup">
         <mat-card appearance="fill" id="matcardResize">
           <mat-card-title>Disabilities</mat-card-title>
-          <mat-checkbox (click)="toggle_checkbox_disabilities(0)"  [checked]="user_data.disabilities[0]">Vision impaired</mat-checkbox><br>
-          <mat-checkbox (click)="toggle_checkbox_disabilities(1)" [checked]="user_data.disabilities[1]">Wheelchair user</mat-checkbox>
+          <mat-checkbox (click)="toggle_checkbox_disabilities(0)" [checked]="user_data.disabilities[0]">Vision impaired
+          </mat-checkbox><br>
+          <mat-checkbox (click)="toggle_checkbox_disabilities(1)" [checked]="user_data.disabilities[1]">Wheelchair user
+          </mat-checkbox>
         </mat-card>
         <mat-form-field appearance="fill" hintLabel="Max 200 characters">
           <mat-label>Allergies</mat-label>
@@ -252,6 +269,7 @@
                 <ion-label style="background-color: white; margin: 0px;">
                   <h2>{{device.name || 'Unnamed'}}</h2>
                   <h3>{{device.id}}</h3>
+                  <h3>{{device.battery}}%</h3>
                   <p> RSSI: {{device.rssi}}</p>
                 </ion-label>
               </ion-item>
@@ -263,11 +281,6 @@
               </ion-item-options>
             </ion-item-sliding>
           </ion-list>
-          <!-- <mat-selection-list #BLEdevice [multiple]="false">
-            <mat-card ion-item>
-
-            </mat-card>
-          </mat-selection-list> -->
         </mat-card-content>
       </mat-card>
       <div>

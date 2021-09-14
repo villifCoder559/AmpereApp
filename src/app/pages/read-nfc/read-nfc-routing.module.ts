@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { RegistrationDevicesPage } from './registration-devices.page';
+import { ReadNFCPage } from './read-nfc.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: RegistrationDevicesPage
+    component: ReadNFCPage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class RegistrationDevicesPageRoutingModule {}
+export class ReadNFCPageRoutingModule {}

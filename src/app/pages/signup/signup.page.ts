@@ -16,6 +16,8 @@ import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
 import { AlertController } from '@ionic/angular';
 import { MatGridTileHeaderCssMatStyler } from '@angular/material/grid-list';
+import { Router } from '@angular/router';
+import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
 /*TODO List:
   1)Enable scroll page OK
   2)Fix validator foreach textarea OK
@@ -27,25 +29,15 @@ import { MatGridTileHeaderCssMatStyler } from '@angular/material/grid-list';
   6)Restyle ion list OK
   7)Start to make the page after sign-in 
 
-  0)Fix mat-icon offline, allow device localization, app working in background
+  0)Fix mat-icon offline, allow device localization, app working in background, password min length 8
   */
-
-export interface Emergency_Contact {
-  number: string;
-  name: string;
-}
-export interface Device {
-  name: string,
-  id: string,
-  rssi: string
-}
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
   styleUrls: ['./signup.page.scss'],
 })
 export class SignupPage implements OnInit {
-
+  logged = false;
   posNumberContacts = [false, false, false, false, false];
   countNumberContactsDone = 0;
   name;
@@ -54,34 +46,33 @@ export class SignupPage implements OnInit {
     name: '',
     number: ''
   }
-  user_data = {
-    name: '',
-    surname: '',
-    email: '',
-    phoneNumber: '',
-    birthdate: '',
-    gender: '',
-    address: '',
-    locality: '',
-    city: '',
-    height: '',
-    weight: '',
-    ethnicity: '',
-    description: '',
-    purpose: '',
-    pin: '',
-    allergies: '',
-    medications: '',
-    password: '',
-    disabilities: [false, false],
-    emergency_contacts: [null, null, null, null, null],
-    public_emergency_contacts: { 113: false, 115: false, 118: false },
-    paired_devices: [null, null]
-  }
-  constructor(private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts) {
-    this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
-      .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
-  }
+  user_data;
+
+  // user_data = {
+  //   name: '',
+  //   surname: '',
+  //   email: '',
+  //   phoneNumber: '',
+  //   birthdate: '',
+  //   gender: '',
+  //   address: '',
+  //   locality: '',
+  //   city: '',
+  //   height: '',
+  //   weight: '',
+  //   ethnicity: '',
+  //   description: '',
+  //   purpose: '',
+  //   pin: '',
+  //   allergies: '',
+  //   medications: '',
+  //   password: '',
+  //   disabilities: [false, false],
+  //   emergency_contacts: [null, null, null, null, null],
+  //   public_emergency_contacts: { 113: false, 115: false, 118: false },
+  //   paired_devices: [null, null]
+  // }
+
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   required = Validators.required;
   @ViewChild('tooltip') tooltip: MatTooltip;
@@ -150,7 +141,15 @@ export class SignupPage implements OnInit {
       number: '129852185'
     }
   ];
+  constructor(private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService) {
+    this.user_data = this.shared_data.getUserData();
+    this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
+      .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
+    this.logged = this.shared_data.getIs_logged();
+
+  }
   ngOnInit() {
+
   }
 
   triggerResize() {
@@ -271,8 +270,8 @@ export class SignupPage implements OnInit {
     this.tooltip.show();
     interval(2000).subscribe(() => { this.tooltip.hide(); })
   }
-  devices: any[] = [{ name: 'device1', id: '12sd', rssi: 'AB14' }, { name: 'dfsffg', id: '45ds', rssi: 'RT74' }];
-  paired_devices: any[] = [null, null];
+  devices: Device[] = [{ name: 'device1', id: '12sd', rssi: 'AB14', battery: 100, connected: true }, { name: 'dfsffg', id: '45ds', rssi: 'RT74', battery: 100, connected: true }];
+  paired_devices: [Device, Device];
 
   scan() {
     this.ble.scan([], 10).subscribe(
@@ -317,7 +316,6 @@ export class SignupPage implements OnInit {
   register_user() {
     // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
     this.user_data.email = this.zeroFormGroup.get('email')?.value;
-    console.log(this.firstFormGroup.get('name')?.value)
     this.user_data.name = this.firstFormGroup.get('name')?.value;
     this.user_data.surname = this.firstFormGroup.get('surname')?.value;
     this.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
@@ -348,12 +346,16 @@ export class SignupPage implements OnInit {
       }
     }
     this.user_data.paired_devices = this.paired_devices;
+    this.shared_data.setUserData(this.user_data)
   }
   toggle_checkbox_disabilities(index) {
     this.user_data.disabilities[index] = !this.user_data.disabilities[index];
   }
   toggle_checkbox_public_emergency_contacts(id) {
     this.user_data.public_emergency_contacts[id] = !this.user_data.public_emergency_contacts[id];
+  }
+  go_back() {
+    this.router.navigateByUrl('/', { replaceUrl: true });
   }
 }
 

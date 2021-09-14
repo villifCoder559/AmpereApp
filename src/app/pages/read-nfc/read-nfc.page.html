@@ -1,0 +1,24 @@
+<ion-header>
+  <mat-toolbar class="toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <span>NFC Reader</span>
+  </mat-toolbar>
+  <div *ngIf="!gps_enable" class="alert-msg">
+    NFC is not avaible!
+  </div>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-input type="text" placeholder='My NFC data' [(ngModel)]="NFC_data"></ion-input>
+  </ion-item>
+  <ion-button (click)="read_NFC()">Read NFC</ion-button>
+  <ion-button (click)="writeNFC()">Write NFC</ion-button>
+  <ion-card *ngIf="readMessage">
+    <ion-card-content>
+      Result from scan: {{readMessage}}
+    </ion-card-content>
+  </ion-card>
+</ion-content>

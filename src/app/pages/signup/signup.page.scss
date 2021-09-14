@@ -31,6 +31,12 @@ mat-card-title{
   text-align: center; 
   padding-bottom: 10px;
 }
-h2,h3,p{
-  margin: 0px;
+ion-button{
+  font: 400 17px/12px Roboto, "Helvetica Neue", sans-serif;
+
+}
+.toolbar{
+    background-color: #3F51B5;
+    color: white;
+    justify-content: space-between;
 }
