@@ -26,7 +26,18 @@
 @import "~@ionic/angular/css/flex-utils.css";
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
+.alert-msg{
+    text-align: center;
+    padding: 8px 0px;
+    background-color: red;
+    font-weight: bolder;
+    margin-bottom: 15px;
+}
+
 ion-item{
     --ion-background-color:#fff;
+}
+h2,h3,p{
+    margin: 0px !important
 }
 
