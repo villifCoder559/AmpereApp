@@ -1,0 +1,15 @@
+<ion-header>
+  <mat-toolbar class="toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <span>Homepage</span>
+  </mat-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="!gps_enable" class="alert-msg">
+    Localization is not enable!
+  </div>
+  
+</ion-content>
