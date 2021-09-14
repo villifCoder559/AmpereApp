@@ -17,9 +17,11 @@ export class AutoLoginGuard implements CanLoad {
       map(isAuthenticated => {
         console.log('Found previous token, automatic login');
         if (isAuthenticated) {
-          // Directly open inside area       
-          this.router.navigateByUrl('/tabs', { replaceUrl: true });
+          // Directly open inside area
+          window.localStorage.setItem('logged','true');       
+          this.router.navigateByUrl('menu/homepage', { replaceUrl: true });
         } else {          
+          window.localStorage.setItem('logged','false');
           // Simply allow access to the login
           return true;
         }
