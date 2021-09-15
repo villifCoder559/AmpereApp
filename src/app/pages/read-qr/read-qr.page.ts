@@ -47,7 +47,8 @@ export class ReadQRPage implements OnInit {
     this.base64ToGallery.base64ToGallery(data, { prefix: '_img', mediaScanner: true })
       .then(async res => {
         let toast = await this.toastCtrl.create({
-          header: 'QR Code saved in your PhotoLibrary'
+          header: 'QR Code saved in your PhotoLibrary',
+          duration:2000
         })
         toast.present();
       },
