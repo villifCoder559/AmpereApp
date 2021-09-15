@@ -18,19 +18,7 @@ import { AlertController } from '@ionic/angular';
 import { MatGridTileHeaderCssMatStyler } from '@angular/material/grid-list';
 import { Router } from '@angular/router';
 import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
-/*TODO List:
-  1)Enable scroll page OK
-  2)Fix validator foreach textarea OK
-  3)Import contact from contacts of device TEST OK
-  3.1)Improve html of Contacts tab OK
-  3.2)Password & confirm_psw, add hide/not-hide_psw button OK
-  4)Start page about connection device OK
-  5)Save data untill 4 phase OK
-  6)Restyle ion list OK
-  7)Start to make the page after sign-in 
 
-  0)Fix mat-icon offline, allow device localization, app working in background, password min length 8
-  */
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -46,7 +34,7 @@ export class SignupPage implements OnInit {
     name: '',
     number: ''
   }
-  user_data;
+  user_data: UserData;
 
   // user_data = {
   //   name: '',
@@ -79,21 +67,15 @@ export class SignupPage implements OnInit {
 
   zeroFormGroup = this._formBuilder.group({
     email: ['', Validators.email],
-    psw: ['', [Validators.required]],
+    psw: ['', [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[|!"£/()?@#$%^&+=]).*$')]],
     confirm_psw: ['', [Validators.required]]
   }, {
     validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
   })
-
-  log() {
-    console.log(this.user_data.email)
-  }
   firstFormGroup = this._formBuilder.group({
     name: ['', Validators.required],
     surname: ['', Validators.required],
     phoneNumber: ['', Validators.required],
-    password: ['', Validators.required],
-    confirm_psw: ['', Validators.required],
     birthdate: ['', Validators.required],
     gender: ['', Validators.required],
     address: ['', Validators.required],
@@ -146,10 +128,50 @@ export class SignupPage implements OnInit {
     this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
       .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
     this.logged = this.shared_data.getIs_logged();
-
+    console.log(this.logged)
   }
-  ngOnInit() {
+  logErrors() {
+    console.log("required->", this.zeroFormGroup.get('psw').hasError('required'))
+    console.log("minlength->", this.zeroFormGroup.get('psw').hasError('minlength'))
+    console.log("pattern->", this.zeroFormGroup.get('psw').hasError('pattern'))
+    console.log("required->", this.zeroFormGroup.get('psw').errors)
+  }
 
+  ngOnInit() {
+    if (this.logged) {
+      // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
+      const user_data: UserData = this.shared_data.getUserData();
+      this.firstFormGroup.setValue({
+        name: user_data.name,
+        surname: user_data.surname,
+        phoneNumber: user_data.phoneNumber,
+        birthdate: user_data.birthdate,
+        gender: user_data.gender,
+        address: user_data.address,
+        locality: user_data.locality,
+        city: user_data.city,
+        height: user_data.height,
+        weight: user_data.weight,
+        ethnicity: user_data.ethnicity,
+        description: user_data.description,
+        purpose: user_data.purpose,
+        pin: user_data.pin
+      });
+      // this.user_data.disabilities saved thanks toogle_checkbox(i)
+      this.user_data.disabilities = user_data.disabilities;
+      this.secondFormGroup.setValue({
+        allergies: user_data.allergies,
+        medications: user_data.medications
+      })
+      for (var i = 0; i < user_data.emergency_contacts.length; i++) {
+        if (user_data.emergency_contacts[i].name != '')
+          this.thirdFormGroup.setValue({
+            name: user_data.emergency_contacts[i].name,
+            number: user_data.emergency_contacts[i].number
+          })
+      }
+      this.user_data.paired_devices = user_data.paired_devices;
+    }
   }
 
   triggerResize() {
@@ -366,7 +388,7 @@ class ValidatePassword {
     return (controls: AbstractControl) => {
       const control = controls.get(name);
       const checkControl = controls.get(checkName);
-      if (checkControl.errors && !checkControl.errors.matching) {
+      if (checkControl.errors && !checkControl.errors.matching) { //avoid errors when confirm password is not yet insert
         return null;
       }
       if (control.value !== checkControl.value) {
