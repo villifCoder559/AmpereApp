@@ -11,6 +11,7 @@
     <ion-buttons class="slot-end" *ngIf="logged" (click)="register_user()">
       <ion-button>Save</ion-button>
     </ion-buttons>
+    <div *ngIf="!logged" style="flex: auto;">  </div>
   </mat-toolbar>
 </ion-header>
 <ion-content>
@@ -23,10 +24,13 @@
         </mat-form-field>
         <mat-form-field appearance="fill" id="matcardResize">
           <mat-label>Password</mat-label>
-          <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required>
+          <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required (keyup)="logErrors()">
           <button mat-icon-button matSuffix (click)="hidepsw = !hidepsw">
             <mat-icon>{{hidepsw ? 'visibility' : 'visibility_off'}}</mat-icon>
           </button>
+          <mat-error *ngIf="zeroFormGroup.get('psw').hasError('required')">Field Required</mat-error>
+          <mat-error *ngIf="zeroFormGroup.get('psw').hasError('minlength')">Password length more than 7</mat-error>
+          <mat-error *ngIf="zeroFormGroup.get('psw').hasError('pattern')">At leat one special char</mat-error>
         </mat-form-field>
         <mat-form-field appearance="fill" id="matcardResize">
           <mat-label>Confirm Password</mat-label>
