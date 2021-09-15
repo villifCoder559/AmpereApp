@@ -10,6 +10,19 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
   templateUrl: './homepage.page.html',
   styleUrls: ['./homepage.page.scss'],
 })
+/*TODO List:
+  1)Enable scroll page OK
+  2)Fix validator foreach textarea OK
+  3)Import contact from contacts of device TEST OK
+  3.1)Improve html of Contacts tab OK
+  3.2)Password & confirm_psw, add hide/not-hide_psw button OK
+  4)Start page about connection device OK
+  5)Save data untill 4 phase OK
+  6)Restyle ion list OK
+  7)Start to make the page after sign-in OK
+  8)password min length 8 and special char OK, load user_data when profile is loaded , button read/create Qr code and nfc 
+  0)Fix mat-icon offline, 
+  */
 export class HomepagePage implements OnInit {
   gps_enable = false;
   constructor(private router: Router, private locationAccuracy: LocationAccuracy,private backgroundMode: BackgroundMode ,private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
