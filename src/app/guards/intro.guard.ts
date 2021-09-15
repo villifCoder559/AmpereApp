@@ -16,7 +16,7 @@ export class IntroGuard implements CanLoad {
     if (hasSeenIntro === 'true')
       return true
     else {
-      this.router.navigateByUrl('/intro', { replaceUrl: true });
+      //this.router.navigateByUrl('/login', { replaceUrl: true });
       return true;
     }
   }
