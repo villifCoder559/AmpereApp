@@ -15,7 +15,6 @@ export class TestDevicePage implements OnInit {
   }
   delete(device, index) {
     console.log('delete pos ' + index + " -> " + device.id)
-    //this.paired_devices.splice(index,1);
   }
   simulate() {
     this.router.navigateByUrl('/show-alert', { replaceUrl: false })
