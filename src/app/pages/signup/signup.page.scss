@@ -24,9 +24,7 @@ mat-stepper{
 #emergency_contacts mat-card{
   margin-top: 5px;
 }
-#matcardResize{
-  width: 201px;
-}
+
 mat-card-title{
   text-align: center; 
   padding-bottom: 10px;
@@ -35,8 +33,17 @@ ion-button{
   font: 400 17px/12px Roboto, "Helvetica Neue", sans-serif;
 
 }
+
 .toolbar{
     background-color: #3F51B5;
     color: white;
     justify-content: space-between;
+}
+mat-form-field{
+  width: 100%;
+  max-width: 250px;
+}
+.container-button{
+  display: flex;
+  justify-content: space-around;
 }
