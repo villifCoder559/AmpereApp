@@ -29,15 +29,13 @@ export class LoginPage implements OnInit {
   }
 
   async login() {
-    console.log('2')
-    const loading = await this.loadingController.create();
+      const loading = await this.loadingController.create();
     await loading.present();
 
     this.authService.login(this.credentials.value).subscribe(
       async (res) => {
         await loading.dismiss();
-        this.sharedData.setIs_logged(true);
-        this.router.navigateByUrl('/menu/homepage', { replaceUrl: true });
+        this.sharedData.goHomepage()
       },
       async (res) => {
         await loading.dismiss();
