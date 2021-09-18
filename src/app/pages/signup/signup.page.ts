@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { StepperOrientation } from '@angular/material/stepper';
@@ -15,7 +15,6 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
 import { AlertController } from '@ionic/angular';
-import { MatGridTileHeaderCssMatStyler } from '@angular/material/grid-list';
 import { Router } from '@angular/router';
 import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
 
@@ -30,37 +29,13 @@ export class SignupPage implements OnInit {
   countNumberContactsDone = 0;
   name;
   number;
+  editable = false;
   data = {
     name: '',
     number: ''
   }
   user_data: UserData;
-
-  // user_data = {
-  //   name: '',
-  //   surname: '',
-  //   email: '',
-  //   phoneNumber: '',
-  //   birthdate: '',
-  //   gender: '',
-  //   address: '',
-  //   locality: '',
-  //   city: '',
-  //   height: '',
-  //   weight: '',
-  //   ethnicity: '',
-  //   description: '',
-  //   purpose: '',
-  //   pin: '',
-  //   allergies: '',
-  //   medications: '',
-  //   password: '',
-  //   disabilities: [false, false],
-  //   emergency_contacts: [null, null, null, null, null],
-  //   public_emergency_contacts: { 113: false, 115: false, 118: false },
-  //   paired_devices: [null, null]
-  // }
-
+  public_emergency_contacts
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   required = Validators.required;
   @ViewChild('tooltip') tooltip: MatTooltip;
@@ -68,7 +43,8 @@ export class SignupPage implements OnInit {
   zeroFormGroup = this._formBuilder.group({
     email: ['', Validators.email],
     psw: ['', [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[|!"£/()?@#$%^&+=]).*$')]],
-    confirm_psw: ['', [Validators.required]]
+    confirm_psw: ['', [Validators.required]],
+    old_psw: ['']
   }, {
     validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
   })
@@ -93,8 +69,8 @@ export class SignupPage implements OnInit {
     medications: ['', Validators.maxLength(200)]
   });
   thirdFormGroup = this._formBuilder.group({
-    contact0name: ['', Validators.required],
-    contact0number: ['', Validators.required],
+    contact0name: [''],
+    contact0number: [''],
     contact1name: [''],
     contact1number: [''],
     contact2name: [''],
@@ -123,12 +99,14 @@ export class SignupPage implements OnInit {
       number: '129852185'
     }
   ];
-  constructor(private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService) {
+  constructor(private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     this.user_data = this.shared_data.getUserData();
+    console.log(this.user_data)
     this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
       .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
     this.logged = this.shared_data.getIs_logged();
     console.log(this.logged)
+    this.user_data = new UserData()
   }
   logErrors() {
     console.log("required->", this.zeroFormGroup.get('psw').hasError('required'))
@@ -136,11 +114,18 @@ export class SignupPage implements OnInit {
     console.log("pattern->", this.zeroFormGroup.get('psw').hasError('pattern'))
     console.log("required->", this.zeroFormGroup.get('psw').errors)
   }
-
+  change_EmailPassword() {
+    this.editable = !this.editable
+  }
+  log_data() {
+    console.log(this.firstFormGroup.get('birthdate'))
+  }
   ngOnInit() {
     if (this.logged) {
       // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
       const user_data: UserData = this.shared_data.getUserData();
+      this.zeroFormGroup.get('email').setValue(user_data.email)
+      console.log(user_data.email)
       this.firstFormGroup.setValue({
         name: user_data.name,
         surname: user_data.surname,
@@ -158,19 +143,26 @@ export class SignupPage implements OnInit {
         pin: user_data.pin
       });
       // this.user_data.disabilities saved thanks toogle_checkbox(i)
+      console.log(user_data.disabilities)
       this.user_data.disabilities = user_data.disabilities;
       this.secondFormGroup.setValue({
         allergies: user_data.allergies,
         medications: user_data.medications
       })
-      for (var i = 0; i < user_data.emergency_contacts.length; i++) {
-        if (user_data.emergency_contacts[i].name != '')
-          this.thirdFormGroup.setValue({
-            name: user_data.emergency_contacts[i].name,
-            number: user_data.emergency_contacts[i].number
-          })
+      console.log(user_data.emergency_contacts)
+      for (var i = 0; i < 5; i++) {
+        var mat_card_number = "contact" + (i) + "number";
+        var mat_card_name = "contact" + (i) + "name";
+        console.log(user_data.emergency_contacts[i])
+        if (user_data.emergency_contacts[i] != undefined) {
+          this.thirdFormGroup.get(mat_card_name).setValue(user_data.emergency_contacts[i].name);
+          this.thirdFormGroup.get(mat_card_number).setValue(user_data.emergency_contacts[i].number);
+        }
       }
-      this.user_data.paired_devices = user_data.paired_devices;
+      console.log(user_data.paired_devices)
+      this.user_data.public_emergency_contacts = user_data.public_emergency_contacts;
+      this.paired_devices = user_data.paired_devices;
+      this.changeDetection.detectChanges();
     }
   }
 
@@ -185,59 +177,79 @@ export class SignupPage implements OnInit {
       return true
     return false
   }
+  getFormValidationErrors() {
+    Object.keys(this.thirdFormGroup.controls).forEach(key => {
+      const controlErrors: ValidationErrors = this.thirdFormGroup.get(key).errors;
+      if (controlErrors != null) {
+        Object.keys(controlErrors).forEach(keyError => {
+          console.log('Key control: ' + key + ', keyError: ' + keyError + ', err value: ', controlErrors[keyError]);
+        });
+      }
+    });
+  }
   add_Contact() {
-    if (this.countNumberContactsDone < 5) {
-      if (this.countNumberContactsDone > 0) {
-        var mat_card_number = "contact" + (this.countNumberContactsDone) + "number";
-        var mat_card_name = "contact" + (this.countNumberContactsDone) + "name";
-      }
-      var go = true
-      for (var i = 0; i < this.posNumberContacts.length; i++) {
-        if (this.posNumberContacts[i]) {
-          var mat_card_number = "contact" + (i) + "number";
-          var mat_card_name = "contact" + (i) + "name";
-          if (this.thirdFormGroup.get(mat_card_name).hasError('required') || this.thirdFormGroup.get(mat_card_number).hasError('required'))
-            go = false;
-        }
-      }
-      if (go) {
-        this.countNumberContactsDone++;
-        var i = 0;
-        var stop = false
-        while (!stop && i < 5) {
-          if (!this.posNumberContacts[i]) {
-            this.posNumberContacts[i] = true;
-            var mat_card_number = "contact" + (i) + "number";
-            var mat_card_name = "contact" + (i) + "name";
-            this.thirdFormGroup.get(mat_card_name).setValidators(Validators.required);
-            this.thirdFormGroup.get(mat_card_number).setValidators(Validators.required);
-            console.log(mat_card_name + " aggiunto required")
-            console.log(mat_card_number + " aggiunto required")
-            this.thirdFormGroup.updateValueAndValidity();
-            console.log('add_card')
-            stop = true;
-          }
-          i++;
-        }
-      }
+    this.getFormValidationErrors()
+    console.log(this.thirdFormGroup.hasError('required'))
+    console.log(this.thirdFormGroup.getError('required'))
+    if (this.countNumberContactsDone < 5 && !this.thirdFormGroup.hasError('required')) {
+      this.countNumberContactsDone++;
+      console.log(this.emergency_contacts)
+      const app = new Emergency_Contact()
+      this.emergency_contacts.push(app)
     }
+    // if (this.countNumberContactsDone < 5) {
+    //   if (this.countNumberContactsDone > 0) {
+    //     var mat_card_number = "contact" + (this.countNumberContactsDone) + "number";
+    //     var mat_card_name = "contact" + (this.countNumberContactsDone) + "name";
+    //   }
+    //   var go = true
+    //   for (var i = 0; i < this.posNumberContacts.length; i++) {
+    //     if (this.posNumberContacts[i]) {
+    //       var mat_card_number = "contact" + (i) + "number";
+    //       var mat_card_name = "contact" + (i) + "name";
+    //       if (this.thirdFormGroup.get(mat_card_name).hasError('required') || this.thirdFormGroup.get(mat_card_number).hasError('required'))
+    //         go = false;
+    //     }
+    //   }
+    //   if (go) {
+    //     this.countNumberContactsDone++;
+    //     var i = 0;
+    //     var stop = false
+    //     while (!stop && i < 5) {
+    //       if (!this.posNumberContacts[i]) {
+    //         this.posNumberContacts[i] = true;
+    //         var mat_card_number = "contact" + (i) + "number";
+    //         var mat_card_name = "contact" + (i) + "name";
+    //         this.thirdFormGroup.get(mat_card_name).setValidators(Validators.required);
+    //         this.thirdFormGroup.get(mat_card_number).setValidators(Validators.required);
+    //         console.log(mat_card_name + " aggiunto required")
+    //         console.log(mat_card_number + " aggiunto required")
+    //         this.thirdFormGroup.updateValueAndValidity();
+    //         console.log('add_card')
+    //         stop = true;
+    //       }
+    //       i++;
+    //     }
+    //   }
+    // }
   }
   remove_contact(id) {
-    this.posNumberContacts[id] = false;
+    this.emergency_contacts.splice(id, 1)
+    this.countNumberContactsDone--;
     var mat_card_number = "contact" + (id) + "number";
     var mat_card_name = "contact" + (id) + "name";
     this.thirdFormGroup.get(mat_card_name).setValue("");
     this.thirdFormGroup.get(mat_card_number).setValue(undefined);
-    this.thirdFormGroup.get(mat_card_name).clearAsyncValidators();
-    this.thirdFormGroup.get(mat_card_number).clearAsyncValidators();
-    this.thirdFormGroup.get(mat_card_name).setErrors(null);
-    this.thirdFormGroup.get(mat_card_number).setErrors(null);
-    this.thirdFormGroup.updateValueAndValidity();
-    console.log(mat_card_name + " tolto required " + id)
-    console.log(mat_card_number + " tolto required " + id)
-    this.countNumberContactsDone--;
-    if (this.countNumberContactsDone == 0)
-      this.thirdFormGroup.setErrors(Validators.required)
+    // this.thirdFormGroup.get(mat_card_name).clearAsyncValidators();
+    // this.thirdFormGroup.get(mat_card_number).clearAsyncValidators();
+    // this.thirdFormGroup.get(mat_card_name).setErrors(null);
+    // this.thirdFormGroup.get(mat_card_number).setErrors(null);
+    // this.thirdFormGroup.updateValueAndValidity();
+    // console.log(mat_card_name + " tolto required " + id)
+    // console.log(mat_card_number + " tolto required " + id)
+    // this.countNumberContactsDone--;
+    // if (this.countNumberContactsDone == 0)
+    //   this.thirdFormGroup.setErrors(Validators.required)
     // if (this.countNumberContactsDone == 1) {
     //   for (var i = 0; i < 5; i++) {
     //     if (this.posNumberContacts[i]) {
@@ -273,28 +285,26 @@ export class SignupPage implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
       var app = 'contact' + id + 'name';
-      this.thirdFormGroup.get(app).setValue(result.name)
-      var app = 'contact' + id + 'number';
-      this.thirdFormGroup.get(app).setValue(result.number)
+      if (result?.name != undefined && result?.number != undefined) {
+        this.thirdFormGroup.get(app).setValue(result.name)
+        var app = 'contact' + id + 'number';
+        this.thirdFormGroup.get(app).setValue(result.number)
+      }
     });
   }
   click_next() {
-    for (var i = 0; i < 5; i++) {
-      var name = 'contact' + i + 'name';
-      var number = 'contact' + i + 'number';
-      if (this.thirdFormGroup.get(name).hasError('required') || this.thirdFormGroup.get(number).hasError('required')) {
-        console.log(this.thirdFormGroup.get(name).hasError('required'))
-        console.log(i)
-      }
+    for (var i = 0; i < this.countNumberContactsDone; i++) {
+      if (this.emergency_contacts[i].name === '')
+        this.emergency_contacts.splice(1, i)
     }
   }
   show_tooltip() {
     this.tooltip.show();
     interval(2000).subscribe(() => { this.tooltip.hide(); })
   }
-  devices: Device[] = [{ name: 'device1', id: '12sd', rssi: 'AB14', battery: 100, connected: true }, { name: 'dfsffg', id: '45ds', rssi: 'RT74', battery: 100, connected: true }];
-  paired_devices: [Device, Device];
-
+  devices: Device[];
+  paired_devices: Device[];
+  emergency_contacts: Emergency_Contact[] = []
   scan() {
     this.ble.scan([], 10).subscribe(
       device => this.onDeviceDiscovered(device)
@@ -378,6 +388,9 @@ export class SignupPage implements OnInit {
   }
   go_back() {
     this.router.navigateByUrl('/', { replaceUrl: true });
+  }
+  public trackItem(index: number, item) {
+    return item.trackId;
   }
 }
 
