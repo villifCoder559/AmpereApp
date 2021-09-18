@@ -1,0 +1,13 @@
+.container{
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.footer{
+    position: absolute;
+    bottom: 5px;
+}
+.mat-dialog-content{
+    max-height: 65%;
+}
