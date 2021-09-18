@@ -11,20 +11,29 @@
     <ion-buttons class="slot-end" *ngIf="logged" (click)="register_user()">
       <ion-button>Save</ion-button>
     </ion-buttons>
-    <div *ngIf="!logged" style="flex: auto;">  </div>
+    <div *ngIf="!logged" style="flex: auto;"> </div>
   </mat-toolbar>
 </ion-header>
 <ion-content>
   <mat-stepper [linear]="false" [orientation]="(stepperOrientation | async)!">
-    <mat-step [stepControl]="zeroFormGroup" label="Set login credentials" *ngIf="!logged">
+    <mat-step [stepControl]="zeroFormGroup" label="Login credentials">
       <form id="login_credential" [formGroup]="zeroFormGroup">
         <mat-form-field appearance="fill">
           <mat-label>Email</mat-label>
-          <input matInput type="email" (click)="log()" formControlName="email" placeholder="" required>
+          <input matInput type="email" formControlName="email" placeholder="" required>
         </mat-form-field>
-        <mat-form-field appearance="fill" id="matcardResize">
-          <mat-label>Password</mat-label>
-          <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required (keyup)="logErrors()">
+        <mat-form-field *ngIf="logged && editable" appearance="fill" id="matcardResize">
+          <mat-label>Old Password</mat-label>
+          <input matInput [type]="hideold?'text':'password'" formControlName="old_psw" placeholder="" required>
+          <button mat-icon-button matSuffix (click)="hideold = !hideold">
+            <mat-icon>{{hideold ? 'visibility' : 'visibility_off'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill" id="matcardResize" *ngIf="editable || !logged">
+          <mat-label *ngIf="logged">New Password</mat-label>
+          <mat-label *ngIf="!logged">Password</mat-label>
+          <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required>
           <button mat-icon-button matSuffix (click)="hidepsw = !hidepsw">
             <mat-icon>{{hidepsw ? 'visibility' : 'visibility_off'}}</mat-icon>
           </button>
@@ -32,7 +41,7 @@
           <mat-error *ngIf="zeroFormGroup.get('psw').hasError('minlength')">Password length more than 7</mat-error>
           <mat-error *ngIf="zeroFormGroup.get('psw').hasError('pattern')">At leat one special char</mat-error>
         </mat-form-field>
-        <mat-form-field appearance="fill" id="matcardResize">
+        <mat-form-field appearance="fill" id="matcardResize" *ngIf="editable || !logged">
           <mat-label>Confirm Password</mat-label>
           <input matInput [type]="hide?'text':'password'" formControlName="confirm_psw" placeholder="" required>
           <button mat-icon-button matSuffix (click)="hide = !hide">
@@ -42,10 +51,11 @@
         </mat-form-field>
         <div>
           <button mat-button matStepperNext (click)="click_next()">Next</button>
+          <button mat-button (click)="change_EmailPassword()" *ngIf="logged">Edit</button>
         </div>
       </form>
     </mat-step>
-    <mat-step [stepControl]="firstFormGroup" label="Set Personal Information">
+    <mat-step [stepControl]="firstFormGroup" label="Personal Information">
       <form id="personal_information" [formGroup]="firstFormGroup">
         <mat-form-field appearance="fill">
           <mat-label>Name</mat-label>
@@ -60,7 +70,7 @@
           <mat-label>Phone number</mat-label>
           <input matInput type="number" maxlength="15" required formControlName="phoneNumber" placeholder="">
         </mat-form-field>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="fill" (click)="log_data()">
           <mat-label>Birthdate</mat-label>
           <input matInput type="date" required formControlName="birthdate" placeholder="">
         </mat-form-field>
@@ -125,7 +135,7 @@
         </div>
       </form>
     </mat-step>
-    <mat-step [stepControl]="secondFormGroup" label="Set Medical Information">
+    <mat-step [stepControl]="secondFormGroup" label="Medical Information">
       <form id="medical_information" [formGroup]="secondFormGroup">
         <mat-card appearance="fill" id="matcardResize">
           <mat-card-title>Disabilities</mat-card-title>
@@ -153,24 +163,26 @@
         </div>
       </form>
     </mat-step>
-    <mat-step [stepControl]="thirdFormGroup" label="Set Emergency Contacts">
+    <mat-step [stepControl]="thirdFormGroup" label="Emergency Contacts">
       <form id="emergency_contacts" [formGroup]="thirdFormGroup">
-        <mat-card *ngIf="posNumberContacts[0]">
+        <mat-card *ngFor="let contact of emergency_contacts;let i=index">
           <mat-card-header>
             <mat-card-title>Emergency Contact</mat-card-title>
           </mat-card-header>
           <mat-form-field appearance="fill">
             <mat-label>Name</mat-label>
-            <input matInput maxlength="20" formControlName="contact0name" placeholder="">
+            <input matInput maxlength="20" formControlName="contact{{i}}name" placeholder="">
           </mat-form-field>
           <mat-form-field appearance="fill">
             <mat-label>Phone number</mat-label>
-            <input type="number" matInput maxlength="15" formControlName="contact0number" placeholder="">
+            <input type="number" matInput maxlength="15" formControlName="contact{{i}}number" placeholder="">
           </mat-form-field>
-          <button mat-raised-button (click)="openDialog(0)">Import</button>
-          <button mat-raised-button color="warn" (click)="remove_contact(0)">Remove</button>
+          <div class="container-button">
+            <button style="display: flex;" mat-raised-button (click)="openDialog(i)">Import</button>
+            <button style="display: flex;" mat-raised-button color="warn" (click)="remove_contact(i)">Remove</button>
+          </div>
         </mat-card>
-        <mat-card *ngIf="posNumberContacts[1]">
+        <!-- <mat-card *ngIf="posNumberContacts[1]">
           <mat-card-header>
             <mat-card-title>Emergency Contact</mat-card-title>
           </mat-card-header>
@@ -231,7 +243,7 @@
           </mat-form-field>
           <button mat-raised-button (click)="openDialog(4)">Import</button>
           <button mat-raised-button color="warn" (click)="remove_contact(4)">Remove</button>
-        </mat-card>
+        </mat-card> -->
 
         <button *ngIf="countNumberContactsDone < 5" style="margin: 10px 0 10px;" mat-raised-button
           (click)="add_Contact()">Add Contact</button>
@@ -246,9 +258,12 @@
       <form id="public_contacts" [formGroup]="fourthFormGroup">
         <mat-card appearance="fill">
           <mat-label>Would you like to contact the following numbers?(without direct responsibility)</mat-label><br>
-          <mat-checkbox value="113" (click)="toggle_checkbox_public_emergency_contacts(113)">113</mat-checkbox><br>
-          <mat-checkbox value="115" (click)="toggle_checkbox_public_emergency_contacts(115)">115</mat-checkbox><br>
-          <mat-checkbox value="118" (click)="toggle_checkbox_public_emergency_contacts(118)">118</mat-checkbox>
+          <mat-checkbox [checked]="user_data.public_emergency_contacts[113]"
+            (click)="toggle_checkbox_public_emergency_contacts(113)">113</mat-checkbox><br>
+          <mat-checkbox [checked]="user_data.public_emergency_contacts[115]"
+            (click)="toggle_checkbox_public_emergency_contacts(115)">115</mat-checkbox><br>
+          <mat-checkbox [checked]="user_data.public_emergency_contacts[118]"
+            (click)="toggle_checkbox_public_emergency_contacts(118)">118</mat-checkbox>
         </mat-card>
         <div>
           <button mat-button matStepperPrevious>Back</button>
@@ -267,7 +282,7 @@
           <button style="margin: 13px;" mat-fab color="primary" (click)="scan()">
             <mat-icon>bluetooth</mat-icon>
           </button>
-          <ion-list *ngFor="let device of devices;let i=index" style="padding: 0px;">
+          <ion-list *ngFor="let device of paired_devices;let i=index; trackBy:trackItem" style="padding: 0px;">
             <ion-item-sliding>
               <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;">
                 <ion-label style="background-color: white; margin: 0px;">
