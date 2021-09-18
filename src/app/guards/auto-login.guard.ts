@@ -3,12 +3,13 @@ import { CanLoad, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { filter, map, take } from 'rxjs/operators';
+import { SharedDataService } from '../data/shared-data.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutoLoginGuard implements CanLoad {
-  constructor(private authService: AuthenticationService, private router: Router) { }
+  constructor(private authService: AuthenticationService, private router: Router, private shared_data:SharedDataService) { }
  
   canLoad(): Observable<boolean> {    
     return this.authService.isAuthenticated.pipe(
@@ -18,10 +19,8 @@ export class AutoLoginGuard implements CanLoad {
         console.log('Found previous token, automatic login');
         if (isAuthenticated) {
           // Directly open inside area
-          window.localStorage.setItem('logged','true');       
-          this.router.navigateByUrl('menu/homepage', { replaceUrl: true });
+          this.shared_data.goHomepage()
         } else {          
-          window.localStorage.setItem('logged','false');
           // Simply allow access to the login
           return true;
         }
