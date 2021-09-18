@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { NumericValueAccessor } from '@ionic/angular';
 export class Emergency_Contact {
   number: string = '';
@@ -8,33 +9,10 @@ export class Device {
   name: string = '';
   id: string = '';
   rssi: string = '';
-  battery: 100;
+  battery: number = 100;
   connected: boolean = false;
 }
-// export interface UserData {
-//   name: string,
-//   surname: string,
-//   email: string,
-//   phoneNumber: string,
-//   birthdate: string,
-//   gender: string,
-//   address: string,
-//   locality: string,
-//   city: string,
-//   height: string,
-//   weight: string,
-//   ethnicity: string,
-//   description: string,
-//   purpose: string,
-//   pin: string,
-//   allergies: string,
-//   medications: string,
-//   password: string,
-//   disabilities: [boolean, boolean],
-//   emergency_contacts: [Emergency_Contact, Emergency_Contact, Emergency_Contact, Emergency_Contact, Emergency_Contact],
-//   public_emergency_contacts: { 113: false, 115: false, 118: false },
-//   paired_devices: [Device, Device]
-// }
+
 export class UserData {
   name: string = '';
   surname: string = ''
@@ -68,11 +46,8 @@ export class SharedDataService {
   user_data: UserData;
   private _is_logged = false;
 
-  constructor() {
+  constructor(private router: Router) {
     console.log('constructor')
-    this.user_data = new UserData()
-    this.user_data.paired_devices[0] = { id: 'asdf', name: 'tizio', rssi: 'ASD34', battery: 100, connected: false }
-    this.user_data.paired_devices[1] = { id: 'pxcv', name: 'caio', rssi: 'ZRE18', battery: 100, connected: true }
     // this.user_data.emergency_contacts[0] = { number: '123456789', name: 'paul'};
     // this.user_data.emergency_contacts[2] = { number: '058745632', name: 'Leo' }
   }
@@ -84,9 +59,39 @@ export class SharedDataService {
   }
   setUserData(data) {
     this.user_data = data
+    //save data on database
   }
   getUserData() {
-    console.log(this.user_data.emergency_contacts)
     return this.user_data
+  }
+  goHomepage() {
+    //load user data from database
+    const data: UserData = {
+      address: 'Viale Morgagni 87',
+      allergies: 'gluten',
+      birthdate: '1947-10-25',
+      city: 'Florence',
+      description: 'brown hair, blue eyes',
+      disabilities: [false, true],
+      email: 'email@mail.com',
+      emergency_contacts: [{ number: '8541254732', name: 'Paul Rid' }],
+      ethnicity: 'white',
+      gender: 'male',
+      height: '185',
+      locality: 'Careggi',
+      medications: '',
+      name: 'Wayne',
+      weight: '85',
+      surname: 'Richards',
+      phoneNumber: '2587436910',
+      public_emergency_contacts: { 113: false, "115": false, "118": true },
+      paired_devices: [{ name: 'necklace', battery: 50, connected: true, id: '78542', rssi: 'ADC456' }],
+      password: '',
+      pin: '0258',
+      purpose: 'Personal safety'
+    }
+    this.setUserData(data)
+    this.setIs_logged(true);
+    this.router.navigateByUrl('/menu/homepage', { replaceUrl: true });
   }
 }
