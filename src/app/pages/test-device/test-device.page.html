@@ -11,7 +11,7 @@
   <mat-card>
   <ion-list *ngFor="let device of paired_devices;let i=index" style="padding: 0px;">
     <ion-item-sliding>
-      <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;">
+      <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;" *ngIf="device.name!=''">
         <ion-label style="background-color: white; margin: 0px;">
           <h2>{{device.name || 'Unnamed'}}</h2>
           <h2 *ngIf="device.connected" style="color: green;">Connected</h2>
