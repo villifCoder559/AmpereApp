@@ -14,7 +14,7 @@ import { DialogExampleComponent } from './dialog-example/dialog-example.componen
 import { MatTooltip } from '@angular/material/tooltip';
 import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
 
@@ -99,7 +99,7 @@ export class SignupPage implements OnInit {
       number: '129852185'
     }
   ];
-  constructor(private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     this.user_data = this.shared_data.getUserData();
     console.log(this.user_data)
     this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
@@ -154,7 +154,8 @@ export class SignupPage implements OnInit {
         var mat_card_number = "contact" + (i) + "number";
         var mat_card_name = "contact" + (i) + "name";
         console.log(user_data.emergency_contacts[i])
-        if (user_data.emergency_contacts[i] != undefined) {
+        if (user_data.emergency_contacts[i] != undefined && user_data.emergency_contacts[i].number != '') {
+          this.emergency_contacts.push(user_data.emergency_contacts[i])
           this.thirdFormGroup.get(mat_card_name).setValue(user_data.emergency_contacts[i].name);
           this.thirdFormGroup.get(mat_card_number).setValue(user_data.emergency_contacts[i].number);
         }
@@ -343,7 +344,15 @@ export class SignupPage implements OnInit {
   }
   delete(device, index) {
     console.log('delete pos ' + index + " -> " + device.id)
-    //this.paired_devices.splice(index,1);
+    this.paired_devices.splice(index,1);
+  }
+  async save_data() {
+    this.register_user();
+    let toast = await this.toastCtrl.create({
+      header: 'Data updated!',
+      duration: 2000
+    })
+    toast.present();
   }
   register_user() {
     // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
@@ -373,7 +382,7 @@ export class SignupPage implements OnInit {
       var contact: Emergency_Contact = { name: '', number: '' };
       contact.name = this.thirdFormGroup.get(mat_card_name)?.value;
       contact.number = this.thirdFormGroup.get(mat_card_number)?.value
-      if (contact.name !== '' && contact.number !== '') {
+      if (contact.name != '' && contact.number != '') {
         this.user_data.emergency_contacts[i] = contact;
       }
     }
