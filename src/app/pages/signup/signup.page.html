@@ -9,14 +9,16 @@
     <span *ngIf="!logged">Registration Form</span>
     <span *ngIf="logged">Profile</span>
     <ion-buttons class="slot-end" *ngIf="logged" (click)="register_user()">
-      <ion-button>Save</ion-button>
+      <ion-button (click)="save_data()">Save</ion-button>
     </ion-buttons>
     <div *ngIf="!logged" style="flex: auto;"> </div>
   </mat-toolbar>
 </ion-header>
 <ion-content>
   <mat-stepper [linear]="false" [orientation]="(stepperOrientation | async)!">
-    <mat-step [stepControl]="zeroFormGroup" label="Login credentials">
+    <mat-step [stepControl]="zeroFormGroup">
+      <ng-template matStepLabel>Login credentials</ng-template>
+      <ng-template matStepContent>
       <form id="login_credential" [formGroup]="zeroFormGroup">
         <mat-form-field appearance="fill">
           <mat-label>Email</mat-label>
@@ -54,8 +56,11 @@
           <button mat-button (click)="change_EmailPassword()" *ngIf="logged">Edit</button>
         </div>
       </form>
+    </ng-template>
     </mat-step>
-    <mat-step [stepControl]="firstFormGroup" label="Personal Information">
+    <mat-step [stepControl]="firstFormGroup" >
+      <ng-template matStepLabel>Personal Information</ng-template>
+      <ng-template matStepContent>
       <form id="personal_information" [formGroup]="firstFormGroup">
         <mat-form-field appearance="fill">
           <mat-label>Name</mat-label>
@@ -134,14 +139,17 @@
           <button mat-button matStepperNext (click)="click_next()">Next</button>
         </div>
       </form>
+    </ng-template>
     </mat-step>
-    <mat-step [stepControl]="secondFormGroup" label="Medical Information">
+    <mat-step [stepControl]="secondFormGroup" >
+      <ng-template matStepLabel>Medical Information</ng-template>
+      <ng-template matStepContent>
       <form id="medical_information" [formGroup]="secondFormGroup">
         <mat-card appearance="fill" id="matcardResize">
           <mat-card-title>Disabilities</mat-card-title>
-          <mat-checkbox (click)="toggle_checkbox_disabilities(0)" [checked]="user_data.disabilities[0]">Vision impaired
+          <mat-checkbox [checked]="user_data.disabilities[0]">Vision impaired
           </mat-checkbox><br>
-          <mat-checkbox (click)="toggle_checkbox_disabilities(1)" [checked]="user_data.disabilities[1]">Wheelchair user
+          <mat-checkbox [checked]="user_data.disabilities[1]">Wheelchair user
           </mat-checkbox>
         </mat-card>
         <mat-form-field appearance="fill" hintLabel="Max 200 characters">
@@ -162,8 +170,11 @@
           <button mat-button matStepperNext (click)="click_next()">Next</button>
         </div>
       </form>
+      </ng-template>
     </mat-step>
-    <mat-step [stepControl]="thirdFormGroup" label="Emergency Contacts">
+    <mat-step [stepControl]="thirdFormGroup" >
+      <ng-template matStepLabel>Emergency Contacts</ng-template>
+      <ng-template matStepContent>
       <form id="emergency_contacts" [formGroup]="thirdFormGroup">
         <mat-card *ngFor="let contact of emergency_contacts;let i=index">
           <mat-card-header>
@@ -252,28 +263,33 @@
           <button mat-button matStepperNext (click)="click_next()">Next</button>
         </div>
       </form>
+      </ng-template>
     </mat-step>
 
-    <mat-step [stepControl]="fourthFormGroup" label="Public Emergency Contacts">
+    <mat-step [stepControl]="fourthFormGroup" >
+      <ng-template matStepLabel>Public Emergency Contacts</ng-template>
+      <ng-template matStepContent>
       <form id="public_contacts" [formGroup]="fourthFormGroup">
         <mat-card appearance="fill">
           <mat-label>Would you like to contact the following numbers?(without direct responsibility)</mat-label><br>
           <mat-checkbox [checked]="user_data.public_emergency_contacts[113]"
-            (click)="toggle_checkbox_public_emergency_contacts(113)">113</mat-checkbox><br>
+            >113</mat-checkbox><br>
           <mat-checkbox [checked]="user_data.public_emergency_contacts[115]"
-            (click)="toggle_checkbox_public_emergency_contacts(115)">115</mat-checkbox><br>
+            >115</mat-checkbox><br>
           <mat-checkbox [checked]="user_data.public_emergency_contacts[118]"
-            (click)="toggle_checkbox_public_emergency_contacts(118)">118</mat-checkbox>
+            >118</mat-checkbox>
         </mat-card>
         <div>
           <button mat-button matStepperPrevious>Back</button>
           <button mat-button matStepperNext>Next</button>
         </div>
       </form>
+      </ng-template>
     </mat-step>
 
     <mat-step>
       <ng-template matStepLabel>Connect device</ng-template>
+      <ng-template matStepContent>
       <mat-card appearance="fill">
         <mat-card-title>Pairing</mat-card-title>
         <mat-card-subtitle>Press your smart jewerly and then press the button below to pair it with the app
@@ -306,6 +322,7 @@
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button (click)="register_user()">Done</button>
       </div>
+      </ng-template>
     </mat-step>
   </mat-stepper>
 </ion-content>
