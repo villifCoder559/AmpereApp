@@ -1,7 +1,7 @@
 import { AuthenticationService } from './../../services/authentication.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { SharedDataService } from '../../data/shared-data.service'
 @Component({
@@ -18,7 +18,8 @@ export class LoginPage implements OnInit {
     private alertController: AlertController,
     private router: Router,
     private loadingController: LoadingController,
-    private sharedData:SharedDataService
+    private sharedData:SharedDataService,
+    private toastCtrl:ToastController
   ) { }
 
   ngOnInit() {
@@ -58,5 +59,25 @@ export class LoginPage implements OnInit {
   }
   go_to_signup(){
     this.router.navigateByUrl('/signup');
+  }
+  async go_to_forgot_psw(){
+    if( this.email.hasError('email'))
+      this.show_toast('Insert valid email in the field');
+    else if(this.email.hasError('required'))
+        this.show_toast('Email field is required');
+        else{
+          const alert = await this.alertController.create({
+            header: 'To reset your password follow the instructions sent to your email',
+            buttons: ['OK'],
+          });
+          await alert.present();
+        }
+  }
+  async show_toast(txt){
+    let toast = this.toastCtrl.create({
+      header: txt,
+      duration: 2500
+    })
+    ;(await toast).present();
   }
 }

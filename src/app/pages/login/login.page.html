@@ -17,10 +17,10 @@
       </ion-item>
       <div *ngIf="(password.dirty || password.touched) && password.errors" class="errors">
         <span *ngIf="password.errors?.required">Password is required</span>
-        <span *ngIf="password.errors?.minlength">Password needs to be 6 characters</span>
+        <span *ngIf="password.errors?.minlength">Password needs to be 8 characters</span>
       </div>
     </div>
- 
+    <ion-button class="button_forgotten" type="button" (click) = "go_to_forgot_psw()" color="light" fill="clear"><u>Forgotten password?</u></ion-button>
     <ion-button type="submit" expand="block" [disabled]="!credentials.valid">Log in</ion-button>
     <ion-button type="button" (click) = "go_to_signup()" expand="block" color="light" fill="clear">Not yet a member? Sign up!
     </ion-button>
