@@ -92,6 +92,6 @@ export class SharedDataService {
     }
     this.setUserData(data)
     this.setIs_logged(true);
-    this.router.navigateByUrl('/menu/homepage', { replaceUrl: true });
+    this.router.navigateByUrl('/profile', { replaceUrl: true });
   }
 }
