@@ -22,6 +22,7 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
   7)Start to make the page after sign-in OK
   8)password min length 8 and special char OK, load user_data when profile is loaded OK
   9)Find a way to change email and password when logged OK
+  10) add setting button device status(button redirect to profile with 'connect device' open) OK
   0)Fix mat-icon offline, 
   */
 export class HomepagePage implements OnInit {
