@@ -21,5 +21,7 @@ export class TestDevicePage implements OnInit {
   }
   ngOnInit() {
   }
-
+  go_to_deviceSettings() {
+    this.router.navigateByUrl('menu/profile', { replaceUrl: true, state: { page: 6 } })
+  }
 }
