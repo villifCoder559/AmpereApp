@@ -40,4 +40,11 @@ ion-item{
 h2,h3,p{
     margin: 0px !important
 }
-
+.toolbar{
+    background-color: #3F51B5;
+    color: white;
+    justify-content: space-between;
+}
+.fake-icon{ // for style of toolbar
+    width: 40px;height: 32px;display: flex;
+}
