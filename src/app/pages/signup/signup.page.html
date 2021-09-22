@@ -8,14 +8,14 @@
     </ion-buttons>
     <span *ngIf="!logged">Registration Form</span>
     <span *ngIf="logged">Profile</span>
-    <ion-buttons class="slot-end" *ngIf="logged" (click)="register_user()">
+    <ion-buttons class="slot-end" *ngIf="logged" >
       <ion-button (click)="save_data()">Save</ion-button>
     </ion-buttons>
     <div *ngIf="!logged" style="flex: auto;"> </div>
   </mat-toolbar>
 </ion-header>
-<ion-content>
-  <mat-stepper [linear]="false" [orientation]="(stepperOrientation | async)!">
+<ion-content #content>
+  <mat-stepper #stepper [linear]="false" [orientation]="(stepperOrientation | async)!">
     <mat-step [stepControl]="zeroFormGroup">
       <ng-template matStepLabel>Login credentials</ng-template>
       <ng-template matStepContent>
@@ -288,7 +288,7 @@
     </mat-step>
 
     <mat-step>
-      <ng-template matStepLabel>Connect device</ng-template>
+      <ng-template matStepLabel>Smart devices</ng-template>
       <ng-template matStepContent>
       <mat-card appearance="fill">
         <mat-card-title>Pairing</mat-card-title>
