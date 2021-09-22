@@ -13,17 +13,17 @@ const routes: Routes = [
     loadChildren: () => import('./pages/signup/signup.module').then(m => m.SignupPageModule)
   },
   {
-    path: '',
+    path: 'profile',
     loadChildren: () => import('./pages/menu/menu.module').then(m => m.MenuPageModule)
   },
   {
     path: 'show-alert',
     loadChildren: () => import('./show-alert/show-alert.module').then( m => m.ShowAlertPageModule)
   },
-  // {
-  //   path: 'menu',
-  //   loadChildren: () => import('./pages/menu/menu.module').then(m => m.MenuPageModule)
-  // }
+  {
+    path: '',
+    loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule)
+  }
 ];
 @NgModule({
   imports: [
