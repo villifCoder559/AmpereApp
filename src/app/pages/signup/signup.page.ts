@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { StepperOrientation } from '@angular/material/stepper';
+import { MatStep, MatStepper, StepperOrientation } from '@angular/material/stepper';
 import { interval, Observable, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
@@ -14,8 +14,8 @@ import { DialogExampleComponent } from './dialog-example/dialog-example.componen
 import { MatTooltip } from '@angular/material/tooltip';
 import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
-import { AlertController, ToastController } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { AlertController, IonContent, ToastController } from '@ionic/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
 
 @Component({
@@ -39,7 +39,8 @@ export class SignupPage implements OnInit {
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   required = Validators.required;
   @ViewChild('tooltip') tooltip: MatTooltip;
-
+  @ViewChild('stepper') stepper: MatStepper;
+  @ViewChild('content') content: IonContent;
   zeroFormGroup = this._formBuilder.group({
     email: ['', Validators.email],
     psw: ['', [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[|!"£/()?@#$%^&+=]).*$')]],
@@ -106,7 +107,18 @@ export class SignupPage implements OnInit {
       .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
     this.logged = this.shared_data.getIs_logged();
     console.log(this.logged)
-    this.user_data = new UserData()
+    //this.user_data = new UserData()
+    console.log(this.router.getCurrentNavigation().extras.state);
+    if (this.router.getCurrentNavigation().extras.state?.page == 6) {
+      setTimeout(() => {
+        this.stepper.selectedIndex = 5;
+        console.log(this.stepper.animationDone)
+        this.stepper.animationDone.subscribe(()=>this.content.scrollToBottom(500))
+      }, 0);
+    }
+    setTimeout(() => {
+      console.log(this.stepper.animationDone)
+    }, 2000)
   }
   logErrors() {
     console.log("required->", this.zeroFormGroup.get('psw').hasError('required'))
@@ -344,7 +356,7 @@ export class SignupPage implements OnInit {
   }
   delete(device, index) {
     console.log('delete pos ' + index + " -> " + device.id)
-    this.paired_devices.splice(index,1);
+    this.paired_devices.splice(index, 1);
   }
   async save_data() {
     this.register_user();
