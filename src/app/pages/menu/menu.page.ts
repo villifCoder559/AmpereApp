@@ -11,40 +11,41 @@ export class MenuPage implements OnInit {
   pages=[
     {
       title:'Homepage',
-      url:'/menu/homepage'
+      url:'/profile/menu/homepage'
     },
     {
       title:'Profile',
-      url:'/menu/profile'
+      url:'/profile/menu/profile'
     },
     {
       title:'Devices Status',
-      url:'/menu/testAlert'
+      url:'/profile/menu/testAlert'
     },
     {
       title:'NFC Reader',
-      url:'/menu/read-nfc'
+      url:'/profile/menu/read-nfc'
     },
     {
       title:'QR Reader',
-      url:'/menu/read-qr'
+      url:'/profile/menu/read-qr'
     },
     {
       title:'FAQ',
-      url:'/menu/faq'
+      url:'/profile/menu/faq'
     },
     {
       title:'Term of Use',
-      url:'/menu/termOfUse'
+      url:'/profile/menu/termOfUse'
     },
     {
       title:'Privacy Policy',
-      url:'/menu/privacyPolicy'
+      url:'/profile/menu/privacyPolicy'
     },
 
   ]
-  selectedPath=this.pages[0].url
+  selectedPath=''
   constructor(private router:Router,private authService: AuthenticationService) { 
+    console.log('costruttore')
     this.router.events.subscribe((event:RouterEvent)=>{
       this.selectedPath=event.url
     })
@@ -53,6 +54,7 @@ export class MenuPage implements OnInit {
     this.router.navigateByUrl('/',{replaceUrl:true})
   }
   ngOnInit() {
+
   }
   async logout() {
     await this.authService.logout();
