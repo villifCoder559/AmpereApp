@@ -6,6 +6,7 @@ import { SignupPageRoutingModule } from './signup-routing.module';
 import { SignupPage } from './signup.page';
 import { MaterialModule } from '../../material-module'
 import { DialogExampleComponent } from './dialog-example/dialog-example.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   imports: [
@@ -14,7 +15,8 @@ import { DialogExampleComponent } from './dialog-example/dialog-example.componen
     ReactiveFormsModule,
     IonicModule,
     SignupPageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    HttpClientModule
   ],
   declarations: [SignupPage,DialogExampleComponent],
   providers:[],
