@@ -15,6 +15,7 @@
   </mat-toolbar>
 </ion-header>
 <ion-content #content>
+  <!-- <ion-button (click)="sendPostRequest()">Send POST</ion-button> -->
   <mat-stepper #stepper [linear]="false" [orientation]="(stepperOrientation | async)!">
     <mat-step [stepControl]="zeroFormGroup">
       <ng-template matStepLabel>Login credentials</ng-template>
@@ -289,10 +290,10 @@
 
     <mat-step>
       <ng-template matStepLabel>Smart devices</ng-template>
-      <ng-template matStepContent>
+      <!-- <ng-template matStepContent> -->
       <mat-card appearance="fill">
         <mat-card-title>Pairing</mat-card-title>
-        <mat-card-subtitle>Press your smart jewerly and then press the button below to pair it with the app
+        <mat-card-subtitle>Press your smart jewerly and then press the button below to pair it with the app (swipe to delete device)
         </mat-card-subtitle>
         <mat-card-content style="text-align: center;">
           <button style="margin: 13px;" mat-fab color="primary" (click)="scan()">
@@ -322,7 +323,7 @@
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button (click)="register_user()">Done</button>
       </div>
-      </ng-template>
+      <!-- </ng-template> -->
     </mat-step>
   </mat-stepper>
 </ion-content>
