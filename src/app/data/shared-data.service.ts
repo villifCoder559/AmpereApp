@@ -64,8 +64,7 @@ export class SharedDataService {
   getUserData() {
     return this.user_data
   }
-  goHomepage() {
-    //load user data from database
+  loadDataUser(){
     const data: UserData = {
       address: 'Viale Morgagni 87',
       allergies: 'gluten',
@@ -92,6 +91,11 @@ export class SharedDataService {
     }
     this.setUserData(data)
     this.setIs_logged(true);
-    this.router.navigateByUrl('/profile', { replaceUrl: true });
+
+  }
+  goHomepage() {
+    //load user data from database
+    this.loadDataUser();
+    this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
   }
 }
