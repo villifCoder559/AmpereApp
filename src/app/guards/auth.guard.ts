@@ -18,7 +18,6 @@ export class AuthGuard implements CanLoad {
         if (isAuthenticated) {          
           return true;
         } else {          
-          this.shared_Data.goHomepage();
           return false;
         }
       })
