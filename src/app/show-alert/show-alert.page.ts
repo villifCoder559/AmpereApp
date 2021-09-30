@@ -141,7 +141,7 @@ export class ShowAlertPage implements OnInit {
     }
     else {
       this.presentAlert('PIN correct', 1500);
-      this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+      this.locationURL.back();
     }
   }
   async presentAlert(text, time) {

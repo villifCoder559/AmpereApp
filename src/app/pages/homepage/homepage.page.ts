@@ -74,6 +74,6 @@ export class HomepagePage implements OnInit {
     );
   }
   showAlert(){
-    this.router.navigateByUrl('/show-alert',{replaceUrl:true})
+    this.router.navigateByUrl('/show-alert',{replaceUrl:false})
   }
 }
