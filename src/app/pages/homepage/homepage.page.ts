@@ -23,7 +23,7 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
   8)password min length 8 and special char OK, load user_data when profile is loaded OK
   9)Find a way to change email and password when logged OK
   10) add setting button device status(button redirect to profile with 'connect device' open) OK
-  0)Fix mat-icon offline, 
+  11)Fix not loaded data autologin(login works but no autologin), 
   */
 export class HomepagePage implements OnInit {
   gps_enable = false;
@@ -72,5 +72,8 @@ export class HomepagePage implements OnInit {
         alert(error);
       }
     );
+  }
+  showAlert(){
+    this.router.navigateByUrl('/show-alert',{replaceUrl:true})
   }
 }
