@@ -17,7 +17,7 @@ import * as bcrypt from 'bcryptjs';
 import { AlertController, IonContent, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
-
+import { HttpClient,HttpHeaders,HttpRequest } from '@angular/common/http';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -100,7 +100,7 @@ export class SignupPage implements OnInit {
       number: '129852185'
     }
   ];
-  constructor(private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(public http: HttpClient,private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     this.user_data = this.shared_data.getUserData();
     console.log(this.user_data)
     this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
@@ -109,22 +109,25 @@ export class SignupPage implements OnInit {
     console.log(this.logged)
     //this.user_data = new UserData()
     console.log(this.router.getCurrentNavigation().extras.state);
-    if (this.router.getCurrentNavigation().extras.state?.page == 6) {
-      setTimeout(() => {
-        this.stepper.selectedIndex = 5;
-        console.log(this.stepper.animationDone)
-        this.stepper.animationDone.subscribe(()=>this.content.scrollToBottom(500))
-      }, 0);
-    }
-    setTimeout(() => {
-      console.log(this.stepper.animationDone)
-    }, 2000)
+    // setTimeout(() => {
+    //   console.log(this.stepper.animationDone)
+    // }, 2000)
   }
-  logErrors() {
-    console.log("required->", this.zeroFormGroup.get('psw').hasError('required'))
-    console.log("minlength->", this.zeroFormGroup.get('psw').hasError('minlength'))
-    console.log("pattern->", this.zeroFormGroup.get('psw').hasError('pattern'))
-    console.log("required->", this.zeroFormGroup.get('psw').errors)
+  sendPostRequest() {
+    var headers = new HttpHeaders();
+    headers.append("Accept", 'application/json');
+    headers.append('Content-Type', 'application/json' );
+    let postData = {
+            "name": "Customer004",
+            "email": "customer004@email.com",
+            "tel": "0000252525"
+    }
+    this.http.post("http://127.0.0.1:1880/home", postData, {headers:headers})
+      .subscribe(data => {
+        console.log(data['_body']);
+       }, error => {
+        console.log(error);
+      });
   }
   change_EmailPassword() {
     this.editable = !this.editable
@@ -176,6 +179,15 @@ export class SignupPage implements OnInit {
       this.user_data.public_emergency_contacts = user_data.public_emergency_contacts;
       this.paired_devices = user_data.paired_devices;
       this.changeDetection.detectChanges();
+      if (this.router.getCurrentNavigation().extras.state?.page == 6) {
+        setTimeout(() => {
+          this.stepper.selectedIndex = 5;
+          console.log(this.stepper.animationDone)
+          this.stepper.animationDone.subscribe(()=>{
+            this.content.scrollToBottom(500)
+          })
+        }, 250);
+      }
     }
   }
 
