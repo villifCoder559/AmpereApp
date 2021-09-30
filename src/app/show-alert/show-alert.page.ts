@@ -44,7 +44,7 @@ export class ShowAlertPage implements OnInit {
       var app = new Date(response.timestamp);
       this.locationCordinates.date = app.getUTCFullYear() + "-" + (app.getUTCMonth() + 1) + '-' + app.getUTCDate();
       this.locationCordinates.timestamp = app.getUTCHours() + ':' + app.getUTCMinutes()
-      console.log(this.locationCordinates)
+      //console.log(this.locationCordinates)
     }).catch((error) => {
       alert('Error: ' + error);
     });
@@ -141,7 +141,7 @@ export class ShowAlertPage implements OnInit {
     }
     else {
       this.presentAlert('PIN correct', 1500);
-      this.router.navigateByUrl('menu/homepage', { replaceUrl: true })
+      this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }
   }
   async presentAlert(text, time) {
