@@ -11,6 +11,7 @@ export class AuthenticationService {
   token = '';
   constructor(private http:HttpClient,private shared_data:SharedDataService) {
     this.loadToken();
+    this.shared_data.loadDataUser();
    }
 
   loadToken(){
@@ -27,7 +28,6 @@ export class AuthenticationService {
   }
 
   login(credentials: {email, password}): Observable<any> {
-    console.log('1')
     return this.http.post(`https://reqres.in/api/login`, credentials).pipe(
       map((data: any) => {
         this.token=data.token;
