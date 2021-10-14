@@ -1,6 +1,4 @@
-<ion-header>
-</ion-header>
- 
+
 <ion-content>
  
   <form (ngSubmit)="login()" [formGroup]="credentials">
@@ -24,5 +22,6 @@
     <ion-button type="submit" expand="block" [disabled]="!credentials.valid">Log in</ion-button>
     <ion-button type="button" (click) = "go_to_signup()" expand="block" color="light" fill="clear">Not yet a member? Sign up!
     </ion-button>
+    <ion-button (click)="autentication()">Login Snap4City </ion-button>
   </form>
 </ion-content>
