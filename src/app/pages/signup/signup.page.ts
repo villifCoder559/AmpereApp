@@ -17,7 +17,7 @@ import * as bcrypt from 'bcryptjs';
 import { AlertController, IonContent, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
-import { HttpClient,HttpHeaders,HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -25,6 +25,10 @@ import { HttpClient,HttpHeaders,HttpRequest } from '@angular/common/http';
 })
 export class SignupPage implements OnInit {
   logged = false;
+  hide;
+  
+  hideold;
+  hidepsw;
   posNumberContacts = [false, false, false, false, false];
   countNumberContactsDone = 0;
   name;
@@ -100,8 +104,11 @@ export class SignupPage implements OnInit {
       number: '129852185'
     }
   ];
-  constructor(public http: HttpClient,private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     this.user_data = this.shared_data.getUserData();
+    if (this.user_data == undefined) {
+      this.user_data = new UserData();
+    }
     console.log(this.user_data)
     this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
       .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
@@ -116,16 +123,16 @@ export class SignupPage implements OnInit {
   sendPostRequest() {
     var headers = new HttpHeaders();
     headers.append("Accept", 'application/json');
-    headers.append('Content-Type', 'application/json' );
+    headers.append('Content-Type', 'application/json');
     let postData = {
-            "name": "Customer004",
-            "email": "customer004@email.com",
-            "tel": "0000252525"
+      "name": "Customer004",
+      "email": "customer004@email.com",
+      "tel": "0000252525"
     }
-    this.http.post("http://127.0.0.1:1880/home", postData, {headers:headers})
+    this.http.post("http://127.0.0.1:1880/home", postData, { headers: headers })
       .subscribe(data => {
         console.log(data['_body']);
-       }, error => {
+      }, error => {
         console.log(error);
       });
   }
@@ -183,7 +190,7 @@ export class SignupPage implements OnInit {
         setTimeout(() => {
           this.stepper.selectedIndex = 5;
           console.log(this.stepper.animationDone)
-          this.stepper.animationDone.subscribe(()=>{
+          this.stepper.animationDone.subscribe(() => {
             this.content.scrollToBottom(500)
           })
         }, 250);
