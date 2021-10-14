@@ -11,6 +11,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SMS } from '@ionic-native/sms/ngx';
 import { DeviceMotion } from '@ionic-native/device-motion/ngx'
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 
 @NgModule({
   imports: [
@@ -27,7 +28,8 @@ import { DeviceMotion } from '@ionic-native/device-motion/ngx'
     Geolocation,
     AndroidPermissions,
     SMS,
-    DeviceMotion
+    DeviceMotion,
+    LocalNotifications
   ]
 })
 export class ShowAlertPageModule { }
