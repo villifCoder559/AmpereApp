@@ -9,7 +9,7 @@ import { SMS } from '@ionic-native/sms/ngx';
 import { SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx'
 import { Location } from "@angular/common";
-
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 
 @Component({
   selector: 'app-show-alert',
@@ -19,11 +19,11 @@ import { Location } from "@angular/common";
 export class ShowAlertPage implements OnInit {
   pin = ['', '', '', '']
   config: CountdownConfig = {
-    leftTime: 10,
+    leftTime: 35,
     formatDate: ({ date }) => `${date / 1000}`
   };
   locationCordinates: any;
-  constructor(private locationURL: Location,private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
+  constructor(private localNotifications: LocalNotifications, private locationURL: Location, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
     private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.locationCordinates = {
       latitude: "",
@@ -32,6 +32,15 @@ export class ShowAlertPage implements OnInit {
       date: "",
       timestamp: ''
     }
+    document.addEventListener("deviceready", () => {
+      this.localNotifications.schedule({
+        id: 1,
+        text: 'Emergency notification',
+        //sound: 'file://beep.caf',
+        data: "Signal received, click to open and insert PIN to disable alert or ignore it and send emergency"
+      });
+    });
+
   }
   ngOnInit() {
     this.currentLocPosition();
@@ -43,7 +52,7 @@ export class ShowAlertPage implements OnInit {
       this.locationCordinates.accuracy = response.coords.accuracy;
       var app = new Date(response.timestamp);
       this.locationCordinates.date = app.getUTCFullYear() + "-" + (app.getUTCMonth() + 1) + '-' + app.getUTCDate();
-      this.locationCordinates.timestamp = app.getUTCHours() + ':' + app.getUTCMinutes()
+      this.locationCordinates.timestamp = (app.getUTCHours() < 10 ? '0' + app.getUTCHours() : app.getUTCHours()) + ':' + (app.getUTCMinutes() < 10 ? '0' + app.getUTCMinutes() : app.getUTCMinutes())
       //console.log(this.locationCordinates)
     }).catch((error) => {
       alert('Error: ' + error);
@@ -158,12 +167,12 @@ export class ShowAlertPage implements OnInit {
     });
   }
   data_device_motion() {
-    var sub = this.deviceMotion.watchAcceleration().subscribe((acceleration: DeviceMotionAccelerationData) => {
+    var sub = this.deviceMotion.watchAcceleration({ frequency: 1500 }).subscribe((acceleration: DeviceMotionAccelerationData) => {
       //send acceleration data
       console.log(acceleration)
     })
     setTimeout(() => {
       sub.unsubscribe()
-    }, 120000)
+    }, 60000)
   }
 }
