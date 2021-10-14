@@ -8,7 +8,7 @@
   </mat-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content #content>
   <ion-item>
     <ion-input type="text" placeholder='My QR code data' [(ngModel)]="qrData"></ion-input>
   </ion-item>
@@ -16,17 +16,8 @@
   <ion-button expand="full" (click)="scanCode()">
     Scan Code
   </ion-button>
-  <ion-card *ngIf="qrData" text-center>
-    <ngx-qrcode [elementType]="elementType" [value]="qrData">
-    </ngx-qrcode>
-    <ion-card-content>
-      <ion-button expand="full" (click)="downloadQR()">
-        <ion-icon name="download" slot="start"></ion-icon>
-        Download QR Code
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
-  <ion-card *ngIf="scannedCode">
+
+  <ion-card>
     <ion-card-content>
       Result from scan: {{scannedCode}}
     </ion-card-content>

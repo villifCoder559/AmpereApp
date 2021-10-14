@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Base64ToGallery } from '@ionic-native/base64-to-gallery/ngx';
 import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 import { ToastController } from '@ionic/angular';
+import * as $ from "jquery";
+import { ChangeDetectorRef } from '@angular/core';
+
+/* QR-Code has 3 fields:{"description":"","link":"","code":""} */
 
 @Component({
   selector: 'app-read-qr',
@@ -12,22 +16,31 @@ export class ReadQRPage implements OnInit {
   qrData = ''
   scannedCode = null;
   title = 'app';
-  elementType: 'url' | 'canvas' | 'img' = 'canvas';
-  constructor(private qrScanner: QRScanner, private base64ToGallery: Base64ToGallery, private toastCtrl: ToastController) {
-
+  isOn = false;
+  constructor(private changeRef: ChangeDetectorRef, private qrScanner: QRScanner, private base64ToGallery: Base64ToGallery, private toastCtrl: ToastController) {
   }
   scanCode() {
     this.qrScanner.prepare()
       .then((status: QRScannerStatus) => {
         if (status.authorized) {// camera permission was granted
           // start scanning
-          let scanSub = this.qrScanner.scan().subscribe((text: string) => {
-            this.scannedCode = text;
-            console.log('Scanned something', text);
-            this.qrScanner.hide(); // hide camera preview
-            scanSub.unsubscribe(); // stop scanning
-          });
-
+          // this.isOn = true;
+          console.log('scanner ok')
+          $("#content").hide(500, () => {
+            this.qrScanner.show();
+            this.qrScanner.scan().subscribe((text: string) => {
+              console.log('camera')
+              //  this.isOn = false;
+              console.log(this.isOn);
+              this.scannedCode = text;
+              alert('Scanned something: ' + text);
+              console.log(this.scannedCode)
+              this.qrScanner.hide(); // hide camera preview
+              this.qrScanner.destroy();
+              this.changeRef.detectChanges();
+              $("#content").show(500);
+            });
+          })
         } else if (status.denied) {
           this.qrScanner.openSettings()
           // camera permission was permanently denied
@@ -48,7 +61,7 @@ export class ReadQRPage implements OnInit {
       .then(async res => {
         let toast = await this.toastCtrl.create({
           header: 'QR Code saved in your PhotoLibrary',
-          duration:2000
+          duration: 2000
         })
         toast.present();
       },
