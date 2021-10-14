@@ -31,19 +31,11 @@ export class ReadNFCPage implements OnInit {
     else if (this.platform.is('ios')) {
       try {
         let tag = await this.nfc.scanNdef();
-        console.log(JSON.stringify(tag));
+        this.readMessage = JSON.stringify(tag);
       } catch (err) {
-        console.log('Error reading tag', err);
+        alert('Error reading tag ' + err);
       }
     }
-  }
-  write_NFC() {
-    var message = [
-      this.ndef.textRecord(this.NFC_data)
-    ];
-    this.nfc.write(message).then(async () => {
-      this.create_message('Write text in NFC device')
-    }, err => alert('err: ' + err))
   }
 
   async create_message(txt: string) {
