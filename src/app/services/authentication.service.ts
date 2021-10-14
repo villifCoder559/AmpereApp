@@ -11,7 +11,7 @@ export class AuthenticationService {
   token = '';
   constructor(private http:HttpClient,private shared_data:SharedDataService) {
     this.loadToken();
-    this.shared_data.loadDataUser();
+    
    }
 
   loadToken(){
@@ -20,6 +20,7 @@ export class AuthenticationService {
     if (token != null) {
       console.log('set token: ', token);
       this.token = token;
+      this.shared_data.loadDataUser();
       this.shared_data.setIs_logged(true);
       this.isAuthenticated.next(true);
     } else {
