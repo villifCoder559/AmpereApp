@@ -4,6 +4,7 @@ import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 @Component({
   selector: 'app-homepage',
@@ -22,15 +23,27 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
   7)Start to make the page after sign-in OK
   8)password min length 8 and special char OK, load user_data when profile is loaded OK
   9)Find a way to change email and password when logged OK
-  10) add setting button device status(button redirect to profile with 'connect device' open) OK
-  11)Fix not loaded data autologin(login works but no autologin), 
+  10) add setting button device status(button redirect to profile with stepper 'connect device' open) OK
+  11)Fix not loaded data autologin(login works but no autologin), OK
+  12)Check local notification OK
+  13) On device:
+        _login page bad resize when open keyboard OK
+        _QR code camera not working OK
+        _Create div for camera
+        _Fix when camera is opened and user clicks back-button or in another menu section 
+        _show_alert doesn't show pin labels OK
+        _bad performance OK
   */
 export class HomepagePage implements OnInit {
   gps_enable = false;
-  constructor(private router: Router, private locationAccuracy: LocationAccuracy,private backgroundMode: BackgroundMode ,private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private localNotifications: LocalNotifications,private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.backgroundMode.enable();
     this.backgroundMode.overrideBackButton();
     this.backgroundMode.disableWebViewOptimizations();
+    this.localNotifications.hasPermission().then(result=>{
+      if(!result.valueOf())
+        this.localNotifications.requestPermission()
+    })
   }
 
   ngOnInit() {
@@ -73,7 +86,8 @@ export class HomepagePage implements OnInit {
       }
     );
   }
-  showAlert(){
-    this.router.navigateByUrl('/show-alert',{replaceUrl:false})
+  showAlert() {
+    //take bluetooth singal
+    this.router.navigateByUrl('/show-alert', { replaceUrl: false })
   }
 }

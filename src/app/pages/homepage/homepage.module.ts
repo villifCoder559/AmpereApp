@@ -12,6 +12,7 @@ import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 @NgModule({
   imports: [
@@ -26,6 +27,7 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
     LocationAccuracy,
     Geolocation,
     AndroidPermissions,
+    LocalNotifications,
     BackgroundMode]
 })
 export class HomepagePageModule { }
