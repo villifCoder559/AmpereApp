@@ -1,15 +1,18 @@
-<div class="container">
+<div class="containerDialog">
   <h1 mat-dialog-title>Contacts list</h1>
   <mat-form-field appearance="outline" style="position: sticky;">
     <mat-label>Find contact</mat-label>
     <input #input matInput type="text" placeholder="" (keyup)="find_contact(input.value)"
       (ionInput)="find_contact(input.value)">
+    <mat-spinner id="spinnerInput" [diameter]="20" style="visibility: hidden;"></mat-spinner>
   </mat-form-field>
   <div mat-dialog-content>
-    <mat-selection-list [(ngModel)]="selectedOptions" #contacts [multiple]="false">
+    <mat-spinner id="matSpinner"></mat-spinner>
+    <mat-selection-list [(ngModel)]="selectedOptions" #contacts [multiple]="false"
+      style="height: inherit; width: inherit;">
       <mat-list-option *ngFor="let contact of myContacts" [value]="contact" (click)="save_data()">
-        <div mat-line>{{contact.name}}</div>
-        <div mat-line>{{contact.number}}</div>
+        <div mat-line>{{contact?.name}}</div>
+        <div mat-line>{{contact?.number}}</div>
       </mat-list-option>
     </mat-selection-list>
   </div>
