@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, ElementRef } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatStep, MatStepper, StepperOrientation } from '@angular/material/stepper';
@@ -7,7 +7,6 @@ import { map } from 'rxjs/operators';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { NgZone, ViewChild } from '@angular/core';
 import { take } from 'rxjs/operators';
-import { Contacts, ContactName, ContactField, Contact } from '@ionic-native/contacts';
 import { Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogExampleComponent } from './dialog-example/dialog-example.component';
@@ -18,6 +17,8 @@ import { AlertController, IonContent, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
+import * as moment from 'moment'; // add this 1 of 4
+import { Contacts, ContactName, ContactField }  from '@ionic-native/contacts';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -26,7 +27,7 @@ import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 export class SignupPage implements OnInit {
   logged = false;
   hide;
-  
+
   hideold;
   hidepsw;
   posNumberContacts = [false, false, false, false, false];
@@ -45,6 +46,7 @@ export class SignupPage implements OnInit {
   @ViewChild('tooltip') tooltip: MatTooltip;
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
+
   zeroFormGroup = this._formBuilder.group({
     email: ['', Validators.email],
     psw: ['', [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[|!"£/()?@#$%^&+=]).*$')]],
@@ -57,7 +59,7 @@ export class SignupPage implements OnInit {
     name: ['', Validators.required],
     surname: ['', Validators.required],
     phoneNumber: ['', Validators.required],
-    birthdate: ['', Validators.required],
+    birthdate: ['', Validators.compose([Validators.required, DateValidator.dateVaidator])],
     gender: ['', Validators.required],
     address: ['', Validators.required],
     locality: ['', Validators.required],
@@ -104,21 +106,14 @@ export class SignupPage implements OnInit {
       number: '129852185'
     }
   ];
-  constructor(public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private contacts: Contacts, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     this.user_data = this.shared_data.getUserData();
     if (this.user_data == undefined) {
       this.user_data = new UserData();
     }
-    console.log(this.user_data)
     this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
       .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
     this.logged = this.shared_data.getIs_logged();
-    console.log(this.logged)
-    //this.user_data = new UserData()
-    console.log(this.router.getCurrentNavigation().extras.state);
-    // setTimeout(() => {
-    //   console.log(this.stepper.animationDone)
-    // }, 2000)
   }
   sendPostRequest() {
     var headers = new HttpHeaders();
@@ -131,7 +126,6 @@ export class SignupPage implements OnInit {
     }
     this.http.post("http://127.0.0.1:1880/home", postData, { headers: headers })
       .subscribe(data => {
-        console.log(data['_body']);
       }, error => {
         console.log(error);
       });
@@ -139,15 +133,13 @@ export class SignupPage implements OnInit {
   change_EmailPassword() {
     this.editable = !this.editable
   }
-  log_data() {
-    console.log(this.firstFormGroup.get('birthdate'))
-  }
+
   ngOnInit() {
     if (this.logged) {
       // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
       const user_data: UserData = this.shared_data.getUserData();
       this.zeroFormGroup.get('email').setValue(user_data.email)
-      console.log(user_data.email)
+      console.log(user_data);
       this.firstFormGroup.setValue({
         name: user_data.name,
         surname: user_data.surname,
@@ -165,31 +157,26 @@ export class SignupPage implements OnInit {
         pin: user_data.pin
       });
       // this.user_data.disabilities saved thanks toogle_checkbox(i)
-      console.log(user_data.disabilities)
       this.user_data.disabilities = user_data.disabilities;
       this.secondFormGroup.setValue({
         allergies: user_data.allergies,
         medications: user_data.medications
       })
-      console.log(user_data.emergency_contacts)
       for (var i = 0; i < 5; i++) {
         var mat_card_number = "contact" + (i) + "number";
         var mat_card_name = "contact" + (i) + "name";
-        console.log(user_data.emergency_contacts[i])
         if (user_data.emergency_contacts[i] != undefined && user_data.emergency_contacts[i].number != '') {
           this.emergency_contacts.push(user_data.emergency_contacts[i])
           this.thirdFormGroup.get(mat_card_name).setValue(user_data.emergency_contacts[i].name);
           this.thirdFormGroup.get(mat_card_number).setValue(user_data.emergency_contacts[i].number);
         }
       }
-      console.log(user_data.paired_devices)
       this.user_data.public_emergency_contacts = user_data.public_emergency_contacts;
       this.paired_devices = user_data.paired_devices;
       this.changeDetection.detectChanges();
       if (this.router.getCurrentNavigation().extras.state?.page == 6) {
         setTimeout(() => {
           this.stepper.selectedIndex = 5;
-          console.log(this.stepper.animationDone)
           this.stepper.animationDone.subscribe(() => {
             this.content.scrollToBottom(500)
           })
@@ -197,17 +184,48 @@ export class SignupPage implements OnInit {
       }
     }
   }
+  checkData(ev) {
+    console.log(ev)
+    //if(backspace) delete 2 chars
+    if (ev.inputType != 'deleteContentBackward') {
+      var value: string = ev.target.value;
+      var split = value.split('/');
+      console.log(split)
+      if (split.length < 3) {
+        if (split.length == 2 || split.length == 5) {
+          this.firstFormGroup.controls['birthdate'].setValue(ev.target.value + '/');
+        }
+        else {
+          for (var i = 0; i < split.length; i++) {
+            if (i == 0) {
+              if (parseInt(split[i]) > 1) {//month
+                this.firstFormGroup.controls['birthdate'].setValue(ev.target.value + '/');
+              }
+            }
+            else {
+              if (i == 1 && parseInt(split[i]) > 3) {//day
+                this.firstFormGroup.controls['birthdate'].setValue(ev.target.value + '/');
+              }
+            }
+          }
+        }
+      }
+    }
+    else if (ev.inputType == 'deleteContentBackward') {
 
+    }
+  }
   triggerResize() {
     this.ngZone.onStable.pipe(take(1))
       .subscribe(() => this.autosize.resizeToFitContent(true));
   }
-  onlyNumbersAllowed(input) {
-    const charCode = input.key;
-    console.log(charCode)
-    if (input.key >= 0 && input.key <= 9)
-      return true
-    return false
+  onlyNumbersAllowed(input, id) {
+    console.log(input)
+    console.log(parseInt(input.data) === NaN)
+    if (isNaN(parseInt(input.data)) && input.inputType != 'deleteContentBackward') {
+      var txt=this.firstFormGroup.controls[id].value;
+      this.firstFormGroup.controls[id].setValue(txt.substring(0, txt.length - 1))
+    }
   }
   getFormValidationErrors() {
     Object.keys(this.thirdFormGroup.controls).forEach(key => {
@@ -221,49 +239,11 @@ export class SignupPage implements OnInit {
   }
   add_Contact() {
     this.getFormValidationErrors()
-    console.log(this.thirdFormGroup.hasError('required'))
-    console.log(this.thirdFormGroup.getError('required'))
     if (this.countNumberContactsDone < 5 && !this.thirdFormGroup.hasError('required')) {
       this.countNumberContactsDone++;
-      console.log(this.emergency_contacts)
       const app = new Emergency_Contact()
       this.emergency_contacts.push(app)
     }
-    // if (this.countNumberContactsDone < 5) {
-    //   if (this.countNumberContactsDone > 0) {
-    //     var mat_card_number = "contact" + (this.countNumberContactsDone) + "number";
-    //     var mat_card_name = "contact" + (this.countNumberContactsDone) + "name";
-    //   }
-    //   var go = true
-    //   for (var i = 0; i < this.posNumberContacts.length; i++) {
-    //     if (this.posNumberContacts[i]) {
-    //       var mat_card_number = "contact" + (i) + "number";
-    //       var mat_card_name = "contact" + (i) + "name";
-    //       if (this.thirdFormGroup.get(mat_card_name).hasError('required') || this.thirdFormGroup.get(mat_card_number).hasError('required'))
-    //         go = false;
-    //     }
-    //   }
-    //   if (go) {
-    //     this.countNumberContactsDone++;
-    //     var i = 0;
-    //     var stop = false
-    //     while (!stop && i < 5) {
-    //       if (!this.posNumberContacts[i]) {
-    //         this.posNumberContacts[i] = true;
-    //         var mat_card_number = "contact" + (i) + "number";
-    //         var mat_card_name = "contact" + (i) + "name";
-    //         this.thirdFormGroup.get(mat_card_name).setValidators(Validators.required);
-    //         this.thirdFormGroup.get(mat_card_number).setValidators(Validators.required);
-    //         console.log(mat_card_name + " aggiunto required")
-    //         console.log(mat_card_number + " aggiunto required")
-    //         this.thirdFormGroup.updateValueAndValidity();
-    //         console.log('add_card')
-    //         stop = true;
-    //       }
-    //       i++;
-    //     }
-    //   }
-    // }
   }
   remove_contact(id) {
     this.emergency_contacts.splice(id, 1)
@@ -272,50 +252,18 @@ export class SignupPage implements OnInit {
     var mat_card_name = "contact" + (id) + "name";
     this.thirdFormGroup.get(mat_card_name).setValue("");
     this.thirdFormGroup.get(mat_card_number).setValue(undefined);
-    // this.thirdFormGroup.get(mat_card_name).clearAsyncValidators();
-    // this.thirdFormGroup.get(mat_card_number).clearAsyncValidators();
-    // this.thirdFormGroup.get(mat_card_name).setErrors(null);
-    // this.thirdFormGroup.get(mat_card_number).setErrors(null);
-    // this.thirdFormGroup.updateValueAndValidity();
-    // console.log(mat_card_name + " tolto required " + id)
-    // console.log(mat_card_number + " tolto required " + id)
-    // this.countNumberContactsDone--;
-    // if (this.countNumberContactsDone == 0)
-    //   this.thirdFormGroup.setErrors(Validators.required)
-    // if (this.countNumberContactsDone == 1) {
-    //   for (var i = 0; i < 5; i++) {
-    //     if (this.posNumberContacts[i]) {
-    //       var mat_card_number = "contact" + (i) + "number";
-    //       var mat_card_name = "contact" + (i) + "name";
-    //       this.thirdFormGroup.get(mat_card_name).setValidators(Validators.required);
-    //       this.thirdFormGroup.get(mat_card_number).setValidators(Validators.required);
-    //       this.thirdFormGroup.updateValueAndValidity();
-    //       console.log(this.thirdFormGroup.get(mat_card_number).validator);
-    //     }
-    //   }
-    // }
   }
-  import_from_addressBook() {
-    let options = {
-      filter: '',
-      hasPhoneNumber: true,
-      multiple: true
-    }
-    this.contacts.find(['*'], options).then((contacts) => {
-      //this.myContacts=contacts;
-      console.log(this.myContacts);
-    });
-  }
+
   openDialog(id): void {
     const dialogRef = this.dialog.open(DialogExampleComponent, {
-      width: '250px',
+      maxWidth:'90vw',
+      minWidth:'40vw',
       data: {
-        contact: { name: 'aaa', number: '1234' }
+        contact: { name: '', number: '' }
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
       var app = 'contact' + id + 'name';
       if (result?.name != undefined && result?.number != undefined) {
         this.thirdFormGroup.get(app).setValue(result.name)
@@ -332,7 +280,7 @@ export class SignupPage implements OnInit {
   }
   show_tooltip() {
     this.tooltip.show();
-    interval(2000).subscribe(() => { this.tooltip.hide(); })
+    interval(4000).subscribe(() => { this.tooltip.hide(); })
   }
   devices: Device[];
   paired_devices: Device[];
@@ -393,7 +341,6 @@ export class SignupPage implements OnInit {
     this.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
     this.user_data.birthdate = this.firstFormGroup.get('birthdate')?.value;
     this.user_data.gender = this.firstFormGroup.get('gender')?.value;
-    this.user_data.birthdate = this.firstFormGroup.get('birthdate')?.value;
     this.user_data.address = this.firstFormGroup.get('address')?.value;
     this.user_data.locality = this.firstFormGroup.get('locality')?.value;
     this.user_data.city = this.firstFormGroup.get('city')?.value;
@@ -434,14 +381,21 @@ export class SignupPage implements OnInit {
   }
 }
 
-
+class DateValidator {
+  static dateVaidator(AC: AbstractControl) {
+    if (AC && AC.value && (!moment(AC.value, 'MM/DD/YYYY', true).isValid() && !moment(AC.value, 'M/D/YYYY', true).isValid())) {
+      return { dateValidator: true };
+    }
+    return null;
+  }
+}
 
 class ValidatePassword {
   static ConfirmValidator(name: string, checkName: string): ValidatorFn {
     return (controls: AbstractControl) => {
       const control = controls.get(name);
       const checkControl = controls.get(checkName);
-      if (checkControl.errors && !checkControl.errors.matching) { //avoid errors when confirm password is not yet insert
+      if (checkControl.errors && !checkControl.errors.matching) { //avoid errors when confirm_password is not yet insert
         return null;
       }
       if (control.value !== checkControl.value) {
