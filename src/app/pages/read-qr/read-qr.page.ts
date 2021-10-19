@@ -13,11 +13,25 @@ import { ChangeDetectorRef } from '@angular/core';
   styleUrls: ['./read-qr.page.scss'],
 })
 export class ReadQRPage implements OnInit {
+  previewCamera = false;
   qrData = ''
   scannedCode = null;
   title = 'app';
   isOn = false;
-  constructor(private changeRef: ChangeDetectorRef, private qrScanner: QRScanner, private base64ToGallery: Base64ToGallery, private toastCtrl: ToastController) {
+  constructor(private changeRef: ChangeDetectorRef, private qrScanner: QRScanner,  private toastCtrl: ToastController) {
+    document.addEventListener('ionBackButton', (ev) => {
+      //console.log(ev)
+      if (this.previewCamera) {
+        console.log('backbutton');
+        this.closePreviewCamera();
+        $("ion-app").show(500);
+      }
+    })
+  }
+  closePreviewCamera() {
+    this.previewCamera = false;
+    this.qrScanner.hide();
+    this.qrScanner.destroy();
   }
   scanCode() {
     this.qrScanner.prepare()
@@ -26,19 +40,18 @@ export class ReadQRPage implements OnInit {
           // start scanning
           // this.isOn = true;
           console.log('scanner ok')
-          $("#content").hide(500, () => {
+          $("ion-app").hide(500, () => {
             this.qrScanner.show();
+            this.previewCamera = true;
             this.qrScanner.scan().subscribe((text: string) => {
               console.log('camera')
-              //  this.isOn = false;
               console.log(this.isOn);
               this.scannedCode = text;
               alert('Scanned something: ' + text);
               console.log(this.scannedCode)
-              this.qrScanner.hide(); // hide camera preview
-              this.qrScanner.destroy();
+              this.closePreviewCamera();
               this.changeRef.detectChanges();
-              $("#content").show(500);
+              $("ion-app").show(500);
             });
           })
         } else if (status.denied) {
@@ -51,21 +64,6 @@ export class ReadQRPage implements OnInit {
         }
       })
       .catch((e: any) => console.log('Error is', e));
-  }
-  downloadQR() {
-    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-    const imageData = canvas.toDataURL('image/jpeg').toString();
-    console.log('data: ' + imageData)
-    let data = imageData.split(',')[1];
-    this.base64ToGallery.base64ToGallery(data, { prefix: '_img', mediaScanner: true })
-      .then(async res => {
-        let toast = await this.toastCtrl.create({
-          header: 'QR Code saved in your PhotoLibrary',
-          duration: 2000
-        })
-        toast.present();
-      },
-        err => console.log('err ' + err))
   }
   ngOnInit() {
   }
