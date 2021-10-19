@@ -47,3 +47,14 @@ mat-form-field{
   display: flex;
   justify-content: space-around;
 }
+.container_date{
+  display: flex;
+  flex-direction: row;
+}
+.span_inline{
+  width: fit-content;
+}
+.input_data{
+  //width: 40px;
+  text-align: center;
+}
