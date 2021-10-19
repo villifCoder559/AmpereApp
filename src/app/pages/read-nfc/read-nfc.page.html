@@ -12,13 +12,10 @@
 </ion-header>
 
 <ion-content>
-  <ion-item>
-    <ion-input type="text" placeholder='My NFC data' [(ngModel)]="NFC_data"></ion-input>
-  </ion-item>
-  <button mat-raised-button color="primary" (click)="read_NFC()">Read NFC</button>
   <ion-card *ngIf="readMessage">
     <ion-card-content>
       Result from scan: {{readMessage}}
     </ion-card-content>
   </ion-card>
+  <ion-button (click)="read_NFC()">Read NFC</ion-button>
 </ion-content>
