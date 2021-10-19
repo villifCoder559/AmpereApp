@@ -8,7 +8,7 @@
     </ion-buttons>
     <span *ngIf="!logged">Registration Form</span>
     <span *ngIf="logged">Profile</span>
-    <ion-buttons class="slot-end" *ngIf="logged" >
+    <ion-buttons class="slot-end" *ngIf="logged">
       <ion-button (click)="save_data()">Save</ion-button>
     </ion-buttons>
     <div *ngIf="!logged" style="flex: auto; width: 50px;height: 50px;"> </div>
@@ -20,271 +20,205 @@
     <mat-step [stepControl]="zeroFormGroup">
       <ng-template matStepLabel>Login credentials</ng-template>
       <ng-template matStepContent>
-      <form id="login_credential" [formGroup]="zeroFormGroup">
-        <mat-form-field appearance="fill">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="" required>
-        </mat-form-field>
-        <mat-form-field *ngIf="logged && editable" appearance="fill" id="matcardResize">
-          <mat-label>Old Password</mat-label>
-          <input matInput [type]="hideold?'text':'password'" formControlName="old_psw" placeholder="" required>
-          <button mat-icon-button matSuffix (click)="hideold = !hideold">
-            <mat-icon>{{hideold ? 'visibility' : 'visibility_off'}}</mat-icon>
-          </button>
-          <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match</mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="fill" id="matcardResize" *ngIf="editable || !logged">
-          <mat-label *ngIf="logged">New Password</mat-label>
-          <mat-label *ngIf="!logged">Password</mat-label>
-          <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required>
-          <button mat-icon-button matSuffix (click)="hidepsw = !hidepsw">
-            <mat-icon>{{hidepsw ? 'visibility' : 'visibility_off'}}</mat-icon>
-          </button>
-          <mat-error *ngIf="zeroFormGroup.get('psw').hasError('required')">Field Required</mat-error>
-          <mat-error *ngIf="zeroFormGroup.get('psw').hasError('minlength')">Password length more than 7</mat-error>
-          <mat-error *ngIf="zeroFormGroup.get('psw').hasError('pattern')">At leat one special char</mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="fill" id="matcardResize" *ngIf="editable || !logged">
-          <mat-label>Confirm Password</mat-label>
-          <input matInput [type]="hide?'text':'password'" formControlName="confirm_psw" placeholder="" required>
-          <button mat-icon-button matSuffix (click)="hide = !hide">
-            <mat-icon>{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
-          </button>
-          <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match</mat-error>
-        </mat-form-field>
-        <div>
-          <button mat-button matStepperNext (click)="click_next()">Next</button>
-          <button mat-button (click)="change_EmailPassword()" *ngIf="logged">Edit</button>
-        </div>
-      </form>
-    </ng-template>
+        <form id="login_credential" [formGroup]="zeroFormGroup">
+          <mat-form-field appearance="fill">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="" required>
+          </mat-form-field>
+          <mat-form-field *ngIf="logged && editable" appearance="fill" id="matcardResize">
+            <mat-label>Old Password</mat-label>
+            <input matInput [type]="hideold?'text':'password'" formControlName="old_psw" placeholder="" required>
+            <button mat-icon-button matSuffix (click)="hideold = !hideold">
+              <mat-icon>{{hideold ? 'visibility' : 'visibility_off'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill" id="matcardResize" *ngIf="editable || !logged">
+            <mat-label *ngIf="logged">New Password</mat-label>
+            <mat-label *ngIf="!logged">Password</mat-label>
+            <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required>
+            <button mat-icon-button matSuffix (click)="hidepsw = !hidepsw">
+              <mat-icon>{{hidepsw ? 'visibility' : 'visibility_off'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="zeroFormGroup.get('psw').hasError('required')">Field Required</mat-error>
+            <mat-error *ngIf="zeroFormGroup.get('psw').hasError('minlength')">Password length more than 7</mat-error>
+            <mat-error *ngIf="zeroFormGroup.get('psw').hasError('pattern')">At leat one special char</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill" id="matcardResize" *ngIf="editable || !logged">
+            <mat-label>Confirm Password</mat-label>
+            <input matInput [type]="hide?'text':'password'" formControlName="confirm_psw" placeholder="" required>
+            <button mat-icon-button matSuffix (click)="hide = !hide">
+              <mat-icon>{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match</mat-error>
+          </mat-form-field>
+          <div>
+            <button mat-button matStepperNext (click)="click_next()">Next</button>
+            <button mat-button (click)="change_EmailPassword()" *ngIf="logged">Edit</button>
+          </div>
+        </form>
+      </ng-template>
     </mat-step>
-    <mat-step [stepControl]="firstFormGroup" >
+    <mat-step [stepControl]="firstFormGroup">
       <ng-template matStepLabel>Personal Information</ng-template>
       <ng-template matStepContent>
-      <form id="personal_information" [formGroup]="firstFormGroup">
-        <mat-form-field appearance="fill">
-          <mat-label>Name</mat-label>
-          <input matInput required formControlName="name" placeholder="Name">
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Surname</mat-label>
-          <input matInput required formControlName="surname" placeholder="Surname">
-        </mat-form-field>
+        <form id="personal_information" [formGroup]="firstFormGroup">
+          <mat-form-field appearance="fill">
+            <mat-label>Name</mat-label>
+            <input matInput required formControlName="name" placeholder="Name">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Surname</mat-label>
+            <input matInput required formControlName="surname" placeholder="Surname">
+          </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Phone number</mat-label>
-          <input matInput type="number" maxlength="15" required formControlName="phoneNumber" placeholder="">
-        </mat-form-field>
-        <mat-form-field appearance="fill" (click)="log_data()">
-          <mat-label>Birthdate</mat-label>
-          <input matInput type="date" required formControlName="birthdate" placeholder="">
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Gender</mat-label>
-          <mat-select formControlName="gender" required>
-            <mat-option value="male">Male</mat-option>
-            <mat-option value="female">Female</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Address</mat-label>
-          <input matInput formControlName="address" placeholder="" required>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Locality</mat-label>
-          <input matInput formControlName="locality" placeholder="" required>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>City</mat-label>
-          <input matInput formControlName="city" placeholder="" required>
-        </mat-form-field>
-        <mat-form-field appearance="fill" id="matcardResize">
-          <mat-label>Height</mat-label>
-          <input matInput maxlength="3" (keypress)="onlyNumbersAllowed($event)" (ionInput)="onlyNumbersAllowed($event)"
-            formControlName="height" placeholder="">
-          <span matSuffix>cm</span>
-        </mat-form-field>
-        <mat-form-field appearance="fill" id="matcardResize">
-          <mat-label>Weight</mat-label>
-          <input matInput maxlength="3" (keypress)="onlyNumbersAllowed($event)" (ionInput)="onlyNumbersAllowed($event)"
-            type="text" formControlName="weight" placeholder="">
-          <span matSuffix>Kg</span>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>Ethnicity</mat-label>
-          <input matInput formControlName="ethnicity" placeholder="">
-        </mat-form-field>
-        <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-          <mat-label>Description</mat-label>
-          <textarea #description matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-            cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="brown hair,blue eyes..."
-            formControlName="description"></textarea>
-          <mat-hint align="end">{{description.value?.length || 0}}/200</mat-hint>
-        </mat-form-field>
-        <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-          <mat-label>Purpose</mat-label>
-          <textarea #purpose matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-            cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="Medical Emergency, Personal safety,..."
-            formControlName="purpose"></textarea>
-          <mat-hint align="end">{{purpose.value?.length || 0}}/200</mat-hint>
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>PIN</mat-label>
-          <input type="text" required (keypress)="onlyNumbersAllowed($event)" (ionInput)="onlyNumbersAllowed($event)"
-            matInput formControlName="pin" placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()"
-            #tooltip="matTooltip" matTooltip="Use to cancel emergency call">
-        </mat-form-field>
-        <div>
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-button matStepperNext (click)="click_next()">Next</button>
-        </div>
-      </form>
-    </ng-template>
+          <mat-form-field appearance="fill">
+            <mat-label>Phone number</mat-label>
+            <input matInput type="tel" maxlength="15" minlength="8" required formControlName="phoneNumber" placeholder="">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Birthdate</mat-label>
+            <input (input)="checkData($event)" maxlength="10" matInput type="tel" required formControlName="birthdate" placeholder="mm/dd/yyyy">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Gender</mat-label>
+            <mat-select formControlName="gender" required>
+              <mat-option value="male">Male</mat-option>
+              <mat-option value="female">Female</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Address</mat-label>
+            <input matInput formControlName="address" placeholder="" required>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Locality</mat-label>
+            <input matInput formControlName="locality" placeholder="" required>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city" placeholder="" required>
+          </mat-form-field>
+          <mat-form-field appearance="fill" id="matcardResize">
+            <mat-label>Height</mat-label>
+            <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'height')"
+              formControlName="height" placeholder="">
+            <span matSuffix>cm</span>
+          </mat-form-field>
+          <mat-form-field appearance="fill" id="matcardResize">
+            <mat-label>Weight</mat-label>
+            <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'weight')"
+               formControlName="weight" placeholder="">
+            <span matSuffix>Kg</span>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Ethnicity</mat-label>
+            <input matInput formControlName="ethnicity" placeholder="">
+          </mat-form-field>
+          <mat-form-field appearance="fill" hintLabel="Max 200 characters">
+            <mat-label>Description</mat-label>
+            <textarea #description matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="brown hair,blue eyes..."
+              formControlName="description"></textarea>
+            <mat-hint align="end">{{description.value?.length || 0}}/200</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="fill" hintLabel="Max 200 characters">
+            <mat-label>Purpose</mat-label>
+            <textarea #purpose matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="Medical Emergency, Personal safety,..."
+              formControlName="purpose"></textarea>
+            <mat-hint align="end">{{purpose.value?.length || 0}}/200</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>PIN</mat-label>
+            <input type="tel" required (input)="onlyNumbersAllowed($event,'pin')"
+              matInput formControlName="pin" placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()"
+              #tooltip="matTooltip" matTooltip="Use to cancel emergency call">
+          </mat-form-field>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperNext (click)="click_next()">Next</button>
+          </div>
+        </form>
+      </ng-template>
     </mat-step>
-    <mat-step [stepControl]="secondFormGroup" >
+    <mat-step [stepControl]="secondFormGroup">
       <ng-template matStepLabel>Medical Information</ng-template>
       <ng-template matStepContent>
-      <form id="medical_information" [formGroup]="secondFormGroup">
-        <mat-card appearance="fill" id="matcardResize">
-          <mat-card-title>Disabilities</mat-card-title>
-          <mat-checkbox [checked]="user_data.disabilities[0]">Vision impaired
-          </mat-checkbox><br>
-          <mat-checkbox [checked]="user_data.disabilities[1]">Wheelchair user
-          </mat-checkbox>
-        </mat-card>
-        <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-          <mat-label>Allergies</mat-label>
-          <textarea #allergies matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-            cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="pollen,Insect stings..."
-            formControlName="allergies"></textarea>
-          <mat-hint align="end">{{allergies.value?.length || 0}}/200</mat-hint>
-        </mat-form-field>
-        <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-          <mat-label>Medications</mat-label>
-          <textarea #medications matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-            cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="" formControlName="medications"></textarea>
-          <mat-hint align="end">{{medications.value?.length || 0}}/200</mat-hint>
-        </mat-form-field>
-        <div>
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-button matStepperNext (click)="click_next()">Next</button>
-        </div>
-      </form>
+        <form id="medical_information" [formGroup]="secondFormGroup">
+          <mat-card appearance="fill" id="matcardResize">
+            <mat-card-title>Disabilities</mat-card-title>
+            <mat-checkbox [checked]="user_data.disabilities[0]">Vision impaired
+            </mat-checkbox><br>
+            <mat-checkbox [checked]="user_data.disabilities[1]">Wheelchair user
+            </mat-checkbox>
+          </mat-card>
+          <mat-form-field appearance="fill" hintLabel="Max 200 characters">
+            <mat-label>Allergies</mat-label>
+            <textarea #allergies matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="pollen,Insect stings..."
+              formControlName="allergies"></textarea>
+            <mat-hint align="end">{{allergies.value?.length || 0}}/200</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="fill" hintLabel="Max 200 characters">
+            <mat-label>Medications</mat-label>
+            <textarea #medications matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="" formControlName="medications"></textarea>
+            <mat-hint align="end">{{medications.value?.length || 0}}/200</mat-hint>
+          </mat-form-field>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperNext (click)="click_next()">Next</button>
+          </div>
+        </form>
       </ng-template>
     </mat-step>
-    <mat-step [stepControl]="thirdFormGroup" >
+    <mat-step [stepControl]="thirdFormGroup">
       <ng-template matStepLabel>Emergency Contacts</ng-template>
       <ng-template matStepContent>
-      <form id="emergency_contacts" [formGroup]="thirdFormGroup">
-        <mat-card *ngFor="let contact of emergency_contacts;let i=index">
-          <mat-card-header>
-            <mat-card-title>Emergency Contact</mat-card-title>
-          </mat-card-header>
-          <mat-form-field appearance="fill">
-            <mat-label>Name</mat-label>
-            <input matInput maxlength="20" formControlName="contact{{i}}name" placeholder="">
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Phone number</mat-label>
-            <input type="number" matInput maxlength="15" formControlName="contact{{i}}number" placeholder="">
-          </mat-form-field>
-          <div class="container-button">
-            <button style="display: flex;" mat-raised-button (click)="openDialog(i)">Import</button>
-            <button style="display: flex;" mat-raised-button color="warn" (click)="remove_contact(i)">Remove</button>
+        <form id="emergency_contacts" [formGroup]="thirdFormGroup">
+          <mat-card *ngFor="let contact of emergency_contacts;let i=index">
+            <mat-card-header>
+              <mat-card-title>Emergency Contact</mat-card-title>
+            </mat-card-header>
+            <mat-form-field appearance="fill">
+              <mat-label>Name</mat-label>
+              <input matInput maxlength="20" formControlName="contact{{i}}name" placeholder="">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Phone number</mat-label>
+              <input type="tel" matInput maxlength="15" formControlName="contact{{i}}number" placeholder="">
+            </mat-form-field>
+            <div class="container-button">
+              <button style="display: flex;" mat-raised-button (click)="openDialog(i)">Import</button>
+              <button style="display: flex;" mat-raised-button color="warn" (click)="remove_contact(i)">Remove</button>
+            </div>
+          </mat-card>
+          <button *ngIf="countNumberContactsDone < 5" style="margin: 10px 0 10px;" mat-raised-button
+            (click)="add_Contact()">Add Contact</button>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperNext (click)="click_next()">Next</button>
           </div>
-        </mat-card>
-        <!-- <mat-card *ngIf="posNumberContacts[1]">
-          <mat-card-header>
-            <mat-card-title>Emergency Contact</mat-card-title>
-          </mat-card-header>
-          <mat-form-field appearance="fill">
-            <mat-label>Name</mat-label>
-            <input matInput maxlength="20" formControlName="contact1name" placeholder="">
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Phone number</mat-label>
-            <input type="number" matInput maxlength="15" formControlName="contact1number" placeholder="">
-          </mat-form-field>
-          <button mat-raised-button (click)="openDialog(1)">Import</button>
-          <button mat-raised-button color="warn" (click)="remove_contact(1)">Remove</button>
-
-        </mat-card>
-        <mat-card *ngIf="posNumberContacts[2]">
-          <mat-card-header>
-            <mat-card-title>Emergency Contact</mat-card-title>
-          </mat-card-header>
-          <mat-form-field appearance="fill">
-            <mat-label>Name</mat-label>
-            <input matInput maxlength="20" formControlName="contact2name" placeholder="">
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Phone number</mat-label>
-            <input type="number" matInput maxlength="15" formControlName="contact2number" placeholder="">
-          </mat-form-field>
-          <button mat-raised-button (click)="openDialog(2)">Import</button>
-          <button mat-raised-button color="warn" (click)="remove_contact(2)">Remove</button>
-        </mat-card>
-        <mat-card *ngIf="posNumberContacts[3]">
-          <mat-card-header>
-            <mat-card-title>Emergency Contact</mat-card-title>
-          </mat-card-header>
-          <mat-form-field appearance="fill">
-            <mat-label>Name</mat-label>
-            <input matInput maxlength="20" formControlName="contact3name" placeholder="">
-          </mat-form-field>
-
-          <mat-form-field appearance="fill">
-            <mat-label>Phone number</mat-label>
-            <input type="number" matInput maxlength="15" formControlName="contact3number" placeholder="">
-          </mat-form-field>
-          <button mat-raised-button (click)="openDialog(3)">Import</button>
-          <button mat-raised-button color="warn" (click)="remove_contact(3)">Remove</button>
-        </mat-card>
-        <mat-card *ngIf="posNumberContacts[4]">
-          <mat-card-header>
-            <mat-card-title>Emergency Contact</mat-card-title>
-          </mat-card-header>
-          <mat-form-field appearance="fill">
-            <mat-label>Name</mat-label>
-            <input matInput maxlength="20" formControlName="contact4name" placeholder="">
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Phone number</mat-label>
-            <input type="number" matInput maxlength="15" formControlName="contact4number" placeholder="">
-          </mat-form-field>
-          <button mat-raised-button (click)="openDialog(4)">Import</button>
-          <button mat-raised-button color="warn" (click)="remove_contact(4)">Remove</button>
-        </mat-card> -->
-
-        <button *ngIf="countNumberContactsDone < 5" style="margin: 10px 0 10px;" mat-raised-button
-          (click)="add_Contact()">Add Contact</button>
-        <div>
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-button matStepperNext (click)="click_next()">Next</button>
-        </div>
-      </form>
+        </form>
       </ng-template>
     </mat-step>
 
-    <mat-step [stepControl]="fourthFormGroup" >
+    <mat-step [stepControl]="fourthFormGroup">
       <ng-template matStepLabel>Public Emergency Contacts</ng-template>
       <ng-template matStepContent>
-      <form id="public_contacts" [formGroup]="fourthFormGroup">
-        <mat-card appearance="fill">
-          <mat-label>Would you like to contact the following numbers?(without direct responsibility)</mat-label><br>
-          <mat-checkbox [checked]="user_data.public_emergency_contacts[113]"
-            >113</mat-checkbox><br>
-          <mat-checkbox [checked]="user_data.public_emergency_contacts[115]"
-            >115</mat-checkbox><br>
-          <mat-checkbox [checked]="user_data.public_emergency_contacts[118]"
-            >118</mat-checkbox>
-        </mat-card>
-        <div>
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-button matStepperNext>Next</button>
-        </div>
-      </form>
+        <form id="public_contacts" [formGroup]="fourthFormGroup">
+          <mat-card appearance="fill">
+            <mat-label>Would you like to contact the following numbers?(without direct responsibility)</mat-label><br>
+            <mat-checkbox [checked]="user_data.public_emergency_contacts[113]">113</mat-checkbox><br>
+            <mat-checkbox [checked]="user_data.public_emergency_contacts[115]">115</mat-checkbox><br>
+            <mat-checkbox [checked]="user_data.public_emergency_contacts[118]">118</mat-checkbox>
+          </mat-card>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperNext>Next</button>
+          </div>
+        </form>
       </ng-template>
     </mat-step>
 
@@ -293,7 +227,8 @@
       <!-- <ng-template matStepContent> -->
       <mat-card appearance="fill">
         <mat-card-title>Pairing</mat-card-title>
-        <mat-card-subtitle>Press your smart jewerly and then press the button below to pair it with the app (swipe to delete device)
+        <mat-card-subtitle>Press your smart jewerly and then press the button below to pair it with the app (swipe to
+          delete device)
         </mat-card-subtitle>
         <mat-card-content style="text-align: center;">
           <button style="margin: 13px;" mat-fab color="primary" (click)="scan()">
