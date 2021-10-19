@@ -74,11 +74,13 @@
 
           <mat-form-field appearance="fill">
             <mat-label>Phone number</mat-label>
-            <input matInput type="tel" maxlength="15" minlength="8" required formControlName="phoneNumber" placeholder="">
+            <input matInput type="tel" maxlength="15" minlength="8" required formControlName="phoneNumber"
+              placeholder="">
           </mat-form-field>
           <mat-form-field appearance="fill">
             <mat-label>Birthdate</mat-label>
-            <input (input)="checkData($event)" maxlength="10" matInput type="tel" required formControlName="birthdate" placeholder="mm/dd/yyyy">
+            <input (input)="checkData($event)" maxlength="10" matInput type="tel" required formControlName="birthdate"
+              placeholder="mm/dd/yyyy">
           </mat-form-field>
           <mat-form-field appearance="fill">
             <mat-label>Gender</mat-label>
@@ -108,7 +110,7 @@
           <mat-form-field appearance="fill" id="matcardResize">
             <mat-label>Weight</mat-label>
             <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'weight')"
-               formControlName="weight" placeholder="">
+              formControlName="weight" placeholder="">
             <span matSuffix>Kg</span>
           </mat-form-field>
           <mat-form-field appearance="fill">
@@ -131,9 +133,9 @@
           </mat-form-field>
           <mat-form-field appearance="fill">
             <mat-label>PIN</mat-label>
-            <input type="tel" required (input)="onlyNumbersAllowed($event,'pin')"
-              matInput formControlName="pin" placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()"
-              #tooltip="matTooltip" matTooltip="Use to cancel emergency call">
+            <input type="tel" required (input)="onlyNumbersAllowed($event,'pin')" matInput formControlName="pin"
+              placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()" #tooltip="matTooltip"
+              matTooltip="Use to cancel emergency call">
           </mat-form-field>
           <div>
             <button mat-button matStepperPrevious>Back</button>
@@ -225,16 +227,16 @@
     <mat-step>
       <ng-template matStepLabel>Smart devices</ng-template>
       <!-- <ng-template matStepContent> -->
-      <mat-card appearance="fill">
+      <mat-card appearance="fill" id="bluetooth">
         <mat-card-title>Pairing</mat-card-title>
         <mat-card-subtitle>Press your smart jewerly and then press the button below to pair it with the app (swipe to
           delete device)
         </mat-card-subtitle>
-        <mat-card-content style="text-align: center;">
-          <button style="margin: 13px;" mat-fab color="primary" (click)="scan()">
+        <mat-card-content>
+          <button mat-fab color="primary" (click)="scan()">
             <mat-icon>bluetooth</mat-icon>
           </button>
-          <ion-list *ngFor="let device of paired_devices;let i=index; trackBy:trackItem" style="padding: 0px;">
+          <ion-list *ngFor="let device of paired_devices;let i=index; trackBy:trackItem">
             <ion-item-sliding>
               <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;">
                 <ion-label style="background-color: white; margin: 0px;">
@@ -245,9 +247,11 @@
                 </ion-label>
               </ion-item>
               <ion-item-options side="end" (ionSwipe)="delete(device,i)" style="background-color: white;">
-                <ion-item-option color="danger" (click)="delete(device,i)" expandable>
-                  <ion-icon name="trash-outline">
-                  </ion-icon>
+                <ion-item-option color="danger" (click)="delete(device,i)" expandable style="display: flex; flex-direction: row;">
+                  <div >
+                    <ion-icon name="trash-outline" style="width: 30px; height: 30px;"></ion-icon>
+                    <p>Delete</p>
+                  </div>
                 </ion-item-option>
               </ion-item-options>
             </ion-item-sliding>
