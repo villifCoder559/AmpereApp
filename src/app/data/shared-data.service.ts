@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { NumericValueAccessor } from '@ionic/angular';
+
 export class Emergency_Contact {
   number: string = '';
   name: string = '';
@@ -68,7 +68,7 @@ export class SharedDataService {
     const data: UserData = {
       address: 'Viale Morgagni 87',
       allergies: 'gluten',
-      birthdate: '1947-10-25',
+      birthdate: '10/25/1947',
       city: 'Florence',
       description: 'brown hair, blue eyes',
       disabilities: [false, true],
