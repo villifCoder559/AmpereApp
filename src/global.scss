@@ -31,7 +31,7 @@
     padding: 8px 0px;
     background-color: red;
     font-weight: bolder;
-    margin-bottom: 15px;
+    // margin-bottom: 15px;
 }
 
 ion-item{
@@ -47,4 +47,8 @@ h2,h3,p{
 }
 .fake-icon{ // for style of toolbar
     width: 40px;height: 32px;display: flex;
+}
+.containerDialog .mat-form-field-infix{
+    display: flex;
+    flex-direction: row;
 }
