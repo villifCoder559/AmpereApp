@@ -29,8 +29,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
   13) On device:
         _login page bad resize when open keyboard OK
         _QR code camera not working OK
-        _Create div for camera
-        _Fix when camera is opened and user clicks back-button or in another menu section 
+        _Fix when camera is opened and user clicks back-button or in another menu section OK
         _show_alert doesn't show pin labels OK
         _bad performance OK
   */
