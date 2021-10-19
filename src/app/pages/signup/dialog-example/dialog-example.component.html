@@ -8,7 +8,7 @@
   </mat-form-field>
   <div mat-dialog-content>
     <mat-spinner id="matSpinner"></mat-spinner>
-    <mat-selection-list [(ngModel)]="selectedOptions" #contacts [multiple]="false"
+    <mat-selection-list id="selectionList" [(ngModel)]="selectedOptions" #contacts [multiple]="false"
       style="height: inherit; width: inherit;">
       <mat-list-option *ngFor="let contact of myContacts" [value]="contact" (click)="save_data()">
         <div mat-line>{{contact?.name}}</div>

@@ -87,7 +87,8 @@ export class DialogExampleComponent implements OnInit {
         });
       });
       $('#matSpinner').hide();
-      $('.mat-dialog-content').css('justify-content', 'flex-start')
+      $('.mat-dialog-content').css('justify-content', 'flex-start');
+      $('#selectionList').css("width", "100%");
       console.log(this.myContacts);
     }, (err) => {
       $('#matSpinner').hide();
