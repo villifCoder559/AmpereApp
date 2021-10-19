@@ -1,13 +1,19 @@
-.container{
+.containerDialog{
     height: 500px;
     display: flex;
     flex-direction: column;
     position: relative;
 }
 .footer{
-    position: absolute;
-    bottom: 5px;
+    // position: absolute;
+    // bottom: 5px;
+    // top:5px
 }
 .mat-dialog-content{
-    max-height: 65%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    overflow: auto;
 }
