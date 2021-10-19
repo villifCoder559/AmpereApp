@@ -7,7 +7,7 @@ import { SignupPage } from './signup.page';
 import { MaterialModule } from '../../material-module'
 import { DialogExampleComponent } from './dialog-example/dialog-example.component';
 import { HttpClientModule } from '@angular/common/http';
-
+import {Contacts} from '@ionic-native/contacts/ngx'
 @NgModule({
   imports: [
     CommonModule,
@@ -19,7 +19,7 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule
   ],
   declarations: [SignupPage,DialogExampleComponent],
-  providers:[],
+  providers:[Contacts],
   entryComponents:[DialogExampleComponent]
 })
 export class SignupPageModule {}
