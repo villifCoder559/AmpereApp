@@ -17,8 +17,10 @@ import { AlertController, IonContent, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
-import * as moment from 'moment'; // add this 1 of 4
-import { Contacts, ContactName, ContactField }  from '@ionic-native/contacts';
+import * as moment from 'moment';
+import { Contacts, ContactName, ContactField } from '@ionic-native/contacts/ngx';
+import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
+
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -41,16 +43,17 @@ export class SignupPage implements OnInit {
   }
   user_data: UserData;
   public_emergency_contacts
+  paired_devices = [];
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   required = Validators.required;
   @ViewChild('tooltip') tooltip: MatTooltip;
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
-
+  pswValidator: Validators = [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[|!"£/()?@#$%^&+=]).*$')];
   zeroFormGroup = this._formBuilder.group({
     email: ['', Validators.email],
-    psw: ['', [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[|!"£/()?@#$%^&+=]).*$')]],
-    confirm_psw: ['', [Validators.required]],
+    psw: [''],
+    confirm_psw: [''],
     old_psw: ['']
   }, {
     validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
@@ -90,6 +93,7 @@ export class SignupPage implements OnInit {
   fourthFormGroup = this._formBuilder.group({
     fourthCtrl: ['']
   });
+  readonly arrayFormGroup = [this.zeroFormGroup, this.firstFormGroup, this.secondFormGroup, this.thirdFormGroup, this.fourthFormGroup]
   stepperOrientation: Observable<StepperOrientation>;
   myContacts = [
     {
@@ -106,7 +110,7 @@ export class SignupPage implements OnInit {
       number: '129852185'
     }
   ];
-  constructor(public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public ble: BLE, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     this.user_data = this.shared_data.getUserData();
     if (this.user_data == undefined) {
       this.user_data = new UserData();
@@ -130,8 +134,34 @@ export class SignupPage implements OnInit {
         console.log(error);
       });
   }
+  findErrorsAllFormsGroup() {
+    console.log(this.arrayFormGroup.length)
+    var error = false;
+    for (var i = 0; i < this.arrayFormGroup.length && !error; i++) {
+      var result = this.getFormValidationErrors(this.arrayFormGroup[i]);
+      if (result.length != 0) {
+        return i+1;
+      }
+    }
+    return error;
+  }
+  /*Create generalised check foreach formGroup field. this specific implementation working fine*/
   change_EmailPassword() {
-    this.editable = !this.editable
+    this.editable = !this.editable;
+    if (!this.editable) {
+      this.zeroFormGroup.controls['psw'].setErrors(null);
+      this.zeroFormGroup.controls['confirm_psw'].setErrors(null);
+      this.zeroFormGroup.controls['old_psw'].setErrors(null);
+      console.log('clear')
+    }
+    else {
+      this.zeroFormGroup.controls['psw'].setErrors(this.pswValidator)
+      this.zeroFormGroup.controls['confirm_psw'].setErrors([Validators.required])
+      this.zeroFormGroup.controls['old_psw'].setErrors([Validators.required])
+      this.createToast('If you don\'t want to modify your password, click close Edit psw')
+    }
+    this.zeroFormGroup.updateValueAndValidity();
+
   }
 
   ngOnInit() {
@@ -223,22 +253,13 @@ export class SignupPage implements OnInit {
     console.log(input)
     console.log(parseInt(input.data) === NaN)
     if (isNaN(parseInt(input.data)) && input.inputType != 'deleteContentBackward') {
-      var txt=this.firstFormGroup.controls[id].value;
+      var txt = this.firstFormGroup.controls[id].value;
       this.firstFormGroup.controls[id].setValue(txt.substring(0, txt.length - 1))
     }
   }
-  getFormValidationErrors() {
-    Object.keys(this.thirdFormGroup.controls).forEach(key => {
-      const controlErrors: ValidationErrors = this.thirdFormGroup.get(key).errors;
-      if (controlErrors != null) {
-        Object.keys(controlErrors).forEach(keyError => {
-          console.log('Key control: ' + key + ', keyError: ' + keyError + ', err value: ', controlErrors[keyError]);
-        });
-      }
-    });
-  }
+
   add_Contact() {
-    this.getFormValidationErrors()
+    this.getFormValidationErrors(this.thirdFormGroup)
     if (this.countNumberContactsDone < 5 && !this.thirdFormGroup.hasError('required')) {
       this.countNumberContactsDone++;
       const app = new Emergency_Contact()
@@ -254,10 +275,10 @@ export class SignupPage implements OnInit {
     this.thirdFormGroup.get(mat_card_number).setValue(undefined);
   }
 
-  openDialog(id): void {
+  openDialogContacts(id): void {
     const dialogRef = this.dialog.open(DialogExampleComponent, {
-      maxWidth:'90vw',
-      minWidth:'40vw',
+      maxWidth: '90vw',
+      minWidth: '40vw',
       data: {
         contact: { name: '', number: '' }
       }
@@ -272,6 +293,19 @@ export class SignupPage implements OnInit {
       }
     });
   }
+  openDialogBLE(): void {
+    const dialogRef = this.dialog.open(DialogScanBluetoothComponent, {
+      maxWidth: '90vw',
+      minWidth: '40vw'
+      //data: { id: '' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result)
+      if (result != null && result != '' && result != undefined)
+        this.paired_devices.push(result);
+    })
+  };
   click_next() {
     for (var i = 0; i < this.countNumberContactsDone; i++) {
       if (this.emergency_contacts[i].name === '')
@@ -282,21 +316,11 @@ export class SignupPage implements OnInit {
     this.tooltip.show();
     interval(4000).subscribe(() => { this.tooltip.hide(); })
   }
-  devices: Device[];
-  paired_devices: Device[];
   emergency_contacts: Emergency_Contact[] = []
-  scan() {
-    this.ble.scan([], 10).subscribe(
-      device => this.onDeviceDiscovered(device)
-    );
-  }
-  onDeviceDiscovered(device) {
-    console.log('Discovered' + JSON.stringify(device, null, 2));
-    this.ngZone.run(() => {
-      this.devices.push(device)
-      console.log(device)
-    })
-  }
+
+  scanInterval = null;
+  //add loading while searching devices, try to paire the devices
+
 
   async pair_device(device) {
     var free_index = this.pair_device == null ? 0 : 1;
@@ -323,15 +347,46 @@ export class SignupPage implements OnInit {
   }
   delete(device, index) {
     console.log('delete pos ' + index + " -> " + device.id)
-    this.paired_devices.splice(index, 1);
+    var a = $('#device' + index).hide(800, () => {
+      this.paired_devices.splice(index, 1);
+      console.log(this.paired_devices)
+    })
+
   }
-  async save_data() {
+  save_data() {
+    //conyrollo
+    console.log(this.zeroFormGroup.errors);
+    console.log(this.getFormValidationErrors(this.zeroFormGroup))
     this.register_user();
+    var error=this.findErrorsAllFormsGroup();
+    if (!error)      //check if change is registred in db
+      this.createToast('Data updated!');
+    else
+      this.createToast('Error in step number '+(error));
+  }
+  async createToast(header) {
     let toast = await this.toastCtrl.create({
-      header: 'Data updated!',
-      duration: 2000
+      header: header,
+      duration:3500
     })
     toast.present();
+  }
+  getFormValidationErrors(form: FormGroup) {
+    const result = [];
+    Object.keys(form.controls).forEach(key => {
+      const controlErrors: ValidationErrors = form.get(key).errors;
+      if (controlErrors) {
+        Object.keys(controlErrors).forEach(keyError => {
+          result.push({
+            'control': key,
+            'error': keyError,
+            'value': controlErrors[keyError]
+          });
+        });
+      }
+    });
+
+    return result;
   }
   register_user() {
     // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
