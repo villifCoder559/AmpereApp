@@ -7,7 +7,9 @@ import { SignupPage } from './signup.page';
 import { MaterialModule } from '../../material-module'
 import { DialogExampleComponent } from './dialog-example/dialog-example.component';
 import { HttpClientModule } from '@angular/common/http';
-import {Contacts} from '@ionic-native/contacts/ngx'
+import { Contacts } from '@ionic-native/contacts/ngx'
+import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
+import { BLE } from '@ionic-native/ble/ngx'
 @NgModule({
   imports: [
     CommonModule,
@@ -18,8 +20,8 @@ import {Contacts} from '@ionic-native/contacts/ngx'
     MaterialModule,
     HttpClientModule
   ],
-  declarations: [SignupPage,DialogExampleComponent],
-  providers:[Contacts],
-  entryComponents:[DialogExampleComponent]
+  declarations: [SignupPage, DialogExampleComponent, DialogScanBluetoothComponent],
+  providers: [Contacts,BLE],
+  entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent]
 })
-export class SignupPageModule {}
+export class SignupPageModule { }
