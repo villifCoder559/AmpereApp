@@ -6,7 +6,7 @@
       (ionInput)="find_contact(input.value)">
     <mat-spinner id="spinnerInput" [diameter]="20" style="visibility: hidden;"></mat-spinner>
   </mat-form-field>
-  <div mat-dialog-content>
+  <div mat-dialog-content id="mat-dialog-content">
     <mat-spinner id="matSpinner"></mat-spinner>
     <mat-selection-list id="selectionList" [(ngModel)]="selectedOptions" #contacts [multiple]="false"
       style="height: inherit; width: inherit;">
@@ -16,7 +16,7 @@
       </mat-list-option>
     </mat-selection-list>
   </div>
-  <div mat-dialog-actions class="footer">
+  <div mat-dialog-actions >
     <button mat-button mat-dialog-close>Close</button>
     <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
   </div>
