@@ -54,7 +54,8 @@
           </mat-form-field>
           <div>
             <button mat-button matStepperNext (click)="click_next()">Next</button>
-            <button mat-button (click)="change_EmailPassword()" *ngIf="logged">Edit</button>
+            <button mat-button (click)="change_EmailPassword()" *ngIf="logged">{{editable? 'Close edit ':'Edit '}}psw</button>
+
           </div>
         </form>
       </ng-template>
@@ -192,7 +193,7 @@
               <input type="tel" matInput maxlength="15" formControlName="contact{{i}}number" placeholder="">
             </mat-form-field>
             <div class="container-button">
-              <button style="display: flex;" mat-raised-button (click)="openDialog(i)">Import</button>
+              <button style="display: flex;" mat-raised-button (click)="openDialogContacts(i)">Import</button>
               <button style="display: flex;" mat-raised-button color="warn" (click)="remove_contact(i)">Remove</button>
             </div>
           </mat-card>
@@ -233,12 +234,12 @@
           delete device)
         </mat-card-subtitle>
         <mat-card-content>
-          <button mat-fab color="primary" (click)="scan()">
+          <button mat-fab color="primary" (click)="openDialogBLE()">
             <mat-icon>bluetooth</mat-icon>
           </button>
           <ion-list *ngFor="let device of paired_devices;let i=index; trackBy:trackItem">
             <ion-item-sliding>
-              <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;">
+              <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;" id="device{{i}}">
                 <ion-label style="background-color: white; margin: 0px;">
                   <h2>{{device.name || 'Unnamed'}}</h2>
                   <h3>{{device.id}}</h3>
