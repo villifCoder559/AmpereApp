@@ -52,3 +52,11 @@ h2,h3,p{
     display: flex;
     flex-direction: row;
 }
+#mat-dialog-content{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    overflow: auto;
+  }
