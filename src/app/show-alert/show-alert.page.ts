@@ -10,7 +10,12 @@ import { SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx'
 import { Location } from "@angular/common";
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
-
+/*
+  Fix view page OK
+  Check cordova elements( localization,accelerometer,if I send emergency check the coords,notification, etc )
+  Add sound when I click button and when the time expires
+  Add possibility when I click two times the emergency button send immediately notification
+*/
 @Component({
   selector: 'app-show-alert',
   templateUrl: './show-alert.page.html',
@@ -19,7 +24,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 export class ShowAlertPage implements OnInit {
   pin = ['', '', '', '']
   config: CountdownConfig = {
-    leftTime: 35,
+    leftTime: 30,
     formatDate: ({ date }) => `${date / 1000}`
   };
   locationCordinates: any;
@@ -35,9 +40,9 @@ export class ShowAlertPage implements OnInit {
     document.addEventListener("deviceready", () => {
       this.localNotifications.schedule({
         id: 1,
-        text: 'Emergency notification',
+        text: 'Emergency notification, click to open and insert PIN to disable alert or ignore it and send emergency',
         //sound: 'file://beep.caf',
-        data: "Signal received, click to open and insert PIN to disable alert or ignore it and send emergency"
+        data: ""
       });
     });
 
@@ -107,7 +112,7 @@ export class ShowAlertPage implements OnInit {
       //send emergency data
       this.data_device_motion();
       console.log('Emergenza inviata');
-      this.locationURL.back();
+      this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
       //this.router.navigateByUrl('/');
     }
   }
@@ -150,7 +155,7 @@ export class ShowAlertPage implements OnInit {
     }
     else {
       this.presentAlert('PIN correct', 1500);
-      this.locationURL.back();
+      this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }
   }
   async presentAlert(text, time) {
