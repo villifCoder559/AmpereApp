@@ -5,6 +5,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-homepage',
@@ -34,25 +35,33 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
         _bad performance OK
   */
 export class HomepagePage implements OnInit {
-  gps_enable = false;
-  constructor(private localNotifications: LocalNotifications,private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
-    this.backgroundMode.enable();
-    this.backgroundMode.overrideBackButton();
-    this.backgroundMode.disableWebViewOptimizations();
-    this.localNotifications.hasPermission().then(result=>{
-      if(!result.valueOf())
-        this.localNotifications.requestPermission()
+  gps_enable = true;
+  constructor(private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+    this.platform.ready().then(() => {
+      this.backgroundMode.enable();
+      this.backgroundMode.overrideBackButton();
+      this.backgroundMode.disableWebViewOptimizations();
+      this.localNotifications.hasPermission().then(result => {
+        if (!result.valueOf())
+          this.localNotifications.requestPermission()
+      })
+      this.enableGPS()
     })
   }
 
   ngOnInit() {
-    this.checkPermission();
+
   }
 
   enableGPS() {
     this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
-      () => { },
-      error => alert(JSON.stringify(error))
+      () => {
+        this.gps_enable = true;
+      },
+      error => {
+        alert(JSON.stringify(error))
+        this.gps_enable = false;
+      }
     );
   }
   locationAccPermission() {
@@ -66,6 +75,7 @@ export class HomepagePage implements OnInit {
             },
             error => {
               alert(error)
+              this.gps_enable = false;
             }
           );
       }
@@ -87,6 +97,6 @@ export class HomepagePage implements OnInit {
   }
   showAlert() {
     //take bluetooth singal
-    this.router.navigateByUrl('/show-alert', { replaceUrl: false })
+    this.router.navigateByUrl('/show-alert', { replaceUrl: true })
   }
 }
