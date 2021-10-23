@@ -1,0 +1,19 @@
+.container-option{
+    display: flex; 
+    flex-direction: row; 
+    align-items: center; 
+    width: 55vw; 
+    justify-content: space-between;
+}
+.container-name{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.matSpinner-i{
+    display: flex
+}
+mat-selection-list{
+    max-height: inherit;
+    max-width: inherit;
+}
