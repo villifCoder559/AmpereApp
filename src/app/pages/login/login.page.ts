@@ -97,8 +97,10 @@ export class LoginPage implements OnInit {
       adapter:'cordova'
     }).then((autentication) => {
       console.log(autentication)
-      if(autentication)
+      if(autentication){
         alert("Success Auth")
+        this.sharedData.goHomepage()
+      }
       else
         this.keycloak.login();
     }, (err) => alert(err));
