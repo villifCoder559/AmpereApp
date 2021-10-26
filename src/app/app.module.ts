@@ -8,15 +8,36 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import {Contacts} from '@ionic-native/contacts'
-import { BLE } from '@ionic-native/ble/ngx'
 import {MaterialModule} from '../app/material-module';
+//import { ShowAlertPage } from '../app/show-alert/show-alert.page'
+//import { ShowAlertPageModule } from '../app/show-alert/show-alert.module'
+import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { NativeAudio } from '@ionic-native/native-audio/ngx';
+import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
+import { CountdownModule } from 'ngx-countdown';
+import {LoginPageModule} from '../app/pages/login/login.module'
+import {LoginPage} from '../app/pages/login/login.page'
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,
+  imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,
             IonicModule.forRoot(), AppRoutingModule,HttpClientModule,MaterialModule
             ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },Contacts,BLE],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    Contacts,
+    LocationAccuracy,
+    Geolocation,
+    AndroidPermissions,
+    LocalNotifications,
+    BackgroundMode,
+    DeviceMotion,
+    NativeAudio,
+    LoginPage
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
