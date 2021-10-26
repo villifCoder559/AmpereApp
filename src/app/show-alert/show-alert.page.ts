@@ -1,20 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
-import { CountdownConfig } from 'ngx-countdown';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AlertController, Platform } from '@ionic/angular';
+import { CountdownConfig, CountdownModule } from 'ngx-countdown';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SMS } from '@ionic-native/sms/ngx';
 import { SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx'
-import { Location } from "@angular/common";
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
+import { NativeAudio } from '@ionic-native/native-audio/ngx'
 /*
-  Fix view page OK
-  Check cordova elements( localization,accelerometer,if I send emergency check the coords,notification, etc )
-  Add sound when I click button and when the time expires
-  Add possibility when I click two times the emergency button send immediately notification
+  OK Fix view page OK
+  OK Add sound when I click button and when the time expires OK
+  Check cordova elements( localization,accelerometer,if I send emergency check the coords,notification, etc ) OK
+    _fix errors when i click notification OK
+  Add possibility when I click two times the emergency button app sends immediately notification OK
+  
 */
 @Component({
   selector: 'app-show-alert',
@@ -24,41 +26,36 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 export class ShowAlertPage implements OnInit {
   pin = ['', '', '', '']
   config: CountdownConfig = {
-    leftTime: 30,
-    formatDate: ({ date }) => `${date / 1000}`
+    leftTime: 25,
+    formatDate: ({ date }) => `${date / 1000}`,
+    // notify: 1
+  };;
+  currentPosition = {
+    latitude: 0.0,
+    longitude: 0.0,
+    accuracy: 0,
+    date: "",
+    time: ''
   };
-  locationCordinates: any;
-  constructor(private localNotifications: LocalNotifications, private locationURL: Location, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
+  constructor(private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
     private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
-    this.locationCordinates = {
-      latitude: "",
-      longitude: "",
-      accuracy: "",
-      date: "",
-      timestamp: ''
-    }
-    document.addEventListener("deviceready", () => {
-      this.localNotifications.schedule({
-        id: 1,
-        text: 'Emergency notification, click to open and insert PIN to disable alert or ignore it and send emergency',
-        //sound: 'file://beep.caf',
-        data: ""
-      });
+    this.localNotifications.schedule({
+      id: 1,
+      text: 'Emergency notification, click to open and insert PIN to disable alert or click again to send emergency immediatly',
+      data: ""
     });
-
   }
   ngOnInit() {
-    this.currentLocPosition();
   }
   currentLocPosition() {
     this.geolocation.getCurrentPosition().then((response) => {
-      this.locationCordinates.latitude = response.coords.latitude;
-      this.locationCordinates.longitude = response.coords.longitude;
-      this.locationCordinates.accuracy = response.coords.accuracy;
-      var app = new Date(response.timestamp);
-      this.locationCordinates.date = app.getUTCFullYear() + "-" + (app.getUTCMonth() + 1) + '-' + app.getUTCDate();
-      this.locationCordinates.timestamp = (app.getUTCHours() < 10 ? '0' + app.getUTCHours() : app.getUTCHours()) + ':' + (app.getUTCMinutes() < 10 ? '0' + app.getUTCMinutes() : app.getUTCMinutes())
-      //console.log(this.locationCordinates)
+      this.currentPosition.latitude = response.coords.latitude;
+      this.currentPosition.longitude = response.coords.longitude;
+      this.currentPosition.accuracy = response.coords.accuracy;
+      var today = new Date();
+      this.currentPosition.date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+      this.currentPosition.time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      console.log(this.currentPosition)
     }).catch((error) => {
       alert('Error: ' + error);
     });
@@ -101,19 +98,11 @@ export class ShowAlertPage implements OnInit {
       }
     );
   }
-  send_Emergency(event) {
-    if (event.action == 'done') {
-      var user_data = this.shared_data.getUserData();
-      console.log(user_data)
-      for (var i = 0; i < user_data.emergency_contacts.length; i++) {
-        if (user_data.emergency_contacts[i].number != '')
-          this.sms.send(user_data.emergency_contacts[i].number, 'I need a help! My current position is: \n latitude: ' + this.locationCordinates.latitude + ' longitude: ' + this.locationCordinates.longitude)
-      }
-      //send emergency data
-      this.data_device_motion();
-      console.log('Emergenza inviata');
-      this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-      //this.router.navigateByUrl('/');
+  async send_Emergency(event) {
+    console.log(event)
+    if (event.action == 'done' && this.shared_data.count_click_emergency == 1) {
+      console.log('TRUE')
+      this.shared_data.showAlertandSendEmergency();
     }
   }
   onDigitInput(event) {
@@ -154,6 +143,7 @@ export class ShowAlertPage implements OnInit {
 
     }
     else {
+      this.shared_data.reset_EmergencyClick();
       this.presentAlert('PIN correct', 1500);
       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }
@@ -171,13 +161,8 @@ export class ShowAlertPage implements OnInit {
       alert.dismiss();
     });
   }
-  data_device_motion() {
-    var sub = this.deviceMotion.watchAcceleration({ frequency: 1500 }).subscribe((acceleration: DeviceMotionAccelerationData) => {
-      //send acceleration data
-      console.log(acceleration)
-    })
-    setTimeout(() => {
-      sub.unsubscribe()
-    }, 60000)
+
+  testButton() {
+    this.shared_data.showAlertandSendEmergency();
   }
 }
