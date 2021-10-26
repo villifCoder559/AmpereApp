@@ -6,7 +6,7 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
-
+import {SharedDataService} from '../../data/shared-data.service'
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.page.html',
@@ -35,8 +35,8 @@ import { Platform } from '@ionic/angular';
         _bad performance OK
   */
 export class HomepagePage implements OnInit {
-  gps_enable = true;
-  constructor(private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  gps_enable = false;
+  constructor(private sharedData:SharedDataService,private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
       this.backgroundMode.enable();
       this.backgroundMode.overrideBackButton();
@@ -45,7 +45,7 @@ export class HomepagePage implements OnInit {
         if (!result.valueOf())
           this.localNotifications.requestPermission()
       })
-      this.enableGPS()
+      this.checkPermission()
     })
   }
 
@@ -97,6 +97,6 @@ export class HomepagePage implements OnInit {
   }
   showAlert() {
     //take bluetooth singal
-    this.router.navigateByUrl('/show-alert', { replaceUrl: true })
+    this.sharedData.showAlertandSendEmergency();
   }
 }
