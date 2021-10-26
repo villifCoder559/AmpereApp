@@ -12,7 +12,7 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SMS } from '@ionic-native/sms/ngx';
 import { DeviceMotion } from '@ionic-native/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
-
+import { NativeAudio } from '@ionic-native/native-audio/ngx'
 @NgModule({
   imports: [
     CommonModule,
@@ -29,7 +29,9 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
     AndroidPermissions,
     SMS,
     DeviceMotion,
-    LocalNotifications
+    LocalNotifications,
+    NativeAudio,
+    
   ]
 })
 export class ShowAlertPageModule { }
