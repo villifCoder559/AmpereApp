@@ -1,7 +1,7 @@
 <ion-header>
   <mat-toolbar class="toolbar">
-    <button mat-icon-button (click)="go_back()" *ngIf="!logged">
-      <mat-icon>arrow_back</mat-icon>
+    <button mat-icon-button (click)="go_back()" *ngIf="!logged" style="display: flex;justify-content: center;align-items: center;">
+      <mat-icon style="display: inline;">arrow_back</mat-icon>
     </button>
     <ion-buttons slot="start" *ngIf="logged">
       <ion-menu-button></ion-menu-button>
@@ -11,7 +11,7 @@
     <ion-buttons class="slot-end" *ngIf="logged">
       <ion-button (click)="save_data()">Save</ion-button>
     </ion-buttons>
-    <div *ngIf="!logged" style="flex: auto; width: 50px;height: 50px;"> </div>
+    <div *ngIf="!logged" style="width: 50px;height: 50px;"> </div>
   </mat-toolbar>
 </ion-header>
 <ion-content #content>
