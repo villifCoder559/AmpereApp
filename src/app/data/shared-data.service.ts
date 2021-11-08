@@ -73,6 +73,7 @@ export class SharedDataService {
   user_data: UserData;
   gps_enable=false;
   private _is_logged = false;
+  snap4city_logged=false;
   currentPosition = {
     latitude: 0.0,
     longitude: 0.0,
@@ -138,6 +139,7 @@ export class SharedDataService {
   goHomepage() {
     //load user data from database
     this.loadDataUser();
+    console.log('goHomepage')
     this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
   }
   showAlertandSendEmergency() {

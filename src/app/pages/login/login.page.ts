@@ -31,25 +31,45 @@ export class LoginPage implements OnInit {
     });
   }
 
-  async login() {
+  async login(platform) {
+    console.log(platform)
     const loading = await this.loadingController.create();
     await loading.present();
-
-    this.authService.login(this.credentials.value).subscribe(
-      async (res) => {
-        await loading.dismiss();
-        this.sharedData.goHomepage()
-      },
-      async (res) => {
-        await loading.dismiss();
-        const alert = await this.alertController.create({
-          header: 'Login failed',
-          message: res.error.error,
-          buttons: ['OK'],
+    console.log('prima di if');
+    if (platform == 'snap4city') {
+      try {
+        this.authService.loginSnap4City().then(async (auth) => {
+          console.log('IN')
+          await loading.dismiss();
+          console.log('end_auth')
+          console.log(auth)
+          if (auth) {
+            this.sharedData.snap4city_logged = true;
+            console.log('snap4citylogged_TRUE')
+            this.sharedData.goHomepage()
+          }
         });
-        await alert.present();
+      } catch (e) {
+        alert((e as Error).message)
       }
-    );
+    }
+    else {
+      this.authService.login(this.credentials.value).subscribe(
+        async (res) => {
+          await loading.dismiss();
+          this.sharedData.goHomepage()
+        },
+        async (res) => {
+          await loading.dismiss();
+          const alert = await this.alertController.create({
+            header: 'Login failed',
+            message: res.error.error,
+            buttons: ['OK'],
+          });
+          await alert.present();
+        }
+      );
+    }
   }
   // Easy access for form fields
   get email() {
@@ -81,33 +101,5 @@ export class LoginPage implements OnInit {
       duration: 2500
     })
       ; (await toast).present();
-  }
-
-  autentication() {
-    if (this.keycloak == null) {
-      console.log('keycloak null')
-      this.keycloak = Keycloak({
-        clientId: 'js-snap4city-mobile-app',
-        realm: 'master',
-        url: "https://www.snap4city.org/auth/"
-      });
-    }
-    this.keycloak.init({
-      onLoad: 'login-required',
-      adapter:'cordova'
-    }).then((autentication) => {
-      console.log(autentication)
-      if(autentication){
-        alert("Success Auth")
-        this.sharedData.goHomepage()
-      }
-      else
-        this.keycloak.login();
-    }, (err) => alert(err));
-
-    // Test if it works, when coming back from this.keycloak.login();
-    this.keycloak.onAuthSuccess = () => {
-      console.log('authenticated!');
-    };
   }
 }
