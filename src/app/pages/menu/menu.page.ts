@@ -8,57 +8,58 @@ import { AuthenticationService } from '../../services/authentication.service';
   styleUrls: ['./menu.page.scss'],
 })
 export class MenuPage implements OnInit {
-  pages=[
+  pages = [
     {
-      title:'Homepage',
-      url:'/profile/menu/homepage'
+      title: 'Homepage',
+      url: '/profile/menu/homepage'
     },
     {
-      title:'Profile',
-      url:'/profile/menu/profile'
+      title: 'Profile',
+      url: '/profile/menu/profile'
     },
     {
-      title:'Devices Status',
-      url:'/profile/menu/testAlert'
+      title: 'Devices Status',
+      url: '/profile/menu/testAlert'
     },
     {
-      title:'NFC Reader',
-      url:'/profile/menu/read-nfc'
+      title: 'NFC Reader',
+      url: '/profile/menu/read-nfc'
     },
     {
-      title:'QR Reader',
-      url:'/profile/menu/read-qr'
+      title: 'QR Reader',
+      url: '/profile/menu/read-qr'
     },
     {
-      title:'FAQ',
-      url:'/profile/menu/faq'
+      title: 'FAQ',
+      url: '/profile/menu/faq'
     },
     {
-      title:'Term of Use',
-      url:'/profile/menu/termOfUse'
+      title: 'Term of Use',
+      url: '/profile/menu/termOfUse'
     },
     {
-      title:'Privacy Policy',
-      url:'/profile/menu/privacyPolicy'
+      title: 'Privacy Policy',
+      url: '/profile/menu/privacyPolicy'
     },
 
   ]
-  selectedPath=''
-  constructor(private router:Router,private authService: AuthenticationService) { 
+  selectedPath = ''
+  constructor(private router: Router, private authService: AuthenticationService) {
     console.log('costruttore')
-    this.router.events.subscribe((event:RouterEvent)=>{
-      this.selectedPath=event.url
+    this.router.events.subscribe((event: RouterEvent) => {
+      this.selectedPath = event.url
     })
   }
-  go_back(){
-    this.router.navigateByUrl('/',{replaceUrl:true})
+  go_back() {
+    this.router.navigateByUrl('/', { replaceUrl: true })
   }
   ngOnInit() {
 
   }
   async logout() {
-    await this.authService.logout();
-    this.router.navigateByUrl('/login', { replaceUrl: true });
+    await this.authService.logout().then(() => {
+      this.router.navigateByUrl('/login', { replaceUrl: true });
+    });
   }
 
 }
