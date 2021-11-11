@@ -2,6 +2,7 @@ import { Component, Inject, NgZone, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BLE } from '@ionic-native/ble/ngx';
 import { Platform } from '@ionic/angular';
+import { BluetoothService } from '../../../data/bluetooth.service'
 @Component({
   selector: 'app-dialog-scan-bluetooth',
   templateUrl: './dialog-scan-bluetooth.component.html',
@@ -10,10 +11,10 @@ import { Platform } from '@ionic/angular';
 export class DialogScanBluetoothComponent implements OnInit {
   devices = [];
   selectedOptions
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
     this.platform.ready().then(() => {
       this.scan();
-      this.dialogRef.afterClosed().subscribe(()=>{
+      this.dialogRef.afterClosed().subscribe(() => {
         this.ble.stopScan();
         console.log('stopScanning')
       })
@@ -28,36 +29,28 @@ export class DialogScanBluetoothComponent implements OnInit {
   //   this.devices.push({id:'3456ruj2',name:'TOpo'})
   //   $('#matSpinner').hide();
   // }
-  scan() {// ble.enale() only supported for android
-    this.ble.isEnabled().then(() => { }, (err) => this.ble.enable())
-      .then(() => {
-        var array = []
-        this.ble.startScanWithOptions([], { reportDuplicates: false }).subscribe(device => {
-          array.push(device)
-          console.log(JSON.stringify(device));
-        }, (err) => console.log(err));
-        setTimeout(() => {
-          this.devices = array;
-          this.ble.stopScan();
-          $('#matSpinner').hide();
-          console.log('stopScan')
-        }, 15000);
-      });
+  scan() {
+    this.bluetoothService.scan(15000).then((scanList: []) => {
+      $('#matSpinner').hide()
+      this.devices = scanList;
+      console.log(scanList)
+    });
   }
   connect(i) {
     console.log(i);
     // $('#matSpinner').hide();
     $('#matSpinner' + i).css('display', 'flex')
     this.data = this.devices[i];
-    this.ble.connect(this.data.id).subscribe((peripheralData) => {
+    this.bluetoothService.connectDevice(this.data.id).then((peripheralData) => {
       $('#matSpinner' + i).hide();
-      console.log(peripheralData)
       this.data = peripheralData;
+      console.log(peripheralData)
+      alert('Correctly connected')
       this.closeDialog();
     }, (err) => {
-      console.log(err)
-      $('#matSpinner' + i).hide();
-    })
+      $('#matSpinner' + i).hide();;
+      alert('Error ' + err)
+    });
   }
   closeDialog() {
     this.ngZone.run(() => {
