@@ -38,9 +38,6 @@ export class HomepagePage implements OnInit {
   gps_enable = false;
   constructor(private sharedData:SharedDataService,private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
-      this.backgroundMode.enable();
-      this.backgroundMode.overrideBackButton();
-      this.backgroundMode.disableWebViewOptimizations();
       this.localNotifications.hasPermission().then(result => {
         if (!result.valueOf())
           this.localNotifications.requestPermission()
@@ -48,11 +45,9 @@ export class HomepagePage implements OnInit {
       this.checkPermission()
     })
   }
-
   ngOnInit() {
 
   }
-
   enableGPS() {
     this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
       () => {
