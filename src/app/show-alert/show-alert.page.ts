@@ -26,17 +26,10 @@ import { NativeAudio } from '@ionic-native/native-audio/ngx'
 export class ShowAlertPage implements OnInit {
   pin = ['', '', '', '']
   config: CountdownConfig = {
-    leftTime: 25,
+    leftTime: 20,
     formatDate: ({ date }) => `${date / 1000}`,
     // notify: 1
   };;
-  currentPosition = {
-    latitude: 0.0,
-    longitude: 0.0,
-    accuracy: 0,
-    date: "",
-    time: ''
-  };
   constructor(private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
     private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.localNotifications.schedule({
@@ -47,64 +40,7 @@ export class ShowAlertPage implements OnInit {
   }
   ngOnInit() {
   }
-  currentLocPosition() {
-    this.geolocation.getCurrentPosition().then((response) => {
-      this.currentPosition.latitude = response.coords.latitude;
-      this.currentPosition.longitude = response.coords.longitude;
-      this.currentPosition.accuracy = response.coords.accuracy;
-      var today = new Date();
-      this.currentPosition.date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-      this.currentPosition.time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      console.log(this.currentPosition)
-    }).catch((error) => {
-      alert('Error: ' + error);
-    });
-  }
-  enableGPS() {
-    this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
-      () => {
-        this.currentLocPosition()
-      },
-      error => alert(JSON.stringify(error))
-    );
-  }
-  locationAccPermission() {
-    this.locationAccuracy.canRequest().then((canRequest: boolean) => {
-      if (canRequest) {
-      } else {
-        this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.ACCESS_COARSE_LOCATION)
-          .then(
-            () => {
-              this.enableGPS();
-            },
-            error => {
-              alert(error)
-            }
-          );
-      }
-    });
-  }
-  checkPermission() {
-    this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.ACCESS_COARSE_LOCATION).then(
-      result => {
-        if (result.hasPermission) {
-          this.enableGPS();
-        } else {
-          this.locationAccPermission();
-        }
-      },
-      error => {
-        alert(error);
-      }
-    );
-  }
-  async send_Emergency(event) {
-    console.log(event)
-    if (event.action == 'done' && this.shared_data.count_click_emergency == 1) {
-      console.log('TRUE')
-      this.shared_data.showAlertandSendEmergency();
-    }
-  }
+
   onDigitInput(event) {
     console.log(event);
     // console.log(event.target.attributes.getNamedItem('ng-reflect-name').value)
@@ -161,8 +97,13 @@ export class ShowAlertPage implements OnInit {
       alert.dismiss();
     });
   }
-
+  async send_Emergency(event) {
+    console.log(event)
+    if (event.action == 'done' && this.shared_data.count_click_emergency == 1) {
+      this.shared_data.showAlert();
+    }
+  }
   testButton() {
-    this.shared_data.showAlertandSendEmergency();
+    this.shared_data.showAlert();
   }
 }
