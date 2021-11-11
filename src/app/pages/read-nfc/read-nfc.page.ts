@@ -1,20 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { NFC, Ndef } from '@ionic-native/nfc/ngx'
 import { Platform, ToastController } from '@ionic/angular';
+import { NFCCode, SharedDataService } from 'src/app/data/shared-data.service';
+import { Entity, NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
+
 @Component({
   selector: 'app-read-nfc',
   templateUrl: './read-nfc.page.html',
   styleUrls: ['./read-nfc.page.scss'],
+  providers:[SharedDataService,NGSIv2QUERYService]
 })
 export class ReadNFCPage implements OnInit {
   NFC_data = '';
   readMessage = '';
   NFC_enable = false;
-  constructor(private toastCtrl: ToastController, private nfc: NFC, private ndef: Ndef, private platform: Platform) { }
-
+  NFC_list = [new NFCCode(), new NFCCode(), new NFCCode(), new NFCCode()];
+  constructor(private NGSIv2Query:NGSIv2QUERYService,private sharedData: SharedDataService, private toastCtrl: ToastController, private nfc: NFC, private ndef: Ndef, private platform: Platform) {
+    console.log(this.sharedData.user_data)
+    this.NFC_list = this.sharedData.user_data?.nfc_code;
+  }
+  addNFC() {
+    this.NGSIv2Query.getEntity(Entity.NFC)
+  }
   ngOnInit() {
     this.nfc.enabled().then(() => {
       this.NFC_enable = true;
+      this.read_NFC();
     }, err => this.create_message('Error :' + err))
   }
   async read_NFC() {
@@ -45,9 +56,14 @@ export class ReadNFCPage implements OnInit {
     })
     toast.present();
   }
-  add_event() {
-    this.nfc.addNdefListener(() => {
-      this.read_NFC();
-    }, err => this.create_message('Error ' + err));
+  delete(device, index) {
+    console.log('delete pos ' + index + " -> " + device.id)
+    $('#item' + index).hide(800, () => {
+      this.NFC_list.splice(index, 1);
+      console.log(this.NFC_list)
+    })
+  }
+  ngOnDestroy() {
+
   }
 }
