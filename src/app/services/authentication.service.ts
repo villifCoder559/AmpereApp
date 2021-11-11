@@ -4,6 +4,8 @@ import { map, tap, switchMap } from 'rxjs/operators';
 import { BehaviorSubject, from, Observable, Subject } from 'rxjs';
 import { SharedDataService } from '../data/shared-data.service'
 import * as Keycloak from 'keycloak-ionic/keycloak';
+import { BluetoothService } from '../data/bluetooth.service'
+import { NGSIv2QUERYService, Entity } from '../data/ngsiv2-query.service'
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +14,7 @@ export class AuthenticationService {
   isAuthenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
   public keycloak: Keycloak.KeycloakInstance;
   token = '';
-  constructor(private http: HttpClient, private shared_data: SharedDataService) {
+  constructor(private ngsiv2QUERY: NGSIv2QUERYService, private bluetoothService: BluetoothService, private http: HttpClient, private shared_data: SharedDataService) {
     this.loadToken();
 
   }
@@ -42,7 +44,7 @@ export class AuthenticationService {
     )
   }
   loginSnap4City() {
-    return new Promise<boolean>((resolve,reject) => {
+    return new Promise<boolean>((resolve, reject) => {
       if (this.keycloak == null) {
         console.log('keycloak null')
         this.keycloak = Keycloak({
@@ -61,8 +63,12 @@ export class AuthenticationService {
           //this.sharedData.snap4city_logged = true;
           //alert("Success Auth")
           console.log('autenticato')
-          resolve(true)
-          //this.shared_data.goHomepage();
+          this.shared_data.enableAllBackgroundMode();
+          this.ngsiv2QUERY.getEntity(Entity.USERID).then(() => {
+            this.bluetoothService.autoConnectBluetooth();
+            this.bluetoothService.enableNotificationTurnOffBluetooth()
+            resolve(true)
+          },(err)=>alert(err))
         }
         else
           this.keycloak.login().then((value) => {
@@ -75,11 +81,13 @@ export class AuthenticationService {
         reject(false)
       })
     })
-    // Test if it works, when coming back from this.keycloak.login();
   }
   async logout() {
     this.isAuthenticated.next(false);
     this.shared_data.setIs_logged(false);
+    this.shared_data.disableBackgaundMode();
+    this.bluetoothService.disconnectAllDevices();
+    this.bluetoothService.disableNotificationTurnOffBluetooth()
     window.localStorage.removeItem('TOKEN_KEY');
     console.log(this.shared_data.snap4city_logged)
     if (this.shared_data.snap4city_logged) {
