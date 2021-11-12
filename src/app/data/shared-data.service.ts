@@ -51,7 +51,11 @@ export class Device {
   rssi: string = '';
   battery: number = 100;
   connected: boolean = false;
+  advertising=[];
+  charateristics=[];
+  services=[];
 }
+/*check iBeacon library */
 export class UserData {
   name: string = '';
   surname: string = ''
@@ -74,7 +78,7 @@ export class UserData {
   disabilities = [false, false]
   emergency_contacts = [new Emergency_Contact, new Emergency_Contact, new Emergency_Contact, new Emergency_Contact, new Emergency_Contact]
   public_emergency_contacts = { 113: false, 115: false, 118: false }
-  paired_devices = [new Device, new Device]
+  paired_devices = [new Device(), new Device()]
   qr_code = [new QRCode(), new QRCode(), new QRCode(), new QRCode()]
   nfc_code = [new NFCCode(), new NFCCode(), new NFCCode(), new NFCCode()]
   constructor() { }
@@ -84,7 +88,7 @@ export class UserData {
   providedIn: 'root'
 })
 export class SharedDataService {
-  user_data: UserData;
+  user_data: UserData=new UserData();
   gps_enable = false;
   is_logged = false;
   snap4city_logged = false;
@@ -135,7 +139,7 @@ export class SharedDataService {
       surname: 'Richards',
       phoneNumber: '2587436910',
       public_emergency_contacts: { 113: false, "115": false, "118": true },
-      paired_devices: [{ name: 'necklace', battery: 50, connected: true, id: '78542', rssi: '-73' }],
+      paired_devices: [],
       password: '',
       pin: '0258',
       purpose: 'Personal safety',
@@ -151,7 +155,7 @@ export class SharedDataService {
     this.loadDataUser();
     this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
   }
-  showAlertandSendEmergency() {
+  showAlert() {
     //take bluetooth signal, create handler that takes the signal
     console.log(this.count_click_emergency)
     if (this.count_click_emergency == 0) {
