@@ -60,3 +60,43 @@ h2,h3,p{
     flex: 1;
     overflow: auto;
   }
+.bluetooth_item{
+    padding-left: 15px;
+    background-color: #fff;
+}
+.label_bluetooth_item{
+    background-color: #fff;
+    margin: 0px;
+}
+.bluetooth_item_options{
+    background-color: #fff;
+}
+.bluetooth_item_option{
+    display: flex;
+    flex-direction: row;
+}
+.trash_icon{
+    width: 30px;
+    height: 30px;
+}
+#bluetooth mat-card-content{
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+  #bluetooth button{
+    margin: 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #bluetooth mat-icon{
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+  #bluetooth ion-list{
+    padding: 0px;
+    width: 100%;
+  }
