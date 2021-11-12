@@ -21,6 +21,9 @@ import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device
 import { CountdownModule } from 'ngx-countdown';
 import {LoginPageModule} from '../app/pages/login/login.module'
 import {LoginPage} from '../app/pages/login/login.page'
+import {SharedDataService} from '../app/data/shared-data.service'
+import {NGSIv2QUERYService} from '../app/data/ngsiv2-query.service'
+import {BluetoothService} from '../app/data/bluetooth.service'
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -36,7 +39,10 @@ import {LoginPage} from '../app/pages/login/login.page'
     BackgroundMode,
     DeviceMotion,
     NativeAudio,
-    LoginPage
+    LoginPage,
+    SharedDataService,
+    NGSIv2QUERYService,
+    BluetoothService
   ],
   bootstrap: [AppComponent],
 })
