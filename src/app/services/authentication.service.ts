@@ -34,14 +34,16 @@ export class AuthenticationService {
   }
 
   login(credentials: { email, password }): Observable<any> {
-    return this.http.post(`https://reqres.in/api/login`, credentials).pipe(
-      map((data: any) => {
-        this.token = data.token;
-        window.localStorage.setItem('TOKEN_KEY', this.token);
-        this.shared_data.setIs_logged(true);
-        this.isAuthenticated.next(true);
-      })
-    )
+    this.isAuthenticated.next(true)
+    return this.isAuthenticated
+    // return this.http.post(`https://reqres.in/api/login`, credentials).pipe(
+    //   map((data: any) => {
+    //     this.token = data.token;
+    //     window.localStorage.setItem('TOKEN_KEY', this.token);
+    //     this.shared_data.setIs_logged(true);
+    //     this.isAuthenticated.next(true);
+    //   })
+    // )
   }
   loginSnap4City() {
     return new Promise<boolean>((resolve, reject) => {
