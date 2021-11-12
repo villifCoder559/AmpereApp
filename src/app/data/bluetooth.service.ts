@@ -44,31 +44,25 @@ export class BluetoothService {
   startNotificationDevice(device: Device) {
     this.ble.startNotification(device.id, '', '').subscribe((buffer) => {
       console.log(buffer)
-    })
+    }, (err) => (alert(err)))
   }
   autoConnectBluetooth() {
     this.checkBluetooth();
+    console.log(this.sharedData.user_data.paired_devices)
     this.sharedData.user_data.paired_devices.forEach(element => {
-      if (element.id != '-1') {
-        this.ble.autoConnect(element.id, (peripheralData) => {
-          element.connected = true;
-          this.ble.startNotification(peripheralData.id, '', '').subscribe((buffer) => {
-            console.log(buffer)
-          })
-          console.log(peripheralData)
-        }, () => {
-          alert('Disconnected device')
-          element.connected = false
-        })
-        // this.ble.connect(element.id).subscribe((peripheralData) => {
-        //   console.log(peripheralData)
-        //   this.count_devices_connected++;
-        // }, (peripheralData) => {
-        //   alert('Disconnected device')
-        //   this.count_devices_connected--;
-        // })
-      }
+      if (element?.id != '-1') {
+        this.ble.autoConnect(element.id,this.onConnected.bind(this) ,this.onDisconnectd.bind(this));
+    }
     }, (err) => alert(err));
+  }
+  onConnected(peripheralData) {
+    console.log('autoConnectEnbale ' + peripheralData.id);
+    //this.sharedData.showAlert();
+    console.log(peripheralData)
+  }
+  onDisconnectd(peripheralData) {
+    //alert('Disconnected device')
+    console.log('Disconnected ' + peripheralData.id);
   }
   disconnectAllDevices() {
     this.sharedData.user_data.paired_devices.forEach((element) => {
