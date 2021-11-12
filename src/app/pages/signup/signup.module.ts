@@ -10,6 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { Contacts } from '@ionic-native/contacts/ngx'
 import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
 import { BLE } from '@ionic-native/ble/ngx'
+
 @NgModule({
   imports: [
     CommonModule,

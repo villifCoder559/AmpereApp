@@ -13,12 +13,12 @@ export class TestDevicePage implements OnInit {
     this.paired_devices = user_data.paired_devices;
     console.log(this.paired_devices)
   }
-  delete(device, index) {
-    console.log('delete pos ' + index + " -> " + device.id)
-  }
-  simulate() {
-    this.router.navigateByUrl('/show-alert', { replaceUrl: false })
-  }
+  // delete(device, index) {
+  //   console.log('delete pos ' + index + " -> " + device.id)
+  // }
+  // simulate() {
+  //   this.router.navigateByUrl('/show-alert', { replaceUrl: false })
+  // }
   ngOnInit() {
   }
   go_to_deviceSettings() {

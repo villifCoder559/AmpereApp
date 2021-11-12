@@ -30,7 +30,7 @@ export class DialogScanBluetoothComponent implements OnInit {
   //   $('#matSpinner').hide();
   // }
   scan() {
-    this.bluetoothService.scan(15000).then((scanList: []) => {
+    this.bluetoothService.scan(25000).then((scanList: []) => {
       $('#matSpinner').hide()
       this.devices = scanList;
       console.log(scanList)
@@ -49,7 +49,7 @@ export class DialogScanBluetoothComponent implements OnInit {
       this.closeDialog();
     }, (err) => {
       $('#matSpinner' + i).hide();;
-      alert('Error ' + err)
+      alert('Error' + err)
     });
   }
   closeDialog() {

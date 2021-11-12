@@ -35,7 +35,7 @@ import {SharedDataService} from '../../data/shared-data.service'
         _bad performance OK
   */
 export class HomepagePage implements OnInit {
-  gps_enable = false;
+  gps_enable = true;
   constructor(private sharedData:SharedDataService,private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
       this.localNotifications.hasPermission().then(result => {
@@ -92,6 +92,6 @@ export class HomepagePage implements OnInit {
   }
   showAlert() {
     //take bluetooth singal
-    this.sharedData.showAlertandSendEmergency();
+    this.sharedData.showAlert();
   }
 }
