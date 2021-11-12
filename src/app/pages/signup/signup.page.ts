@@ -116,7 +116,7 @@ export class SignupPage implements OnInit {
     if (this.user_data == undefined) {
       this.user_data = new UserData();
     }
-    this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
+    this.stepperOrientation = breakpointObserver.observe('(min-width: 1000px)')
       .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
     this.logged = this.shared_data.is_logged;
   }
@@ -203,6 +203,7 @@ export class SignupPage implements OnInit {
         }
       }
       this.user_data.public_emergency_contacts = user_data.public_emergency_contacts;
+      console.log('Paired devices list')
       for (var i = 0; i < this.paired_devices.length; i++)
         if (this.user_data.paired_devices[i] != undefined)
           this.paired_devices[i] = user_data.paired_devices[i]
@@ -299,7 +300,6 @@ export class SignupPage implements OnInit {
   }
   openDialogBLE(): void {
     var count_device_paired = 0;
-    console.log(this.paired_devices)
     this.paired_devices.forEach((element: Device) => {
       if (element?.id != '-1') {
         count_device_paired++;
@@ -315,13 +315,24 @@ export class SignupPage implements OnInit {
       dialogRef.afterClosed().subscribe(result => {
         console.log(result)
         if (result != null && result != '' && result != undefined) {
-          if (this.paired_devices[0].id == '-1')
-            this.paired_devices[0] = (result);
+          var index;
+          if (this.paired_devices[0].id == '-1') {
+            index = 0;
+          }
           else
-            this.paired_devices[1] = result;
-          this.bluetoothService.startNotificationDevice(result)
+            index = 1;
+          console.log('save data')
+          this.paired_devices[index].advertising = result?.advertising;
+          this.paired_devices[index].charateristics = result?.characteristics;
+          this.paired_devices[index].id = result.id;
+          this.paired_devices[index].name = result.name;
+          this.paired_devices[index].rssi = result.rssi;
+          this.paired_devices[index].services = result.services;
+          this.shared_data.user_data.paired_devices[index] = this.paired_devices[index];
+          //this.bluetoothService.startNotificationDevice(result)
+          this.bluetoothService.autoConnectBluetooth();
         }
-      })
+      }, (err) => console.log(err))
     }
     else {
       alert('Max number of devices reached! You have to swipe left a item and delete it')
@@ -340,32 +351,6 @@ export class SignupPage implements OnInit {
   emergency_contacts: Emergency_Contact[] = []
 
   scanInterval = null;
-  //add loading while searching devices, try to paire the devices
-
-
-  // async pair_device(device) {
-  //   var free_index = this.pair_device == null ? 0 : 1;
-  //   if (this.paired_devices[free_index] != null) {
-  //     var msg = 'You have already pair 2 smart jewelries, delete once if you want to add a new';
-  //     for (var i = 0; i < this.pair_device.length; i++) {
-  //       if (device.id == this.pair_device[i])
-  //         msg = "This device has already been registred!"
-  //     }
-  //     const alert = await this.alertController.create({
-  //       cssClass: '',
-  //       header: 'Alert',
-  //       subHeader: 'Subtitle',
-  //       message: msg,
-  //       buttons: ['OK']
-  //     });
-
-  //     await alert.present();
-  //     const { role } = await alert.onDidDismiss();
-  //     console.log('onDidDismiss resolved with role', role);
-  //   }
-  //   else
-  //     this.paired_devices[free_index] = device
-  // }
   delete(device: Device, index) {
     console.log('delete pos ' + index + " -> " + device.id)
     var a = $('#device' + index).hide(800, () => {
