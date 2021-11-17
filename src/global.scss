@@ -26,6 +26,7 @@
 @import "~@ionic/angular/css/flex-utils.css";
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
+
 .alert-msg{
     text-align: center;
     padding: 8px 0px;
@@ -44,9 +45,32 @@ h2,h3,p{
     background-color: #3F51B5;
     color: white;
     justify-content: space-between;
+    display: flex;
+    align-items: center;
+}
+.toolbar .mat-icon{
+    align-items: center;
+    text-align: center;
+}
+.toolbar .toolbar_content{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 25px;
+    //font-size: 10vw;
+}
+
+.toolbar button{
+    display: flex;
+   // height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
 }
 .fake-icon{ // for style of toolbar
-    width: 1px;height: 1px;display: flex;
+    width: 48px;height: 48px;display: flex;
 }
 .containerDialog .mat-form-field-infix{
     display: flex;
@@ -100,3 +124,49 @@ h2,h3,p{
     padding: 0px;
     width: 100%;
   }
+ngx-qrcode{
+    text-align: center;
+}
+.ion_item{
+    padding-left: 15px;
+    background-color: #fff;
+}
+.ion_item_sliding{
+    background-color: white;
+    margin: 0px;
+}
+.reader{
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    width: 85vw;
+}
+.title_list_Code{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.container_icon{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.scannerCode{
+    margin-top: 30px;
+}
+
+@media(min-width:600px){
+    .reader{
+        width:60%;
+        display: flex;
+        justify-content: center;
+    }
+    .homepage_button{
+        display: flex;
+        height: 20vw;
+        width: 20vw;
+        font-size: 16vw;
+        align-items: center;
+        justify-content: center;
+    }
+}

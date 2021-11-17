@@ -1,18 +1,20 @@
 <ion-header>
   <mat-toolbar class="toolbar">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <span>Devices Status</span>
-    <ion-buttons class="slot-end bttn_settings">
-      <ion-button class="bttn_settings" (click)="go_to_deviceSettings()"><ion-icon name="settings"></ion-icon></ion-button>
-    </ion-buttons>
+    <div class="toolbar_content">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <span>Devices Status</span>
+      <button mat-icon-button style="font-size: 23px;" (click)="go_to_deviceSettings()">
+        <ion-icon name="settings"></ion-icon>
+      </button>
+    </div>
   </mat-toolbar>
 </ion-header>
 
 <ion-content>
   <mat-card>
-  <ion-list *ngFor="let device of paired_devices;let i=index" style="padding: 0px;">
+    <ion-list *ngFor="let device of paired_devices;let i=index" style="padding: 0px;">
       <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;" *ngIf="device.name!=''">
         <ion-label style="background-color: white; margin: 0px;">
           <h2>{{device.name || 'Unnamed'}}</h2>
@@ -23,10 +25,10 @@
           <p> RSSI: {{device.rssi}}</p>
         </ion-label>
       </ion-item>
-  </ion-list>
-</mat-card>
-<div>
-  
-</div>
-<!-- <ion-button (click)="simulate()">Simulate click</ion-button> -->
+    </ion-list>
+  </mat-card>
+  <div>
+
+  </div>
+  <!-- <ion-button (click)="simulate()">Simulate click</ion-button> -->
 </ion-content>

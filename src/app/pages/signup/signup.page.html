@@ -1,17 +1,24 @@
 <ion-header>
   <mat-toolbar class="toolbar">
-    <button mat-icon-button (click)="go_back()" *ngIf="!logged" class="go_back_button">
-      <mat-icon style="display: inline;">arrow_back</mat-icon>
-    </button>
-    <ion-buttons slot="start" *ngIf="logged">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <span *ngIf="!logged">Registration Form</span>
-    <span *ngIf="logged">Profile</span>
-    <ion-buttons class="slot-end" *ngIf="logged">
-      <ion-button (click)="save_data()">Save</ion-button>
-    </ion-buttons>
-    <div *ngIf="!logged" class="fake-icon"> </div>
+    <div class="toolbar_content">
+      <div *ngIf="!logged;then thenBlock else elseBlock"></div>
+      <ng-template #thenBlock>
+        <button mat-icon-button routerLink="/login" class="go_back_button">
+          <mat-icon style="display: inline;">arrow_back</mat-icon>
+        </button>
+      </ng-template>
+      <ng-template #elseBlock>
+        <button mat-icon-button routerLink="/profile/menu/homepage" class="go_back_button">
+          <mat-icon style="display: inline;">arrow_back</mat-icon>
+        </button>
+      </ng-template>
+      <span *ngIf="!logged">Registration Form</span>
+      <span *ngIf="logged">Profile</span>
+      <ion-buttons class="slot-end" *ngIf="logged">
+        <ion-button (click)="save_data()">Save</ion-button>
+      </ion-buttons>
+      <div *ngIf="!logged" class="fake-icon"> </div>
+    </div>
   </mat-toolbar>
 </ion-header>
 <ion-content #content>
@@ -232,9 +239,15 @@
               <mat-card-content style="display: flex; flex-direction: column; width: fit-content;">
                 <mat-label>Would you like to contact the following numbers?</mat-label>
                 <mat-label>(without direct responsibility)</mat-label>
-                <mat-checkbox [checked]="user_data.public_emergency_contacts[113]"><h3>113</h3></mat-checkbox>
-                <mat-checkbox [checked]="user_data.public_emergency_contacts[115]"><h3>115</h3></mat-checkbox>
-                <mat-checkbox [checked]="user_data.public_emergency_contacts[118]"><h3>118</h3></mat-checkbox>
+                <mat-checkbox [checked]="user_data.public_emergency_contacts[113]">
+                  <h3>113</h3>
+                </mat-checkbox>
+                <mat-checkbox [checked]="user_data.public_emergency_contacts[115]">
+                  <h3>115</h3>
+                </mat-checkbox>
+                <mat-checkbox [checked]="user_data.public_emergency_contacts[118]">
+                  <h3>118</h3>
+                </mat-checkbox>
               </mat-card-content>
             </mat-card>
           </div>

@@ -1,0 +1,46 @@
+.homepage_content{
+    display: flex;
+    justify-content: space-evenly;
+    height: 100%;
+    flex-direction: column;
+}
+.mat-icon{
+    font-size: inherit;
+    display: inherit;
+    height: inherit;
+    width: inherit;
+}
+.row_content{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.homepage_button{
+    display: flex;
+    height: 40vw;
+    width: 40vw;
+    font-size: 32vw;
+    align-items: center;
+    justify-content: center;
+}
+
+.homepage_button_content{
+    display: flex;
+    flex-direction: column;
+}
+@media screen and (min-width:600px),screen and (min-height: 700px){
+    .homepage_button{
+        display: flex;
+        height: 20vw;
+        width: 20vw;
+        font-size: 15vw;
+        align-items: center;
+        justify-content: center;
+    }
+    .mat-icon{
+        font-size: 12vw;
+        display: inherit;
+        height: inherit;
+        width: inherit;
+    }
+}

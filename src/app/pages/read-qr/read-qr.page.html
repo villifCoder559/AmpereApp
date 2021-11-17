@@ -3,11 +3,13 @@
 </button> -->
 <ion-header #content>
   <mat-toolbar class="toolbar">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <span>QR Reader</span>
-    <div class="fake-icon"></div>
+    <div class="toolbar_content">
+      <button mat-icon-button routerLink="/profile/menu/homepage" class="go_back_button">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span>QR Reader</span>
+      <div class="fake-icon"></div>
+    </div>
   </mat-toolbar>
 </ion-header>
 

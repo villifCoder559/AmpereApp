@@ -13,26 +13,26 @@ export class MenuPage implements OnInit {
       title: 'Homepage',
       url: '/profile/menu/homepage'
     },
-    {
-      title: 'Profile',
-      url: '/profile/menu/profile'
-    },
+    // {
+    //   title: 'Profile',
+    //   url: '/profile/menu/profile'
+    // },
     {
       title: 'Devices Status',
       url: '/profile/menu/testAlert'
     },
-    {
-      title: 'NFC Reader',
-      url: '/profile/menu/read-nfc'
-    },
-    {
-      title: 'QR Reader',
-      url: '/profile/menu/read-qr'
-    },
-    {
-      title: 'FAQ',
-      url: '/profile/menu/faq'
-    },
+    // {
+    //   title: 'NFC Reader',
+    //   url: '/profile/menu/read-nfc'
+    // },
+    // {
+    //   title: 'QR Reader',
+    //   url: '/profile/menu/read-qr'
+    // },
+    // {
+    //   title: 'FAQ',
+    //   url: '/profile/menu/faq'
+    // },
     {
       title: 'Term of Use',
       url: '/profile/menu/termOfUse'

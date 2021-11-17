@@ -1,10 +1,12 @@
 <ion-header>
   <mat-toolbar class="toolbar">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <span>Homepage</span>
-    <div class="fake-icon"></div>
+    <div class="toolbar_content">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <span>Homepage</span>
+      <div class="fake-icon"></div>
+    </div>
   </mat-toolbar>
 </ion-header>
 
@@ -12,5 +14,35 @@
   <div *ngIf="!gps_enable" class="alert-msg">
     Localization is not enable!
   </div>
-  <ion-button (click)="showAlert()">ShowAlert</ion-button>
+  <!-- <ion-button (click)="showAlert()">ShowAlert</ion-button> -->
+  <div class="homepage_content">
+    <div class="row_content">
+      <button mat-raised-button class="homepage_button" routerLink="/profile/menu/read-qr">
+        <div class="homepage_button_content">
+          <ion-icon name="qr-code-outline"></ion-icon>
+          <h3>QR</h3>
+        </div>
+      </button>
+      <button mat-raised-button class="homepage_button" routerLink="/profile/menu/read-nfc">
+        <div class="homepage_button_content">
+          <mat-icon>nfc</mat-icon>
+          <h3>NFC</h3>
+        </div>
+      </button>
+    </div>
+    <div class="row_content">
+      <button mat-raised-button class="homepage_button" routerLink="/profile/menu/profile">
+        <div class="homepage_button_content">
+          <ion-icon name="person-outline"></ion-icon>
+          <h3>Profile</h3>
+        </div>
+      </button>
+      <button mat-raised-button class="homepage_button" routerLink="/profile/menu/faq">
+        <div class="homepage_button_content">
+          <ion-icon name="help-outline"></ion-icon>
+          <h3>FAQ</h3>
+        </div>
+      </button>
+    </div>
+  </div>
 </ion-content>

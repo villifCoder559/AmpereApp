@@ -8,14 +8,14 @@ import { Entity, NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
   selector: 'app-read-nfc',
   templateUrl: './read-nfc.page.html',
   styleUrls: ['./read-nfc.page.scss'],
-  providers:[SharedDataService,NGSIv2QUERYService]
+  providers: [SharedDataService, NGSIv2QUERYService]
 })
 export class ReadNFCPage implements OnInit {
   NFC_data = '';
-  readMessage = '';
   NFC_enable = false;
+  scannedCode = null;
   NFC_list = [new NFCCode(), new NFCCode(), new NFCCode(), new NFCCode()];
-  constructor(private NGSIv2Query:NGSIv2QUERYService,private sharedData: SharedDataService, private toastCtrl: ToastController, private nfc: NFC, private ndef: Ndef, private platform: Platform) {
+  constructor(private NGSIv2Query: NGSIv2QUERYService, private sharedData: SharedDataService, private toastCtrl: ToastController, private nfc: NFC, private ndef: Ndef, private platform: Platform) {
     console.log(this.sharedData.user_data)
     this.NFC_list = this.sharedData.user_data?.nfc_code;
   }
@@ -33,8 +33,8 @@ export class ReadNFCPage implements OnInit {
       let flags = this.nfc.FLAG_READER_NFC_A | this.nfc.FLAG_READER_NFC_V;
       var readerMode = this.nfc.readerMode(flags).subscribe(
         tag => {
-          this.readMessage = JSON.stringify(tag)
-          console.log(this.readMessage)
+          this.scannedCode = JSON.stringify(tag)
+          console.log(this.scannedCode)
         },
         err => this.create_message('Error reading tag: ' + err)
       );
@@ -42,7 +42,7 @@ export class ReadNFCPage implements OnInit {
     else if (this.platform.is('ios')) {
       try {
         let tag = await this.nfc.scanNdef();
-        this.readMessage = JSON.stringify(tag);
+        this.scannedCode = JSON.stringify(tag);
       } catch (err) {
         alert('Error reading tag ' + err);
       }
