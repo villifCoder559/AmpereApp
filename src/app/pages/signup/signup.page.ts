@@ -113,9 +113,10 @@ export class SignupPage implements OnInit {
   ];
   constructor(private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     this.user_data = this.shared_data.user_data;
-    if (this.user_data == undefined) {
-      this.user_data = new UserData();
-    }
+    console.log(this.shared_data.user_data)
+    // if (this.user_data == undefined) {
+    //   this.user_data = new UserData();
+    // }
     this.stepperOrientation = breakpointObserver.observe('(min-width: 1000px)')
       .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
     this.logged = this.shared_data.is_logged;
@@ -166,6 +167,7 @@ export class SignupPage implements OnInit {
   }
 
   ngOnInit() {
+    console.log('ngOnInit')
     if (this.logged) {
       // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
       const user_data: UserData = this.shared_data.user_data;
@@ -218,6 +220,7 @@ export class SignupPage implements OnInit {
         }, 250);
       }
     }
+    this.paired_devices = this.shared_data.user_data.paired_devices;
   }
   checkData(ev) {
     console.log(ev)
@@ -306,7 +309,9 @@ export class SignupPage implements OnInit {
         console.log(element?.id)
       }
     })
-    if (count_device_paired < this.paired_devices.length) {
+    console.log(count_device_paired);
+    console.log(this.paired_devices.length)
+    if (0 < 1) { /*fix */
       const dialogRef = this.dialog.open(DialogScanBluetoothComponent, {
         maxWidth: '90vw',
         minWidth: '40vw'
@@ -329,6 +334,7 @@ export class SignupPage implements OnInit {
           this.paired_devices[index].rssi = result.rssi;
           this.paired_devices[index].services = result.services;
           this.shared_data.user_data.paired_devices[index] = this.paired_devices[index];
+          console.log(this.shared_data.user_data.paired_devices);
           //this.bluetoothService.startNotificationDevice(result)
           this.bluetoothService.autoConnectBluetooth();
         }

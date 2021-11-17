@@ -6,7 +6,7 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
-import {SharedDataService} from '../../data/shared-data.service'
+import { SharedDataService } from '../../data/shared-data.service'
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.page.html',
@@ -36,14 +36,14 @@ import {SharedDataService} from '../../data/shared-data.service'
   */
 export class HomepagePage implements OnInit {
   gps_enable = true;
-  constructor(private sharedData:SharedDataService,private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
       this.localNotifications.hasPermission().then(result => {
         if (!result.valueOf())
           this.localNotifications.requestPermission()
       })
       this.checkPermission()
-    })
+    }, (err) => console.log(err))
   }
   ngOnInit() {
 
