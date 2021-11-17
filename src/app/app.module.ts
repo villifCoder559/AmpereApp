@@ -24,6 +24,9 @@ import {LoginPage} from '../app/pages/login/login.page'
 import {SharedDataService} from '../app/data/shared-data.service'
 import {NGSIv2QUERYService} from '../app/data/ngsiv2-query.service'
 import {BluetoothService} from '../app/data/bluetooth.service'
+import { IBeacon } from '@ionic-native/ibeacon/ngx'
+import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -42,7 +45,9 @@ import {BluetoothService} from '../app/data/bluetooth.service'
     LoginPage,
     SharedDataService,
     NGSIv2QUERYService,
-    BluetoothService
+    BluetoothService,
+    IBeacon,
+    BluetoothLE
   ],
   bootstrap: [AppComponent],
 })
