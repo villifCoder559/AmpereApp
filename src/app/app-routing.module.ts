@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AutoLoginGuard } from './guards/auto-login.guard';
-import { IntroGuard } from './guards/intro.guard';
 import { BLE } from '@ionic-native/ble/ngx'
+import { AuthGuardService } from './guards/auth-guard.service'
 const routes: Routes = [
   {
     path: 'login',
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule),
-    canLoad: [IntroGuard, AutoLoginGuard],
+    canLoad: [AutoLoginGuard],
   },
   {
     path: 'signup',
@@ -15,16 +15,17 @@ const routes: Routes = [
   },
   {
     path: 'profile',
-    loadChildren: () => import('./pages/menu/menu.module').then(m => m.MenuPageModule)
+    loadChildren: () => import('./pages/menu/menu.module').then(m => m.MenuPageModule),
+    canActivate:[AuthGuardService]
   },
   {
     path: 'show-alert',
-    loadChildren: () => import('./show-alert/show-alert.module').then(m => m.ShowAlertPageModule)
+    loadChildren: () => import('./show-alert/show-alert.module').then(m => m.ShowAlertPageModule),
   },
   {
     path: '',
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule),
-    canLoad: [IntroGuard, AutoLoginGuard],
+    canLoad: [AutoLoginGuard],
   }
 ];
 @NgModule({
