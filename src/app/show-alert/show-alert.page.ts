@@ -63,7 +63,7 @@ export class ShowAlertPage implements OnInit {
   async checkPin() {
     var ok = true;
     // var pin_saved = window.localStorage.getItem('user.password');
-    var pin_saved = ['0', '0', '0', '0',]
+    var pin_saved = this.shared_data.user_data.pin;
     for (var i = 0; i < this.pin.length; i++) {
       if (pin_saved[i] != this.pin[i])
         ok = false
@@ -79,7 +79,6 @@ export class ShowAlertPage implements OnInit {
 
     }
     else {
-      this.shared_data.reset_EmergencyClick();
       this.presentAlert('PIN correct', 1500);
       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }
@@ -99,11 +98,7 @@ export class ShowAlertPage implements OnInit {
   }
   async send_Emergency(event) {
     console.log(event)
-    if (event.action == 'done' && this.shared_data.count_click_emergency == 1) {
+    if (event.action == 'done')
       this.shared_data.showAlert();
-    }
-  }
-  testButton() {
-    this.shared_data.showAlert();
   }
 }
