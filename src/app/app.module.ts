@@ -26,6 +26,9 @@ import {NGSIv2QUERYService} from '../app/data/ngsiv2-query.service'
 import {BluetoothService} from '../app/data/bluetooth.service'
 import { IBeacon } from '@ionic-native/ibeacon/ngx'
 import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
+import { Snap4CityService } from '../app/data/snap4-city.service'
+import { AutoLoginGuard } from '../app/guards/auto-login.guard'
+import { AuthenticationService } from '../app/services/authentication.service'
 
 @NgModule({
   declarations: [AppComponent],
@@ -47,7 +50,10 @@ import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
     NGSIv2QUERYService,
     BluetoothService,
     IBeacon,
-    BluetoothLE
+    BluetoothLE,
+    Snap4CityService,
+    AutoLoginGuard,
+    AuthenticationService
   ],
   bootstrap: [AppComponent],
 })
