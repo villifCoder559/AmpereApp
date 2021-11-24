@@ -11,7 +11,7 @@
 
 /* Core CSS required for Ionic components to work properly */
 @import "~@ionic/angular/css/core.css";
-
+@import '~material-icons/iconfont/material-icons.css';
 /* Basic CSS for apps built with Ionic */
 @import "~@ionic/angular/css/normalize.css";
 @import "~@ionic/angular/css/structure.css";
@@ -38,6 +38,7 @@
 ion-item{
     --ion-background-color:#fff;
 }
+
 h2,h3,p{
     margin: 0px !important
 }
@@ -154,8 +155,19 @@ ngx-qrcode{
 .scannerCode{
     margin-top: 30px;
 }
-
-@media(min-width:600px){
+.content{
+    display: flex;
+    justify-content: center;
+}
+.label_code{//rq and nfc
+    background-color: white;
+     margin: 15px 0px;
+}
+.icon_code{
+    width: 30px; 
+    height: 30px;
+}
+@media(min-width:800px){ //mediaQueries also in signup.scss,signup.ts constructor, homepage.scss
     .reader{
         width:60%;
         display: flex;
