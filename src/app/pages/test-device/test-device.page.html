@@ -13,22 +13,37 @@
 </ion-header>
 
 <ion-content>
-  <mat-card>
-    <ion-list *ngFor="let device of paired_devices;let i=index" style="padding: 0px;">
-      <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;" *ngIf="device.name!=''">
-        <ion-label style="background-color: white; margin: 0px;">
-          <h2>{{device.name || 'Unnamed'}}</h2>
-          <h2 *ngIf="device.connected" style="color: green;">Connected</h2>
-          <h2 *ngIf="!device.connected" style="color:red;">Not Connected</h2>
-          <h3>{{device.id}}</h3>
-          <h3>{{device.battery}}%</h3>
-          <p> RSSI: {{device.rssi}}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </mat-card>
-  <div>
-
+  <div class="content">
+    <div class="reader">
+      <mat-card>
+        <ion-list *ngFor="let device of this.shared_data.user_data.paired_devices;let i=index"
+          style="padding: 0px; display: flex;">
+          <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff; display: flex;"
+            *ngIf="device.name!=''">
+            <ion-label style="background-color: white; margin: 0px;">
+              <h2>{{device.name || 'Unnamed'}}</h2>
+              <h2 style="color: green;">Paired</h2>
+              <!-- <h3>{{device.uuid}}</h3> -->
+              <h3>{{device.proximity}}</h3>
+              <!-- <p> RSSI: {{device.rssi}}</p> -->
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </mat-card>
+      <div style="padding-top: 50px; display: flex;">
+        <mat-card style="border-radius: 25px; border: outset">
+          <mat-card-title-group style="justify-content: center; padding-top: 10px;">
+            <mat-card-title>Test Device</mat-card-title>
+          </mat-card-title-group>
+          <mat-card-content style="padding: 10px; font-size: 15px;">
+            Bring the phone and the device closer, click the button on the device and enter the PIN
+            {{this.shared_data.user_data.pin}} to cancel the sending
+            of the emergency call<br>
+            <b>Be careful if you do not enter the PIN you will send an emergency report</b>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
   </div>
-  <!-- <ion-button (click)="simulate()">Simulate click</ion-button> -->
+  <!-- <button mat-raised-button (click)="testDevice()">Test Device</button> -->
 </ion-content>

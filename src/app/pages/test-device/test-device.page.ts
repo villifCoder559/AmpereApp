@@ -7,21 +7,15 @@ import { Router } from '@angular/router'
   styleUrls: ['./test-device.page.scss'],
 })
 export class TestDevicePage implements OnInit {
-  paired_devices: any;
-  constructor(private shared_data: SharedDataService, private router: Router) {
-    var user_data: UserData = this.shared_data.getUserData();
-    this.paired_devices = user_data.paired_devices;
-    console.log(this.paired_devices)
+  
+  constructor(public shared_data: SharedDataService, private router: Router) {
   }
-  // delete(device, index) {
-  //   console.log('delete pos ' + index + " -> " + device.id)
-  // }
-  // simulate() {
-  //   this.router.navigateByUrl('/show-alert', { replaceUrl: false })
-  // }
   ngOnInit() {
   }
   go_to_deviceSettings() {
     this.router.navigateByUrl('/profile/menu/profile', { replaceUrl: true, state: { page: 6 } })
+  }
+  testDevice(){
+    alert('')
   }
 }
