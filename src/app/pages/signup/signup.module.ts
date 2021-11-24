@@ -10,7 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { Contacts } from '@ionic-native/contacts/ngx'
 import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
 import { BLE } from '@ionic-native/ble/ngx'
-
+import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component'
 @NgModule({
   imports: [
     CommonModule,
@@ -21,8 +21,8 @@ import { BLE } from '@ionic-native/ble/ngx'
     MaterialModule,
     HttpClientModule
   ],
-  declarations: [SignupPage, DialogExampleComponent, DialogScanBluetoothComponent],
-  providers: [Contacts,BLE],
-  entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent]
+  declarations: [SignupPage, DialogModifyNameComponent, DialogExampleComponent, DialogScanBluetoothComponent],
+  providers: [Contacts, BLE],
+  entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent, DialogModifyNameComponent]
 })
 export class SignupPageModule { }
