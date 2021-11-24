@@ -5,7 +5,6 @@ import { BehaviorSubject, from, Observable, Subject } from 'rxjs';
 import { SharedDataService } from '../data/shared-data.service'
 import * as Keycloak from 'keycloak-ionic/keycloak';
 import { BluetoothService } from '../data/bluetooth.service'
-import { NGSIv2QUERYService, Entity } from '../data/ngsiv2-query.service'
 
 @Injectable({
   providedIn: 'root'
@@ -13,25 +12,22 @@ import { NGSIv2QUERYService, Entity } from '../data/ngsiv2-query.service'
 export class AuthenticationService {
   isAuthenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
   public keycloak: Keycloak.KeycloakInstance;
-  token = '';
-  constructor(private ngsiv2QUERY: NGSIv2QUERYService, private bluetoothService: BluetoothService, private http: HttpClient, private shared_data: SharedDataService) {
-    this.loadToken();
-
+  constructor() {
+    //this.loadToken();
   }
 
-  loadToken() {
-    const token = window.localStorage.getItem('TOKEN_KEY');
-    console.log('Token_get')
-    if (token != null) {
-      console.log('set token: ', token);
-      this.token = token;
-      this.shared_data.loadDataUser();
-      this.shared_data.setIs_logged(true);
-      this.isAuthenticated.next(true);
-    } else {
-      this.isAuthenticated.next(false);
-    }
-  }
+  // loadToken() {
+  //   const token = window.localStorage.getItem('TOKEN_KEY');
+  //   console.log('Token_get '+ token)
+  //   if (token != null) {
+  //     console.log('set token: ', token);
+  //     //this.shared_data.loadDataUser();
+  //     this.shared_data.setIs_logged(true);
+  //     this.isAuthenticated.next(true);
+  //   } else {
+  //     this.isAuthenticated.next(false);
+  //   }
+  // }
 
   login(credentials: { email, password }): Observable<any> {
     this.isAuthenticated.next(true)
@@ -64,13 +60,10 @@ export class AuthenticationService {
         if (autentication) {
           //this.sharedData.snap4city_logged = true;
           //alert("Success Auth")
-          console.log('autenticato')
-          this.shared_data.enableAllBackgroundMode();
-          this.ngsiv2QUERY.getEntity(Entity.USERID).then(() => {
-            this.bluetoothService.autoConnectBluetooth();
-            this.bluetoothService.enableNotificationTurnOffBluetooth()
-            resolve(true)
-          },(err)=>alert(err))
+          console.log('autenticated')
+          console.log('token '+this.keycloak.token)
+          console.log('profile '+this.keycloak.profile)
+          resolve(true);
         }
         else
           this.keycloak.login().then((value) => {
@@ -84,18 +77,10 @@ export class AuthenticationService {
       })
     })
   }
-  async logout() {
-    this.isAuthenticated.next(false);
-    this.shared_data.setIs_logged(false);
-    this.shared_data.disableBackgaundMode();
-    this.bluetoothService.disconnectAllDevices();
-    this.bluetoothService.disableNotificationTurnOffBluetooth()
+  logout() {
+    this.isAuthenticated.next(false);  
     window.localStorage.removeItem('TOKEN_KEY');
-    console.log(this.shared_data.snap4city_logged)
-    if (this.shared_data.snap4city_logged) {
-      this.keycloak.logout();
-      console.log('logout')
-      this.shared_data.snap4city_logged = false;
-    }
+    if(this.keycloak!=null)
+      this.keycloak.logout();    
   }
 }
