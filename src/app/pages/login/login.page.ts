@@ -44,20 +44,23 @@ export class LoginPage implements OnInit {
           console.log('end_auth')
           console.log(auth)
           if (auth) {
-            this.sharedData.snap4city_logged = true;
-            console.log('snap4citylogged_TRUE')
+            this.sharedData.enableAllBackgroundMode();
             this.sharedData.goHomepage()
           }
+        },async (err)=>{
+          console.log(err)
+          await loading.dismiss()
         });
       } catch (e) {
+        await loading.dismiss();
         alert((e as Error).message)
       }
     }
     else {
       this.authService.login(this.credentials.value).subscribe(
         async (res) => {
+          this.sharedData.goHomepage();
           await loading.dismiss();
-          this.sharedData.goHomepage()
         },
         async (res) => {
           await loading.dismiss();
