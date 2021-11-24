@@ -83,7 +83,7 @@ mat-form-field{
 .align_checkbox{
   align-items: center;
 }
-@media(min-width: 600px) {
+@media screen and(min-width: 800px) { 
   .tablet_view{
     justify-content: space-around;
     display: flex;
