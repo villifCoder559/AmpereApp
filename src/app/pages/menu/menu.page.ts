@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent } from '@angular/router';
+import { MenuController } from '@ionic/angular';
+import { SharedDataService } from 'src/app/data/shared-data.service';
 import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
@@ -13,26 +15,10 @@ export class MenuPage implements OnInit {
       title: 'Homepage',
       url: '/profile/menu/homepage'
     },
-    // {
-    //   title: 'Profile',
-    //   url: '/profile/menu/profile'
-    // },
     {
       title: 'Devices Status',
       url: '/profile/menu/testAlert'
     },
-    // {
-    //   title: 'NFC Reader',
-    //   url: '/profile/menu/read-nfc'
-    // },
-    // {
-    //   title: 'QR Reader',
-    //   url: '/profile/menu/read-qr'
-    // },
-    // {
-    //   title: 'FAQ',
-    //   url: '/profile/menu/faq'
-    // },
     {
       title: 'Term of Use',
       url: '/profile/menu/termOfUse'
@@ -44,7 +30,7 @@ export class MenuPage implements OnInit {
 
   ]
   selectedPath = ''
-  constructor(private router: Router, private authService: AuthenticationService) {
+  constructor(private ctrlMenu: MenuController, private router: Router, private authService: AuthenticationService, public shared_data: SharedDataService) {
     console.log('costruttore')
     this.router.events.subscribe((event: RouterEvent) => {
       this.selectedPath = event.url
@@ -56,10 +42,13 @@ export class MenuPage implements OnInit {
   ngOnInit() {
 
   }
-  async logout() {
-    await this.authService.logout().then(() => {
+  logout() {
+    this.ctrlMenu.close().then(() => {
+      console.log('logout');
+      this.authService.isAuthenticated.next(false)
+      console.log('autentcated.next is false')
+      this.authService.logout();
       this.router.navigateByUrl('/login', { replaceUrl: true });
-    });
+    })
   }
-
 }
