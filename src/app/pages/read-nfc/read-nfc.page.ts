@@ -8,16 +8,14 @@ import { Entity, NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
   selector: 'app-read-nfc',
   templateUrl: './read-nfc.page.html',
   styleUrls: ['./read-nfc.page.scss'],
-  providers: [SharedDataService, NGSIv2QUERYService]
+  providers: [NGSIv2QUERYService]
 })
 export class ReadNFCPage implements OnInit {
   NFC_data = '';
   NFC_enable = false;
   scannedCode = null;
-  NFC_list = [new NFCCode(), new NFCCode(), new NFCCode(), new NFCCode()];
-  constructor(private NGSIv2Query: NGSIv2QUERYService, private sharedData: SharedDataService, private toastCtrl: ToastController, private nfc: NFC, private ndef: Ndef, private platform: Platform) {
-    console.log(this.sharedData.user_data)
-    this.NFC_list = this.sharedData.user_data?.nfc_code;
+  constructor(private NGSIv2Query: NGSIv2QUERYService, public shared_data: SharedDataService, private toastCtrl: ToastController, private nfc: NFC, private ndef: Ndef, private platform: Platform) {
+    console.log(this.shared_data.user_data)
   }
   addNFC() {
     this.NGSIv2Query.getEntity(Entity.NFC)
@@ -58,9 +56,9 @@ export class ReadNFCPage implements OnInit {
   }
   delete(device, index) {
     console.log('delete pos ' + index + " -> " + device.id)
-    $('#item' + index).hide(800, () => {
-      this.NFC_list.splice(index, 1);
-      console.log(this.NFC_list)
+    $('#item' + index).hide(400, () => {
+      this.shared_data.user_data.nfc_code.splice(index, 1);
+      console.log(this.shared_data.user_data)
     })
   }
   ngOnDestroy() {

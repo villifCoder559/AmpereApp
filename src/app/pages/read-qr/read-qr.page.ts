@@ -4,7 +4,7 @@ import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 import { ToastController } from '@ionic/angular';
 import * as $ from "jquery";
 import { ChangeDetectorRef } from '@angular/core';
-import { QRCode, SharedDataService } from 'src/app/data/shared-data.service';
+import { SharedDataService } from 'src/app/data/shared-data.service';
 import { NGSIv2QUERYService, Entity } from 'src/app/data/ngsiv2-query.service'
 /* QR-Code has 3 fields:{"description":"","link":"","code":""} */
 
@@ -19,8 +19,7 @@ export class ReadQRPage implements OnInit {
   scannedCode = null;
   title = 'app';
   isOn = false;
-  QR_list = [new QRCode(), new QRCode(), new QRCode(), new QRCode()];
-  constructor(private sharedData: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: QRScanner, private toastCtrl: ToastController) {
+  constructor(public sharedData: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: QRScanner, private toastCtrl: ToastController) {
     document.addEventListener('ionBackButton', (ev) => {
       //console.log(ev)
       if (this.previewCamera) {
@@ -29,7 +28,6 @@ export class ReadQRPage implements OnInit {
         $("ion-app").show(500);
       }
     })
-    this.QR_list = this.sharedData.user_data.qr_code;
   }
   closePreviewCamera() {
     this.previewCamera = false;
@@ -75,9 +73,9 @@ export class ReadQRPage implements OnInit {
   }
   delete(device, index) {
     console.log('delete pos ' + index + " -> " + device.id)
-    var a = $('#item' + index).hide(800, () => {
-      this.QR_list.splice(index, 1);
-      console.log(this.QR_list)
+    var a = $('#item' + index).hide(400, () => {
+      this.sharedData.user_data.qr_code.splice(index, 1);
+      console.log(this.sharedData.user_data.qr_code)
     })
   }
 }
