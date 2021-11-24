@@ -14,7 +14,7 @@
 </ion-header>
 
 <ion-content #content>
-  <div class="content" style="display: flex; justify-content: center;">
+  <div class="content">
     <div class="reader">
       <mat-card appearance="fill" id="bluetooth" class="custom_mat_card">
         <div class="title_list_Code">
@@ -24,10 +24,10 @@
           </button>
         </div>
         <div>
-          <ion-list *ngFor="let item of QR_list;let i=index;">
+          <ion-list *ngFor="let item of this.sharedData.user_data.qr_code;let i=index;">
             <ion-item-sliding>
               <ion-item *ngIf="item.id !=-1 " class="ion-no-padding" id="item{{i}}">
-                <ion-label style="background-color: white; margin: 15px 0px;">
+                <ion-label class="label_code">
                   <h3>{{item.description}}</h3>
                 </ion-label>
               </ion-item>
@@ -35,7 +35,7 @@
                 <ion-item-option color="danger" (click)="delete(item,i)" expandable
                   style="display: flex; flex-direction: row;">
                   <div class="container_icon">
-                    <ion-icon name="trash-outline" style="width: 30px; height: 30px;"></ion-icon>
+                    <ion-icon name="trash-outline" class="icon_code"></ion-icon>
                     <p>Delete</p>
                   </div>
                 </ion-item-option>
