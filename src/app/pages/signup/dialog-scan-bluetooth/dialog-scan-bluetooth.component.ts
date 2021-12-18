@@ -30,7 +30,8 @@ export class DialogScanBluetoothComponent implements OnInit {
   //   $('#matSpinner').hide();
   // }
   scan() {
-    this.bluetoothService.scan(25000).then((scanList: []) => {
+    //this.bluetoothService.BeaconLibrary();
+    this.bluetoothService.scanBLE(25000).then((scanList: []) => {
       $('#matSpinner').hide()
       this.devices = scanList;
       console.log(scanList)

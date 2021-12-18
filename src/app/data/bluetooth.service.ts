@@ -1,7 +1,7 @@
 import { Component, Injectable, NgModule } from '@angular/core';
 import { SharedDataService } from '../data/shared-data.service'
 import { BLE } from '@ionic-native/ble/ngx';
-import { IBeacon } from '@ionic-native/ibeacon/ngx'
+import { IBeacon } from '@ionic-native/ibeacon/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 //import { Device } from '../data/shared-data.service';
 import { Platform } from '@ionic/angular';
@@ -17,12 +17,9 @@ import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
   providedIn: 'root'
 })
 export class BluetoothService {
-  constructor(private bluetoothLE: BluetoothLE, private platform: Platform, private ibeacon: IBeacon, private localNotification: LocalNotifications, private ble: BLE, private sharedData: SharedDataService) {
-    //var delegate=this.ibeacon.Delegate();
-    //delegate.
+  constructor( private bluetoothLE: BluetoothLE, private platform: Platform, private ibeacon: IBeacon, private localNotification: LocalNotifications, private ble: BLE, private sharedData: SharedDataService) {
     this.platform.ready().then(() => {
       this.bluetoothLE.initialize()
-      //this.BeaconLibrary();
     })
   }
   bluetoothLEScan(scanningTime = 10000) {
@@ -37,13 +34,13 @@ export class BluetoothService {
           this.bluetoothLE.enable()
         }).then(() => {
           this.bluetoothLE.startScan({ allowDuplicates: false }).subscribe(device => {
-              if (array.findIndex((dev) => dev.address == device.address) == -1) {
-                var adv = device.advertisement;
-                array.push(device)
-                //console.log(this.bluetoothLE.encodedStringToBytes('AwNv/RcWb/1nFJSQPeFo1Vf3Y3mCWEKQEpJyJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='));
-                console.log(device.name + ' ' + device.address)
-                //console.log('adv-> '+this.bluetoothLE.encodedStringToBytes('AgEFBP9NRgEJCXNhZmVkb21lAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='))
-                console.log(JSON.stringify(device));
+            if (array.findIndex((dev) => dev.address == device.address) == -1) {
+              var adv = device.advertisement;
+              array.push(device)
+              //console.log(this.bluetoothLE.encodedStringToBytes('AwNv/RcWb/1nFJSQPeFo1Vf3Y3mCWEKQEpJyJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='));
+              console.log(device.name + ' ' + device.address)
+              //console.log('adv-> '+this.bluetoothLE.encodedStringToBytes('AgEFBP9NRgEJCXNhZmVkb21lAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='))
+              console.log(JSON.stringify(device));
             }
           }, (err) => console.log(err));
         }, (err) => {
@@ -57,34 +54,34 @@ export class BluetoothService {
     })
   }
   BeaconLibrary() {
-    // console.log('BeaconLibrary');
-    // // // Request permission to use location on iOS
-    // // this.ibeacon.requestAlwaysAuthorization();
-    // // //create a new delegate and register it with the native layer
-    // let delegate = this.ibeacon.Delegate();
-    // // // Subscribe to some of the delegate's event handlers
-    // let beaconRegion = this.ibeacon.BeaconRegion('BeaconDevice', 'DD:31:A4:AD:A3:05');
-    // delegate.didRangeBeaconsInRegion()
-    //   .subscribe(
-    //     data => console.log('didRangeBeaconsInRegion: ', data),
-    //     error => console.error()
-    //   );
-    // delegate.didStartMonitoringForRegion()
-    //   .subscribe(
-    //     data => console.log('didStartMonitoringForRegion: ', data),
-    //     error => console.error()
-    //   );
-    // delegate.didEnterRegion()
-    //   .subscribe(
-    //     data => {
-    //       console.log('didEnterRegion: ', data);
-    //     }
-    //   );
-    // this.ibeacon.startMonitoringForRegion(beaconRegion)
-    //   .then(
-    //     () => console.log('Native layer received the request to monitoring'),
-    //     error => console.error('Native layer failed to begin monitoring: ', error)
-    //   );
+    console.log('BeaconLibrary: ' + ' start monitoring 52414449-5553-4e45-5457-4f524b53434f');
+    // // Request permission to use location on iOS
+    // this.ibeacon.requestAlwaysAuthorization();
+    // //create a new delegate and register it with the native layer
+    let delegate = this.ibeacon.Delegate();
+    // // Subscribe to some of the delegate's event handlers
+    let beaconRegion = this.ibeacon.BeaconRegion('BeaconDevice', '52414449-5553-4e45-5457-4f524b53434f');
+    delegate.didRangeBeaconsInRegion()
+      .subscribe(
+        data => console.log('didRangeBeaconsInRegion: ', data),
+        error => console.error()
+      );
+    delegate.didStartMonitoringForRegion()
+      .subscribe(
+        data => console.log('didStartMonitoringForRegion: ', data),
+        error => console.error()
+      );
+    delegate.didEnterRegion()
+      .subscribe(
+        data => {
+          console.log('didEnterRegion: ', data);
+        }
+      );
+    this.ibeacon.startMonitoringForRegion(beaconRegion)
+      .then(
+        () => console.log('Native layer received the request to monitoring'),
+        error => console.error('Native layer failed to begin monitoring: ', error)
+      );
   }
   enableNotificationTurnOffBluetooth() {
     this.ble.startStateNotifications().subscribe((state) => {
@@ -109,6 +106,13 @@ export class BluetoothService {
   connectDevice(id) {
     return new Promise((resolve, reject) => {
       this.ble.connect(id).subscribe((peripheralData) => {
+        console.log('enable autoConnection')
+        console.log(id)
+        this.ble.autoConnect(id, function () {
+          console.log('detect device')
+        }, function () {
+          console.log('disconnect')
+        })
         resolve(peripheralData)
       }, (err) => { reject(err) })
     })
@@ -118,7 +122,7 @@ export class BluetoothService {
       this.bluetoothLE.connect({ address: id, autoConnect: true }).subscribe((peripheralData) => {
         console.log('autoConnect Enabled')
         resolve(peripheralData)
-      }, (err) => { console.log('Disconnected ' + id); reject(err) })
+      }, (err) => { console.log('Disconected ' + id); reject(err) })
     })
   }
   autoConnectBluetooth() {
@@ -133,18 +137,18 @@ export class BluetoothService {
   timeConnected = 0;
   timeDisconnected = 0;
   onConnected(peripheralData) {
-    console.log('autoConnectEnbale ' + peripheralData.id);
-    console.log('start timer');
-    this.timeConnected = new Date().getTime();
+    console.log('detect ' + peripheralData.id);
+    //console.log('start timer');
+    //this.timeConnected = new Date().getTime();
     // this.sharedData.showAlert();
-    console.log(peripheralData)
+    //console.log(peripheralData)
   }
   onDisconnectd(peripheralData) {
     //alert('Disconnected device')
-    this.timeDisconnected = new Date().getTime();
+    //this.timeDisconnected = new Date().getTime();
     console.log('Disconnected ' + peripheralData.id);
-    console.log('stop timer')
-    console.log('total time -> ' + (this.timeDisconnected - this.timeConnected) + ' milliseconds')
+    //console.log('stop timer')
+    //console.log('total time -> ' + (this.timeDisconnected - this.timeConnected) + ' milliseconds')
   }
   disconnectAllDevices() {
     this.sharedData.user_data.paired_devices.forEach((element) => {
@@ -169,7 +173,7 @@ export class BluetoothService {
             })
         }).then(() => {
           this.ble.startScanWithOptions([], { reportDuplicates: false }).subscribe(device => {
-            array.push(device)
+            array.push(device);
             console.log(JSON.stringify(device));
           }, (err) => console.log(err));
         });
