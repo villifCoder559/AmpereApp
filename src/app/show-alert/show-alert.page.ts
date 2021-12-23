@@ -10,6 +10,7 @@ import { SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
+import { NGSIv2QUERYService,Entity } from '../data/ngsiv2-query.service'
 /*
   OK Fix view page OK
   OK Add sound when I click button and when the time expires OK
@@ -30,7 +31,7 @@ export class ShowAlertPage implements OnInit {
     formatDate: ({ date }) => `${date / 1000}`,
     // notify: 1
   };;
-  constructor(private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
+  constructor(private NGSIv2Query:NGSIv2QUERYService, private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
     private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.localNotifications.schedule({
       id: 1,
@@ -99,6 +100,68 @@ export class ShowAlertPage implements OnInit {
   async send_Emergency(event) {
     console.log(event)
     if (event.action == 'done')
-      this.shared_data.showAlert();
+      this.sendEmergency();
+  }
+  private currentLocPosition() {
+    return new Promise((resolve, reject) => {
+      var details_emergency = {
+        latitude: 0.0,
+        longitude: 0.0,
+        dateObserved: 0,
+        quote: 0.0,
+        velocity: 0.0,
+        evolution: '',
+        deviceID: 0,
+        accellX: 0.0,
+        accellY: 0.0,
+        accellZ: 0.0,
+        status: 0
+      };
+      this.geolocation.getCurrentPosition().then((response) => {
+        details_emergency.latitude = response.coords.latitude;
+        details_emergency.longitude = response.coords.longitude;
+        details_emergency.dateObserved = new Date().getTime();
+        resolve(details_emergency);
+      }).catch((error) => {
+        alert('Error: ' + error);
+        reject(error)
+      });
+    })
+  }
+  private sendEmergency() {
+    this.currentLocPosition().then((data) => {
+      this.NGSIv2Query.registerEntity(Entity.EVENT, 0, data).then((result) => {
+        this.nativeAudio.play('sendData').catch(
+          (err) => console.log(err))
+        this.data_device_motion();
+        this.localNotifications.schedule({
+          id: 2,
+          text: 'Emergency sent!',
+          data: ""
+        });
+        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+      }, (err) => {
+        setTimeout(() => {
+          console.log(err);
+          this.sendEmergency();
+        }, 2000);
+      })
+    }, (err) => {
+      setTimeout(() => {
+        console.log(err);
+        this.sendEmergency();
+      }, 2000);
+    });
+  }
+  private data_device_motion() {
+    var sub = this.deviceMotion.watchAcceleration({ frequency: 1500 }).subscribe((acceleration: DeviceMotionAccelerationData) => {
+      this.NGSIv2Query.updateEntityAttribute(Entity.EVENT, 'accelX', acceleration.x)
+      this.NGSIv2Query.updateEntityAttribute(Entity.EVENT, 'accelY', acceleration.y)
+      this.NGSIv2Query.updateEntityAttribute(Entity.EVENT, 'accelZ', acceleration.z)
+      console.log(acceleration)
+    }, (err) => { console.log(err) })
+    setTimeout(() => {
+      sub.unsubscribe()
+    }, 60000)
   }
 }
