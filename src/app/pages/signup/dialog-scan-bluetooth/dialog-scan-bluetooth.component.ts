@@ -4,7 +4,6 @@ import { BLE } from '@ionic-native/ble/ngx';
 import { Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { BluetoothService } from '../../../data/bluetooth.service'
-import { SharedDataService } from '../../../data/shared-data.service'
 
 @Component({
   selector: 'app-dialog-scan-bluetooth',
@@ -12,7 +11,8 @@ import { SharedDataService } from '../../../data/shared-data.service'
   styleUrls: ['./dialog-scan-bluetooth.component.scss'],
 })
 export class DialogScanBluetoothComponent implements OnInit {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any ,public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
+  bs: any;
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
     this.platform.ready().then(() => {
       this.scan();
       this.dialogRef.afterClosed().subscribe(() => {
@@ -22,9 +22,11 @@ export class DialogScanBluetoothComponent implements OnInit {
     })
   }
   scan() {
-    var bs = new BehaviorSubject(this.bluetoothService.beaconList).subscribe(() => {
-      $('#matSpinner').hide();
-      bs.unsubscribe();
+    this.bs = new BehaviorSubject(this.bluetoothService.beaconList).subscribe((data) => {
+      console.log(data)
+      if (this.bluetoothService.beaconList.length != 0)
+        $('#matSpinner').hide();
+      console.log(data)
     })
     this.bluetoothService.detectAllBeacon();
   }
