@@ -1,7 +1,7 @@
 <ion-header>
   <mat-toolbar class="toolbar">
     <div class="toolbar_content">
-      <div *ngIf="!this.shared_data.is_logged;then thenBlock else elseBlock"></div>
+      <div *ngIf="!this.authService.isAuthenticated.getValue();then thenBlock else elseBlock"></div>
       <ng-template #thenBlock>
         <button mat-icon-button routerLink="/login" class="go_back_button">
           <mat-icon style="display: inline;">arrow_back</mat-icon>
@@ -12,12 +12,12 @@
           <mat-icon style="display: inline;">arrow_back</mat-icon>
         </button>
       </ng-template>
-      <span *ngIf="!this.shared_data.is_logged">Registration Form</span>
-      <span *ngIf="this.shared_data.is_logged">Profile</span>
-      <ion-buttons class="slot-end" *ngIf="this.shared_data.is_logged">
+      <span *ngIf="!this.authService.isAuthenticated.getValue()">Registration Form</span>
+      <span *ngIf="this.authService.isAuthenticated.getValue()">Profile</span>
+      <ion-buttons class="slot-end" *ngIf="this.authService.isAuthenticated.getValue()">
         <ion-button (click)="save_data()">Save</ion-button>
       </ion-buttons>
-      <div *ngIf="!this.shared_data.is_logged" class="fake-icon"> </div>
+      <div *ngIf="!this.authService.isAuthenticated.getValue()" class="fake-icon"> </div>
     </div>
   </mat-toolbar>
 </ion-header>
@@ -32,7 +32,7 @@
               <mat-label>Email</mat-label>
               <input matInput type="email" formControlName="email" placeholder="" required>
             </mat-form-field>
-            <mat-form-field *ngIf="this.shared_data.is_logged && psw_editable" appearance="fill" id="matcardResize">
+            <mat-form-field *ngIf="this.authService.isAuthenticated.getValue() && psw_editable" appearance="fill" id="matcardResize">
               <mat-label>Old Password</mat-label>
               <input matInput [type]="hideold?'text':'password'" formControlName="old_psw" placeholder="" required>
               <button mat-icon-button matSuffix (click)="hideold = !hideold">
@@ -41,9 +41,9 @@
               <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match
               </mat-error>
             </mat-form-field>
-            <mat-form-field appearance="fill" id="matcardResize" *ngIf="psw_editable || !this.shared_data.is_logged">
-              <mat-label *ngIf="this.shared_data.is_logged">New Password</mat-label>
-              <mat-label *ngIf="!this.shared_data.is_logged">Password</mat-label>
+            <mat-form-field appearance="fill" id="matcardResize" *ngIf="psw_editable || !this.authService.isAuthenticated.getValue()">
+              <mat-label *ngIf="this.authService.isAuthenticated.getValue()">New Password</mat-label>
+              <mat-label *ngIf="!this.authService.isAuthenticated.getValue()">Password</mat-label>
               <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required>
               <button mat-icon-button matSuffix (click)="hidepsw = !hidepsw">
                 <mat-icon>{{hidepsw ? 'visibility' : 'visibility_off'}}</mat-icon>
@@ -52,7 +52,7 @@
               <mat-error *ngIf="zeroFormGroup.get('psw').hasError('minlength')">Password length more than 7</mat-error>
               <mat-error *ngIf="zeroFormGroup.get('psw').hasError('pattern')">At leat one special char</mat-error>
             </mat-form-field>
-            <mat-form-field appearance="fill" id="matcardResize" *ngIf="psw_editable || !this.shared_data.is_logged">
+            <mat-form-field appearance="fill" id="matcardResize" *ngIf="psw_editable || !this.authService.isAuthenticated.getValue()">
               <mat-label>Confirm Password</mat-label>
               <input matInput [type]="hide?'text':'password'" formControlName="confirm_psw" placeholder="" required>
               <button mat-icon-button matSuffix (click)="hide = !hide">
@@ -64,11 +64,9 @@
           </div>
           <div class="tablet_view" style="justify-content: center;">
             <button mat-button matStepperNext (click)="click_next()">Next</button>
-            <button mat-button (click)="change_EmailPassword()" *ngIf="this.shared_data.is_logged">{{psw_editable? 'Close edit ':'Edit
+            <button mat-button (click)="change_EmailPassword()" *ngIf="this.authService.isAuthenticated.getValue()">{{psw_editable? 'Close edit ':'Edit
               '}}psw</button>
-
           </div>
-
         </form>
       </ng-template>
     </mat-step>
