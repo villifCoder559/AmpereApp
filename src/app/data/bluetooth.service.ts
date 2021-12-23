@@ -12,7 +12,7 @@ import { Beacon, IBeacon, Region } from '@ionic-native/ibeacon/ngx'
   providedIn: 'root'
 })
 export class BluetoothService {
-  beaconList: Beacon[];
+  beaconList: Beacon[] = [];
   constructor(private ibeacon: IBeacon, private shared_data: SharedDataService) {
 
   }
@@ -38,7 +38,6 @@ export class BluetoothService {
     else
       alert('Error ' + result)
   }
-
   enableAllUserBeacon() {
     this.shared_data.user_data.paired_devices.forEach((element) => {
       this.startRegisterBeacon(element)
@@ -58,7 +57,6 @@ export class BluetoothService {
     );
     return ok;
   }
-
   detectAllBeacon() {
     let delegate = this.ibeacon.Delegate();
     delegate.didRangeBeaconsInRegion().subscribe((data) => {

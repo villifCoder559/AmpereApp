@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, Platform, ToastController } from '@ionic/angular';
-import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+// import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
+// import { Geolocation } from '@ionic-native/geolocation/ngx';
+// import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+// import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
-import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
+// import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
 import { CountdownConfig, CountdownModule } from 'ngx-countdown';
-import { NGSIv2QUERYService, Entity } from '../data/ngsiv2-query.service'
+
 @NgModule({
   imports: [
     CommonModule,
@@ -21,12 +21,7 @@ import { NGSIv2QUERYService, Entity } from '../data/ngsiv2-query.service'
     CountdownModule
   ],
   providers: [
-    LocationAccuracy,
-    Geolocation,
-    AndroidPermissions,
-    LocalNotifications,
     BackgroundMode,
-    DeviceMotion,
     NativeAudio]
 })
 export class NFCCode {
@@ -82,8 +77,7 @@ export class UserData {
 export class SharedDataService {
   user_data: UserData = new UserData();
   gps_enable = false;
-  constructor(private toastCtrl: ToastController, private backgroundMode: BackgroundMode, private NGSIv2Query: NGSIv2QUERYService, private router: Router, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion,
-    private geolocation: Geolocation) {
+  constructor(private toastCtrl: ToastController, private backgroundMode: BackgroundMode, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.nativeAudio.preloadSimple('alert', 'assets/sounds/alert.mp3').then(() => { }, (err) => console.log(err));
       this.nativeAudio.preloadSimple('sendData', 'assets/sounds/send_data.mp3').then(() => { }, (err) => console.log(err));
@@ -157,70 +151,9 @@ export class SharedDataService {
     //take bluetooth signal, create handler that takes the signal
     this.nativeAudio.play('alert')
     this.router.navigateByUrl('/show-alert', { replaceUrl: true })
-    this.sendEmergency();
+    //this.sendEmergency();
   }
-  private currentLocPosition() {
-    return new Promise((resolve, reject) => {
-      var details_emergency = {
-        latitude: 0.0,
-        longitude: 0.0,
-        dateObserved: 0,
-        quote: 0.0,
-        velocity: 0.0,
-        evolution: '',
-        deviceID: 0,
-        accellX: 0.0,
-        accellY: 0.0,
-        accellZ: 0.0,
-        status: 0
-      };
-      this.geolocation.getCurrentPosition().then((response) => {
-        details_emergency.latitude = response.coords.latitude;
-        details_emergency.longitude = response.coords.longitude;
-        details_emergency.dateObserved = new Date().getTime();
-        resolve(details_emergency);
-      }).catch((error) => {
-        alert('Error: ' + error);
-        reject(error)
-      });
-    })
-  }
-  private sendEmergency() {
-    this.currentLocPosition().then((data) => {
-      this.NGSIv2Query.registerEntity(Entity.EVENT, 0, data).then((result) => {
-        this.nativeAudio.play('sendData').catch(
-          (err) => console.log(err))
-        this.data_device_motion();
-        this.localNotifications.schedule({
-          id: 2,
-          text: 'Emergency sent!',
-          data: ""
-        });
-        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-      }, (err) => {
-        setTimeout(() => {
-          console.log(err);
-          this.sendEmergency();
-        }, 2000);
-      })
-    }, (err) => {
-      setTimeout(() => {
-        console.log(err);
-        this.sendEmergency();
-      }, 2000);
-    });
-  }
-  private data_device_motion() {
-    var sub = this.deviceMotion.watchAcceleration({ frequency: 1500 }).subscribe((acceleration: DeviceMotionAccelerationData) => {
-      this.NGSIv2Query.updateEntityAttribute(Entity.EVENT, 'accelX', acceleration.x)
-      this.NGSIv2Query.updateEntityAttribute(Entity.EVENT, 'accelY', acceleration.y)
-      this.NGSIv2Query.updateEntityAttribute(Entity.EVENT, 'accelZ', acceleration.z)
-      console.log(acceleration)
-    }, (err) => { console.log(err) })
-    setTimeout(() => {
-      sub.unsubscribe()
-    }, 60000)
-  }
+  
   enableAllBackgroundMode() {
     this.backgroundMode.enable();
     this.backgroundMode.overrideBackButton();
