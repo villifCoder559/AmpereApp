@@ -1,10 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { map, tap, switchMap } from 'rxjs/operators';
 import { BehaviorSubject, from, Observable, Subject } from 'rxjs';
-import { SharedDataService } from '../data/shared-data.service'
 import * as Keycloak from 'keycloak-ionic/keycloak';
-import { BluetoothService } from '../data/bluetooth.service'
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +44,7 @@ export class AuthenticationService {
         this.keycloak = Keycloak({
           clientId: 'js-snap4city-mobile-app',
           realm: 'master',
-          url: "https://www.snap4city.org/auth/"
+          url: "https://www.snap4city.org/auth/",
         });
       }
       this.keycloak.init({
@@ -58,16 +54,19 @@ export class AuthenticationService {
         console.log('autentication')
         console.log(autentication)
         if (autentication) {
-          //this.sharedData.snap4city_logged = true;
-          //alert("Success Auth")
-          console.log('autenticated')
-          console.log('token '+this.keycloak.token)
-          console.log('profile '+this.keycloak.profile)
+          this.isAuthenticated.next(true);
+          //this.keycloak.tok
+          console.log('idtoken ' + this.keycloak.idToken)
+          console.log('sessionID ' + this.keycloak.sessionId)
+          console.log('token ' + this.keycloak.token)
+          console.log('token parsed ' + this.keycloak.tokenParsed)
+          console.log(this.keycloak.clientId)
           resolve(true);
         }
         else
           this.keycloak.login().then((value) => {
-            console.log('authenticated!');
+            this.isAuthenticated.next(true)
+            console.log('authenticated else!');
             console.log(value)
             resolve(true)
           });
@@ -78,9 +77,9 @@ export class AuthenticationService {
     })
   }
   logout() {
-    this.isAuthenticated.next(false);  
+    this.isAuthenticated.next(false);
     window.localStorage.removeItem('TOKEN_KEY');
-    if(this.keycloak!=null)
-      this.keycloak.logout();    
+    if (this.keycloak != null)
+      this.keycloak.logout();
   }
 }
