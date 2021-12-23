@@ -7,6 +7,8 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
 import { SharedDataService } from '../../data/shared-data.service'
+import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
+
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.page.html',
@@ -36,12 +38,12 @@ import { SharedDataService } from '../../data/shared-data.service'
   */
 export class HomepagePage implements OnInit {
   gps_enable = true;
-  constructor(private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
       this.localNotifications.hasPermission().then(result => {
         if (!result.valueOf())
           this.localNotifications.requestPermission()
-      })
+      }, (err) => console.log(err))
       this.checkPermission()
     }, (err) => console.log(err))
   }
@@ -93,5 +95,20 @@ export class HomepagePage implements OnInit {
   showAlert() {
     //take bluetooth singal
     this.sharedData.showAlert();
+  }
+  testQuery() {
+    this.ngsi.getDeviceData().then((result) => {
+      console.log(result)
+    }, (err) => console.log(err))
+  }
+  testAPIEntry() {
+    this.ngsi.testAPIGetEntities().then((result) => {
+      console.log(result)
+    }, (err) => console.log(err))
+  }
+  testWriteQuery() {
+    this.ngsi.testWriteAPI().then((result) => {
+      console.log(result)
+    }, (err) => console.log(err))
   }
 }
