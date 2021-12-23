@@ -10,7 +10,7 @@ const routes: Routes = [
     children: [
       {
         path: 'homepage',
-        loadChildren: () => import('../homepage/homepage.module').then(m => m.HomepagePageModule)
+        loadChildren: () => import('../homepage/homepage.module').then(m => m.HomepagePageModule),
       },
       {
         path: 'read-nfc',
