@@ -35,7 +35,6 @@ export class LoginPage implements OnInit {
     console.log(platform)
     const loading = await this.loadingController.create();
     await loading.present();
-    console.log('prima di if');
     if (platform == 'snap4city') {
       try {
         this.authService.loginSnap4City().then(async (auth) => {
