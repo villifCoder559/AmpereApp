@@ -25,9 +25,10 @@ export class NGSIv2QUERYService {
       $.ajax({
         url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/ampereuser1QRNFCEvent?elementid=ampereuser1QRNFCEvent&type=EventQRNFC",
         headers:{
-          Authentication:'Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOZVBpSFRvREtibWZzbl9hREtETGpGTHFKQXluTXNNWjZjS1lMeGRoS29zIn0.eyJqdGkiOiJjMmQwOGQzZS1mZjkzLTQ2YmYtOGQ5Yi1hYWZjMjJkZWJmZWYiLCJleHAiOjE2NDIyNjMyNjIsIm5iZiI6MCwiaWF0IjoxNjQwMTkzOTU1LCJpc3MiOiJodHRwczovL3d3dy5zbmFwNGNpdHkub3JnL2F1dGgvcmVhbG1zL21hc3RlciIsImF1ZCI6InBocC1pb3QtZGlyZWN0b3J5Iiwic3ViIjoiZGI1ZmU3NzYtMzA1YS00NDIwLWIyNDctODQzZmY1ZmFlMGNiIiwidHlwIjoiUmVmcmVzaCIsImF6cCI6InBocC1pb3QtZGlyZWN0b3J5Iiwibm9uY2UiOiIzODQxNmViOWFjNzEwZDJlNjE4ODZkNDhjZTYwYjY4OSIsImF1dGhfdGltZSI6MCwic2Vzc2lvbl9zdGF0ZSI6IjJmZjM0NTI3LTQ3Y2ItNGU2Ni1hNzZjLTQ0MjRhZDhhOGU5MiIsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJ1bWFfYXV0aG9yaXphdGlvbiIsIk1hbmFnZXIiXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19fQ.fuEDdPdU2hFyre2DBxHbg65ycWEupT-N1vyt0kng3I6ZNMfKaQNtYTqKkbLD8lpUO0lmiK2Fzfl_0_4PPTVBlh97grSOXgaD5rxaYkZRTwRJ5WzwvoY9x62XelquA66yVO6zxDXuEF_tsh2srpiH8D6eWR2oSajpXka5y6Qtfw6bMquGqGP-_Ic0Ma1_1NhBSKJn31Di3Co6VvsXDSj7bFD9pMB4ecMeDEWdxrJjweAoMSDFuKrIWE7toOZd8ptBsvjMnDvupGCqgiyIV6mHHijsZ0Iu6oRZ0dsxsHbfTr8bRG6fBEYQ_Jef0-wvl-5Yn7SqclNpf6yTTxCoXoSYqw'
+          'Authorization':'Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOZVBpSFRvREtibWZzbl9hREtETGpGTHFKQXluTXNNWjZjS1lMeGRoS29zIn0.eyJqdGkiOiI0MzEyYWY1Yi1kZTQ3LTRmNTgtODQ5Zi0zZjFlNTkyNzVjMWMiLCJleHAiOjE2NDIzNTAzMjIsIm5iZiI6MCwiaWF0IjoxNjQwMjc2NzQ1LCJpc3MiOiJodHRwczovL3d3dy5zbmFwNGNpdHkub3JnL2F1dGgvcmVhbG1zL21hc3RlciIsImF1ZCI6InBocC1pb3QtZGlyZWN0b3J5Iiwic3ViIjoiZGI1ZmU3NzYtMzA1YS00NDIwLWIyNDctODQzZmY1ZmFlMGNiIiwidHlwIjoiUmVmcmVzaCIsImF6cCI6InBocC1pb3QtZGlyZWN0b3J5Iiwibm9uY2UiOiJhNTc3NTRlYTI0NGE0ZGFjYWNiOWFjMTA4ZDJjNTBlOCIsImF1dGhfdGltZSI6MCwic2Vzc2lvbl9zdGF0ZSI6IjY2NTZhNWRiLTIxYmQtNDg2My1hODAyLTllMDU2YzBjZmE5NiIsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJ1bWFfYXV0aG9yaXphdGlvbiIsIk1hbmFnZXIiXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19fQ.Zv623HF-TDCH7qIn6FmXq4E_ns8vl2mWV6xEnV-2boiSRW6xZTyJWJPuk_Eiet5OsUwDQRAcAtlBX3enlUZ1hLHTJMiy9bNKUVk5hvUDoZ96h0Wgf_qImdObhpJqrktA96WvqM5XTLoUsLj3OJcHbxuuuXDekYBXQCn0LJBQGjyKz21-Zp8hJJtVE-KCsdD5HlAZcERbRjahtWP3IuUYmmrHA0cJd3za-EgTE8nS_fNIeXW0sZ69Tkh1kXUg9iKeK9pdA9TzciscHshbP25kfCLcjhcQxCTlSmHNQX-A_Rt-x1AeEYV6ymbzsMtNlUyVE4O0mGQtrA8enzTQMorNTQ',
+          'Content-Type':'application/json'
         },
-        type: "POST",
+        type: "PATCH",
         data:{
           payload:{
             action:{
@@ -67,6 +68,9 @@ export class NGSIv2QUERYService {
         }
       });
     })
+  }
+  checkValidityToken(){
+    
   }
   testAPIGetEntities() {
     return new Promise((resolve, reject) => {
