@@ -53,12 +53,18 @@ export class AuthenticationService {
       }).then((autentication) => {
         console.log('autentication')
         console.log(autentication)
+        this.keycloak.updateToken(30).then((result) => {
+          console.log('Token successfully refreshed')
+        }, (err) => {
+          console.log(err)
+        })
         if (autentication) {
           this.isAuthenticated.next(true);
-          //this.keycloak.tok
           console.log('idtoken ' + this.keycloak.idToken)
           console.log('sessionID ' + this.keycloak.sessionId)
           console.log('token ' + this.keycloak.token)
+          console.log('refresh_token ' + this.keycloak.refreshToken) //Use this token!
+
           console.log('token parsed ' + this.keycloak.tokenParsed)
           console.log(this.keycloak.clientId)
           resolve(true);
