@@ -87,11 +87,12 @@ export class SignupPage implements OnInit {
   });
   readonly arrayFormGroup = [this.zeroFormGroup, this.firstFormGroup, this.secondFormGroup, this.thirdFormGroup, this.fourthFormGroup]
   stepperOrientation: Observable<StepperOrientation>;
-  constructor(private authService:AuthenticationService,private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(public authService:AuthenticationService,private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     // this.stepperOrientation = breakpointObserver.observe('(min-width: 1000px)')
     //   .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
   }
   findErrorsAllFormsGroup() {
+    
     console.log(this.arrayFormGroup.length)
     var error = false;
     for (var i = 0; i < this.arrayFormGroup.length && !error; i++) {
@@ -334,9 +335,9 @@ export class SignupPage implements OnInit {
       }
     }
     this.shared_data.setUserData(this.shared_data.user_data)
-    this.snap4CityService.registrationUserSnap4City().then(() => {
-      this.shared_data.createToast('Successfull registered')
-    }, (err) => this.shared_data.createToast(err));
+    // this.snap4CityService.getUserPayload().then(() => {
+    //   this.shared_data.createToast('Successfull registered')
+    // }, (err) => this.shared_data.createToast(err));
   }
   toggle_checkbox_disabilities(index) {
     this.shared_data.user_data.disabilities[index] = !this.shared_data.user_data.disabilities[index];
