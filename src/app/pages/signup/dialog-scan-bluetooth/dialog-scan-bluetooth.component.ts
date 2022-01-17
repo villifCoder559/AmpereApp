@@ -21,14 +21,6 @@ export class DialogScanBluetoothComponent implements OnInit {
     })
 
   }
-  // scan(){
-  //   this.devices.push({id:'sddfwfsfsfsffgrg',name:'Pippo'})
-  //   this.devices.push({id:'sggfgsddsvv',name:'Pluto'})
-  //   this.devices.push({id:'fdgdfvd',name:'Pape'})
-  //   this.devices.push({id:'ngmgmgmmghm ',name:'Rino'})
-  //   this.devices.push({id:'3456ruj2',name:'TOpo'})
-  //   $('#matSpinner').hide();
-  // }
   scan() {
     //this.bluetoothService.BeaconLibrary();
     this.bluetoothService.scanBLE(25000).then((scanList: []) => {
@@ -46,6 +38,7 @@ export class DialogScanBluetoothComponent implements OnInit {
       $('#matSpinner' + i).hide();
       this.data = peripheralData;
       console.log(peripheralData)
+      this.bluetoothService.BeaconLibrary();
       alert('Correctly connected')
       this.closeDialog();
     }, (err) => {

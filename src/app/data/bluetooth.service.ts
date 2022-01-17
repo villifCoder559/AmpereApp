@@ -17,7 +17,7 @@ import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
   providedIn: 'root'
 })
 export class BluetoothService {
-  constructor( private bluetoothLE: BluetoothLE, private platform: Platform, private ibeacon: IBeacon, private localNotification: LocalNotifications, private ble: BLE, private sharedData: SharedDataService) {
+  constructor(private bluetoothLE: BluetoothLE, private platform: Platform, private ibeacon: IBeacon, private localNotification: LocalNotifications, private ble: BLE, private sharedData: SharedDataService) {
     this.platform.ready().then(() => {
       this.bluetoothLE.initialize()
     })
@@ -54,13 +54,10 @@ export class BluetoothService {
     })
   }
   BeaconLibrary() {
-    console.log('BeaconLibrary: ' + ' start monitoring 52414449-5553-4e45-5457-4f524b53434f');
-    // // Request permission to use location on iOS
-    // this.ibeacon.requestAlwaysAuthorization();
-    // //create a new delegate and register it with the native layer
+    this.ibeacon.requestAlwaysAuthorization();
+    // create a new delegate and register it with the native layer
     let delegate = this.ibeacon.Delegate();
-    // // Subscribe to some of the delegate's event handlers
-    let beaconRegion = this.ibeacon.BeaconRegion('BeaconDevice', '52414449-5553-4e45-5457-4f524b53434f');
+    // Subscribe to some of the delegate's event handlers
     delegate.didRangeBeaconsInRegion()
       .subscribe(
         data => console.log('didRangeBeaconsInRegion: ', data),
@@ -75,8 +72,11 @@ export class BluetoothService {
       .subscribe(
         data => {
           console.log('didEnterRegion: ', data);
+          alert('Connected');
         }
       );
+
+    let beaconRegion = this.ibeacon.BeaconRegion('Beacon', '52414449-5553-4e45-5457-4f524b53434f');
     this.ibeacon.startMonitoringForRegion(beaconRegion)
       .then(
         () => console.log('Native layer received the request to monitoring'),
@@ -106,13 +106,8 @@ export class BluetoothService {
   connectDevice(id) {
     return new Promise((resolve, reject) => {
       this.ble.connect(id).subscribe((peripheralData) => {
-        console.log('enable autoConnection')
+        console.log('enable connection')
         console.log(id)
-        this.ble.autoConnect(id, function () {
-          console.log('detect device')
-        }, function () {
-          console.log('disconnect')
-        })
         resolve(peripheralData)
       }, (err) => { reject(err) })
     })
