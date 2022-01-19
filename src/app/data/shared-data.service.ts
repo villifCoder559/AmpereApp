@@ -7,7 +7,7 @@ import { IonicModule, Platform, ToastController } from '@ionic/angular';
 // import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 // import { Geolocation } from '@ionic-native/geolocation/ngx';
 // import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 // import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 // import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
@@ -21,8 +21,7 @@ import { CountdownConfig, CountdownModule } from 'ngx-countdown';
     CountdownModule
   ],
   providers: [
-    BackgroundMode,
-    NativeAudio]
+    NativeAudio,BackgroundMode]
 })
 export class NFCCode {
   link: string = '';
@@ -77,14 +76,14 @@ export class UserData {
 export class SharedDataService {
   user_data: UserData = new UserData();
   gps_enable = false;
-  constructor(private toastCtrl: ToastController, private backgroundMode: BackgroundMode, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.nativeAudio.preloadSimple('alert', 'assets/sounds/alert.mp3').then(() => { }, (err) => console.log(err));
       this.nativeAudio.preloadSimple('sendData', 'assets/sounds/send_data.mp3').then(() => { }, (err) => console.log(err));
     })
   }
-  getkeycloak(){
-    
+  getkeycloak() {
+
   }
   async createToast(header) {
     let toast = await this.toastCtrl.create({
@@ -153,13 +152,13 @@ export class SharedDataService {
     this.router.navigateByUrl('/show-alert', { replaceUrl: true })
     //this.sendEmergency();
   }
-  
+
   enableAllBackgroundMode() {
-    this.backgroundMode.enable();
-    this.backgroundMode.overrideBackButton();
-    this.backgroundMode.disableWebViewOptimizations();
+    // this.backgroundMode.enable();
+    // this.backgroundMode.overrideBackButton();
+    // this.backgroundMode.disableWebViewOptimizations();
   }
   disableBackgaundMode() {
-    this.backgroundMode.disable();
+    // this.backgroundMode.disable();
   }
 }
