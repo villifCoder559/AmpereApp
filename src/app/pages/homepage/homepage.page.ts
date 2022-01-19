@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+//import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
 import { SharedDataService } from '../../data/shared-data.service'
@@ -38,8 +38,9 @@ import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
   */
 export class HomepagePage implements OnInit {
   gps_enable = true;
-  constructor(private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
+      this.sharedData.enableAllBackgroundMode()
       this.localNotifications.hasPermission().then(result => {
         if (!result.valueOf())
           this.localNotifications.requestPermission()
