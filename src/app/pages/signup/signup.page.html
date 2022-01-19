@@ -278,7 +278,7 @@
                   <p> RSSI: {{device?.rssi}}</p>
                 </ion-label>
               </ion-item>
-              <ion-item-options side="end" (ionSwipe)="modifyNameDevice(i)" class="bluetooth_item_options">
+              <ion-item-options side="end" (ionSwipe)="delete(device,i)" class="bluetooth_item_options">
                 <ion-item-option color="primary" (click)="modifyNameDevice(i)" expandable class="bluetooth_item_option">
                   <div>
                     <ion-icon name="cog" class="trash_icon"></ion-icon>
