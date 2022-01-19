@@ -14,7 +14,7 @@ import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-na
 import { MatTooltip } from '@angular/material/tooltip';
 import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
-import { AlertController, IonContent, ToastController } from '@ionic/angular';
+import { AlertController, IonContent, Platform, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedDataService, UserData, Emergency_Contact } from '../../data/shared-data.service'
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
@@ -87,12 +87,11 @@ export class SignupPage implements OnInit {
   });
   readonly arrayFormGroup = [this.zeroFormGroup, this.firstFormGroup, this.secondFormGroup, this.thirdFormGroup, this.fourthFormGroup]
   stepperOrientation: Observable<StepperOrientation>;
-  constructor(public authService:AuthenticationService,private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(private platform:Platform,public authService:AuthenticationService,private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     // this.stepperOrientation = breakpointObserver.observe('(min-width: 1000px)')
     //   .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
   }
   findErrorsAllFormsGroup() {
-    
     console.log(this.arrayFormGroup.length)
     var error = false;
     for (var i = 0; i < this.arrayFormGroup.length && !error; i++) {
@@ -265,7 +264,7 @@ export class SignupPage implements OnInit {
     console.log('delete pos ' + index + " -> " + device.uuid)
     var a = $('#device' + index).hide(400, () => {
       this.shared_data.user_data.paired_devices.splice(index, 1);
-      this.shared_data.user_data.paired_devices[index] = null;
+      //this.shared_data.user_data.paired_devices[index] = null;
       console.log(this.shared_data.user_data.paired_devices)
     })
   }
@@ -281,7 +280,6 @@ export class SignupPage implements OnInit {
         console.log(value);
         this.shared_data.createToast('Data updated!');
       }, (err) => this.shared_data.createToast(err))
-
     }
     else
       this.shared_data.createToast('Error in step number ' + (error));
@@ -361,7 +359,9 @@ export class SignupPage implements OnInit {
       if (result != undefined && result != ''){
         console.log(i)
         console.log(this.shared_data.user_data.paired_devices[i])
-        this.shared_data.user_data.paired_devices[i].name = result;}
+        this.shared_data.user_data.paired_devices[i].name = result;
+        //this.save_data()
+      }
       console.log(this.shared_data.user_data.paired_devices)
     });
   }
