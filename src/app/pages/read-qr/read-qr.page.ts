@@ -49,6 +49,7 @@ export class ReadQRPage implements OnInit {
               console.log(this.isOn);
               this.scannedCode = text;
               alert('Scanned something: ' + text);
+              window.open(text);
               console.log(this.scannedCode)
               this.closePreviewCamera();
               this.changeRef.detectChanges();
