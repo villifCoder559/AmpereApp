@@ -26,6 +26,7 @@ export class AuthenticationService {
   // }
 
   login(credentials: { email, password }): Observable<any> {
+    
     this.isAuthenticated.next(true)
     return this.isAuthenticated
     // return this.http.post(`https://reqres.in/api/login`, credentials).pipe(
@@ -55,6 +56,7 @@ export class AuthenticationService {
         console.log(autentication)
         this.keycloak.updateToken(30).then((result) => {
           console.log('Token successfully refreshed')
+          console.log(this.keycloak.refreshToken)
         }, (err) => {
           console.log(err)
         })
@@ -64,7 +66,6 @@ export class AuthenticationService {
           console.log('sessionID ' + this.keycloak.sessionId)
           console.log('token ' + this.keycloak.token)
           console.log('refresh_token ' + this.keycloak.refreshToken) //Use this token!
-
           console.log('token parsed ' + this.keycloak.tokenParsed)
           console.log(this.keycloak.clientId)
           resolve(true);
@@ -84,6 +85,7 @@ export class AuthenticationService {
   }
   logout() {
     this.isAuthenticated.next(false);
+    //this.bluetoothService.disableAll();
     window.localStorage.removeItem('TOKEN_KEY');
     if (this.keycloak != null)
       this.keycloak.logout();

@@ -7,7 +7,7 @@ import { IonicModule, Platform, ToastController } from '@ionic/angular';
 // import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 // import { Geolocation } from '@ionic-native/geolocation/ngx';
 // import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-// import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
+import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 // import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 // import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
@@ -39,6 +39,7 @@ export class QRCode {
 export class Emergency_Contact {
   number: string = '';
   name: string = '';
+  surname: string = '';
 }
 /**accuray:'15',major:125,mior:758,proximity:'Near',rssi:'-69',tx:'10db',uuid:'51446-54564w-fwfffw4-56d4we5d1e5113d2e1' */
 
@@ -79,7 +80,7 @@ export class UserData {
 export class SharedDataService {
   public user_data: UserData = new UserData();
   gps_enable = false;
-  constructor(private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     //console.log('contructor')
     this.storage.create();
     this.platform.ready().then(() => {
@@ -160,7 +161,7 @@ export class SharedDataService {
           this.user_data.description = 'brown hair blue eyes'
           this.user_data.disabilities = [false, true]
           this.user_data.email = 'email@mail.com'
-          this.user_data.emergency_contacts = [{ number: '8541254732', name: 'Paul Rid' }]
+          this.user_data.emergency_contacts = [{ number: '8541254732', name: 'Paul', surname: 'Rid' }]
           this.user_data.ethnicity = 'white'
           this.user_data.gender = 'male'
           this.user_data.height = '185'
@@ -195,9 +196,10 @@ export class SharedDataService {
   }
 
   enableAllBackgroundMode() {
-    // this.backgroundMode.enable();
-    // this.backgroundMode.overrideBackButton();
-    // this.backgroundMode.disableWebViewOptimizations();
+    console.log('enableBackgroundMode')
+    this.backgroundMode.enable();
+    this.backgroundMode.overrideBackButton();
+    this.backgroundMode.disableWebViewOptimizations();
   }
   disableBackgaundMode() {
     // this.backgroundMode.disable();

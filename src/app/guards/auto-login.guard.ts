@@ -18,8 +18,9 @@ export class AutoLoginGuard implements CanLoad {
       map(isAuthenticated => {
         console.log(isAuthenticated)
         if (isAuthenticated) {
+          console.log('autologin auth')
           // Directly open inside area
-          this.shared_data.goHomepage()
+          //this.shared_data.goHomepage()
         } else {          
           // Simply allow access to the login
           console.log('access to login')
