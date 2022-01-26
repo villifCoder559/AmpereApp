@@ -42,20 +42,22 @@ export class SignupPage implements OnInit {
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
   pswValidator: Validators = [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[|!"£/()?@#$%^&+=]).*$')];
-  zeroFormGroup = this._formBuilder.group({
-    email: ['', Validators.email],
-    psw: [''],
-    confirm_psw: [''],
-    old_psw: ['']
-  }, {
-    validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
-  })
+  // zeroFormGroup = this._formBuilder.group({
+  //   email: ['', Validators.email],
+  //   psw: [''],
+  //   confirm_psw: [''],
+  //   old_psw: ['']
+  // }, {
+  //   validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
+  // })
   firstFormGroup = this._formBuilder.group({
     name: ['', Validators.required],
     surname: ['', Validators.required],
+    nickname: ['', Validators.required],
+    email:['',Validators.email],
     phoneNumber: ['', Validators.required],
-    birthdate: ['', Validators.compose([Validators.required, DateValidator.dateVaidator])],
-    gender: ['', Validators.required],
+    birthdate: ['', Validators.compose([DateValidator.dateVaidator])],
+    gender: [''],
     address: ['', Validators.required],
     locality: ['', Validators.required],
     city: ['', Validators.required],
@@ -67,7 +69,7 @@ export class SignupPage implements OnInit {
     pin: ['', Validators.minLength(4)]
   });
   secondFormGroup = this._formBuilder.group({
-    allergies: ['', Validators.maxLength(200)],
+    allergies: ['', [Validators.required, Validators.maxLength(200)]],
     medications: ['', Validators.maxLength(200)]
   });
   thirdFormGroup = this._formBuilder.group({
@@ -83,17 +85,30 @@ export class SignupPage implements OnInit {
     contact4number: [''],
   });
   fourthFormGroup = this._formBuilder.group({
-    fourthCtrl: ['']
+    call_112: ['', Validators.required],
+    call_115: ['', Validators.required],
+    call_118: ['', Validators.required]
   });
-  readonly arrayFormGroup = [this.zeroFormGroup, this.firstFormGroup, this.secondFormGroup, this.thirdFormGroup, this.fourthFormGroup]
+  readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.thirdFormGroup, this.fourthFormGroup]
   stepperOrientation: Observable<StepperOrientation>;
-  constructor(private platform:Platform,public authService:AuthenticationService,private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(private platform: Platform, public authService: AuthenticationService, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     // this.stepperOrientation = breakpointObserver.observe('(min-width: 1000px)')
     //   .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
   }
   findErrorsAllFormsGroup() {
     console.log(this.arrayFormGroup.length)
     var error = false;
+    var count = 0;
+    for (var i = 0; i < 5; i++) {
+      var name = this.thirdFormGroup.get('contact' + i + 'name')?.value;
+      var number = this.thirdFormGroup.get('contact' + i + 'number')?.value;
+      console.log(name.length > 0)
+      console.log(number.length)
+      if (number.length > 0 && number.length > 8)
+        count++;
+    }
+    if (count == 0)
+      return 4
     for (var i = 0; i < this.arrayFormGroup.length && !error; i++) {
       var result = this.getFormValidationErrors(this.arrayFormGroup[i]);
       if (result.length != 0) {
@@ -103,30 +118,35 @@ export class SignupPage implements OnInit {
     return error;
   }
   /*Creates generalised check foreach formGroup field. this specific implementation working fine*/
-  change_EmailPassword() {
-    this.psw_editable = !this.psw_editable;
-    if (!this.psw_editable) {
-      this.zeroFormGroup.controls['psw'].setErrors(null);
-      this.zeroFormGroup.controls['confirm_psw'].setErrors(null);
-      this.zeroFormGroup.controls['old_psw'].setErrors(null);
-      console.log('clear')
-    }
-    else {
-      this.zeroFormGroup.controls['psw'].setErrors(this.pswValidator)
-      this.zeroFormGroup.controls['confirm_psw'].setErrors([Validators.required])
-      this.zeroFormGroup.controls['old_psw'].setErrors([Validators.required])
-      this.shared_data.createToast('If you don\'t want to modify your password, click close Edit psw')
-    }
-    this.zeroFormGroup.updateValueAndValidity();
+  // change_EmailPassword() {
+  //   this.psw_editable = !this.psw_editable;
+  //   if (!this.psw_editable) {
+  //     this.zeroFormGroup.controls['psw'].setErrors(null);
+  //     this.zeroFormGroup.controls['confirm_psw'].setErrors(null);
+  //     this.zeroFormGroup.controls['old_psw'].setErrors(null);
+  //     console.log('clear')
+  //   }
+  //   else {
+  //     this.zeroFormGroup.controls['psw'].setErrors(this.pswValidator)
+  //     this.zeroFormGroup.controls['confirm_psw'].setErrors([Validators.required])
+  //     this.zeroFormGroup.controls['old_psw'].setErrors([Validators.required])
+  //     this.shared_data.createToast('If you don\'t want to modify your password, click close Edit psw')
+  //   }
+  //   this.zeroFormGroup.updateValueAndValidity();
 
+  // }
+  button_hash() {
   }
-
   ngOnInit() {
     if (this.authService.isAuthenticated.getValue()) {
-      this.zeroFormGroup.get('email').setValue(this.shared_data.user_data.email)
+      console.log('data from signup')
+      console.log(this.shared_data.user_data)
+      //this.firstFormGroup.get('email').setValue(this.shared_data.user_data.email)
       this.firstFormGroup.setValue({
         name: this.shared_data.user_data.name,
         surname: this.shared_data.user_data.surname,
+        nickname: this.shared_data.user_data.nickname,
+        email:this.shared_data.user_data.email,
         phoneNumber: this.shared_data.user_data.phoneNumber,
         birthdate: this.shared_data.user_data.birthdate,
         gender: this.shared_data.user_data.gender,
@@ -144,6 +164,11 @@ export class SignupPage implements OnInit {
       this.secondFormGroup.setValue({
         allergies: this.shared_data.user_data.allergies,
         medications: this.shared_data.user_data.medications
+      })
+      this.fourthFormGroup.setValue({
+        call_112: this.shared_data.user_data.public_emergency_contacts[112],
+        call_115: this.shared_data.user_data.public_emergency_contacts[115],
+        call_118: this.shared_data.user_data.public_emergency_contacts[118]
       })
       for (var i = 0; i < 5; i++) {
         var mat_card_number = "contact" + (i) + "number";
@@ -171,29 +196,37 @@ export class SignupPage implements OnInit {
     if (ev.inputType != 'deleteContentBackward') {
       var value: string = ev.target.value;
       var split = value.split('/');
-      console.log(split)
-      if (split.length < 3) {
-        if (split.length == 2 || split.length == 5) {
-          this.firstFormGroup.controls['birthdate'].setValue(ev.target.value + '/');
-        }
-        else {
-          for (var i = 0; i < split.length; i++) {
-            if (i == 0) {
-              if (parseInt(split[i]) > 1) {//month
-                this.firstFormGroup.controls['birthdate'].setValue(ev.target.value + '/');
-              }
-            }
+      var year = parseInt(split[0]);
+      var month = parseInt(split[1]);
+      var day = parseInt(split[2]);
+      var date: string = '';
+      if (value.length > 3) {
+        date = year + '/'
+        if (!isNaN(month)) {
+          if (month.toString().length < 2)
+            if (month > 1)
+              date += '0' + month.toString() + '/';
             else {
-              if (i == 1 && parseInt(split[i]) > 3) {//day
-                this.firstFormGroup.controls['birthdate'].setValue(ev.target.value + '/');
-              }
+              date += month.toString()
+              console.log(date)
             }
-          }
+          else
+            date += month + '/'
+        }
+        if (!isNaN(day)) {
+          if (day.toString().length < 2)
+            if (day > 3)
+              date += '0' + day.toString()
+            else
+              date += day.toString()
+          else
+            date += day
         }
       }
-    }
-    else if (ev.inputType == 'deleteContentBackward') {
-
+      if (date != ''){
+        this.firstFormGroup.controls['birthdate'].setValue(date);
+        console.log(date)
+      }
     }
   }
   triggerResize() {
@@ -208,7 +241,6 @@ export class SignupPage implements OnInit {
       this.firstFormGroup.controls[id].setValue(txt.substring(0, txt.length - 1))
     }
   }
-
   add_Contact() {
     this.getFormValidationErrors(this.thirdFormGroup)
     if (this.countNumberContactsDone < 5 && !this.thirdFormGroup.hasError('required')) {
@@ -224,8 +256,8 @@ export class SignupPage implements OnInit {
     var mat_card_name = "contact" + (id) + "name";
     this.thirdFormGroup.get(mat_card_name).setValue("");
     this.thirdFormGroup.get(mat_card_number).setValue(undefined);
+    this.shared_data.user_data.emergency_contacts[id] = new Emergency_Contact();
   }
-
   openDialogContacts(id): void {
     const dialogRef = this.dialog.open(DialogExampleComponent, {
       maxWidth: '90vw',
@@ -245,10 +277,14 @@ export class SignupPage implements OnInit {
     });
   }
   openBeaconDialog(): void {
-    const dialogRef = this.dialog.open(DialogScanBluetoothComponent, {
-      maxWidth: '90vw',
-      minWidth: '40vw'
-    });
+    if (this.shared_data.user_data.paired_devices[0] != null && this.shared_data.user_data.paired_devices[1] != null) {
+      const dialogRef = this.dialog.open(DialogScanBluetoothComponent, {
+        maxWidth: '90vw',
+        minWidth: '40vw'
+      });
+    }
+    else
+      this.shared_data.createToast('You have already 2 paired devices!');
   };
   click_next() {
     for (var i = 0; i < this.countNumberContactsDone; i++) {
@@ -264,20 +300,22 @@ export class SignupPage implements OnInit {
     console.log('delete pos ' + index + " -> " + device.uuid)
     var a = $('#device' + index).hide(400, () => {
       this.shared_data.user_data.paired_devices.splice(index, 1);
+      this.shared_data.saveData();
       //this.shared_data.user_data.paired_devices[index] = null;
       console.log(this.shared_data.user_data.paired_devices)
     })
   }
   save_data() {
     //conyrollo
-    console.log(this.zeroFormGroup.errors);
-    console.log(this.getFormValidationErrors(this.zeroFormGroup))
+    // console.log(this.zeroFormGroup.errors);
+    // console.log(this.getFormValidationErrors(this.zeroFormGroup))
     this.register_user();
     var error = this.findErrorsAllFormsGroup();
     if (!error)      //check if change is registred in db
     {
       this.NGSIv2QUERY.updateEntity(Entity.USERID).then((value) => {
         console.log(value);
+        this.shared_data.saveData();
         this.shared_data.createToast('Data updated!');
       }, (err) => this.shared_data.createToast(err))
     }
@@ -303,7 +341,7 @@ export class SignupPage implements OnInit {
   }
   register_user() {
     // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
-    this.shared_data.user_data.email = this.zeroFormGroup.get('email')?.value;
+    this.shared_data.user_data.email = this.firstFormGroup.get('email')?.value;
     this.shared_data.user_data.name = this.firstFormGroup.get('name')?.value;
     this.shared_data.user_data.surname = this.firstFormGroup.get('surname')?.value;
     this.shared_data.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
@@ -318,9 +356,11 @@ export class SignupPage implements OnInit {
     this.shared_data.user_data.description = this.firstFormGroup.get('description')?.value;
     this.shared_data.user_data.purpose = this.firstFormGroup.get('purpose')?.value;
     this.shared_data.user_data.pin = this.firstFormGroup.get('pin')?.value;
-    // this.user_data.disabilities saved thanks toogle_checkbox(i)
     this.shared_data.user_data.allergies = this.secondFormGroup.get('allergies')?.value;
     this.shared_data.user_data.medications = this.secondFormGroup.get('medications')?.value;
+    this.shared_data.user_data.public_emergency_contacts[112] = this.fourthFormGroup.get('call_112')?.value;
+    this.shared_data.user_data.public_emergency_contacts[115] = this.fourthFormGroup.get('call_115')?.value;
+    this.shared_data.user_data.public_emergency_contacts[118] = this.fourthFormGroup.get('call_118')?.value;
     for (var i = 0; i < this.shared_data.user_data.emergency_contacts.length; i++) {
       var index = i + '';
       var mat_card_name = "contact" + (index) + "name";
@@ -356,7 +396,7 @@ export class SignupPage implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log(result)
-      if (result != undefined && result != ''){
+      if (result != undefined && result != '') {
         console.log(i)
         console.log(this.shared_data.user_data.paired_devices[i])
         this.shared_data.user_data.paired_devices[i].name = result;
@@ -370,7 +410,7 @@ export class SignupPage implements OnInit {
 
 class DateValidator {
   static dateVaidator(AC: AbstractControl) {
-    if (AC && AC.value && (!moment(AC.value, 'MM/DD/YYYY', true).isValid() && !moment(AC.value, 'M/D/YYYY', true).isValid())) {
+    if (AC && AC.value && (!moment(AC.value, 'YYYY/MM/DD', true).isValid() || (moment().diff(AC.value) < 0 || moment().diff(AC.value, 'day') > 365 * 150))) {
       return { dateValidator: true };
     }
     return null;
