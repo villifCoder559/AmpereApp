@@ -47,10 +47,10 @@ export class ShowAlertPage implements OnInit {
     // console.log(event.target.attributes.getNamedItem('ng-reflect-name').value)
     let element;
     console.log(this.pin)
-    if (event.code !== 'Backspace')
+    if (event.key !== 'Backspace')
       element = event.srcElement.nextElementSibling;
 
-    if (event.code === 'Backspace') {
+    if (event.key === 'Backspace') {
       element = event.srcElement.previousElementSibling;
       element.select()
     }
@@ -130,6 +130,7 @@ export class ShowAlertPage implements OnInit {
   }
   private sendEmergency() {
     this.currentLocPosition().then((data) => {
+      console.log(data)
       this.NGSIv2Query.registerEntity(Entity.EVENT, 0, data).then((result) => {
         this.nativeAudio.play('sendData').catch(
           (err) => console.log(err))
