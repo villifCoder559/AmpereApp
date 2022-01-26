@@ -22,8 +22,7 @@ export class DialogScanBluetoothComponent implements OnInit {
       this.scan();
       console.log('scanning...')
       this.dialogRef.afterClosed().subscribe(() => {
-        this.ble.stopScan();
-        console.log('stopScanning')
+        this.bluetoothService.stopScan();
       })
     })
   }
@@ -70,6 +69,7 @@ export class DialogScanBluetoothComponent implements OnInit {
   }
   closeDialog() {
     this.ngZone.run(() => {
+      this.bluetoothService.stopScan();
       this.dialogRef.close(this.data);
       console.log('closeDIalog')
     })
