@@ -5,6 +5,7 @@ import { AlertController, LoadingController, ToastController } from '@ionic/angu
 import { Router } from '@angular/router';
 import { SharedDataService } from '../../data/shared-data.service'
 import * as Keycloak from 'keycloak-ionic/keycloak';
+import { BluetoothService } from 'src/app/data/bluetooth.service';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +22,8 @@ export class LoginPage implements OnInit {
     private router: Router,
     private loadingController: LoadingController,
     private sharedData: SharedDataService,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private bluetoothService: BluetoothService
   ) { }
 
   ngOnInit() {
@@ -34,6 +36,8 @@ export class LoginPage implements OnInit {
   async login(platform) {
     console.log(platform)
     const loading = await this.loadingController.create();
+    console.log('LOAD DATA USER')
+    //this.sharedData.loadDataUser();
     await loading.present();
     if (platform == 'snap4city') {
       try {
@@ -43,10 +47,14 @@ export class LoginPage implements OnInit {
           console.log('end_auth')
           console.log(auth)
           if (auth) {
-            this.sharedData.enableAllBackgroundMode();
-            this.sharedData.goHomepage()
+            //this.sharedData.enableAllBackgroundMode();
+            this.sharedData.loadDataUser().then((result) => {
+              console.log('result '+result)
+              this.bluetoothService.enableAllUserBeacon();
+              this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
+            });
           }
-        },async (err)=>{
+        }, async (err) => {
           console.log(err)
           await loading.dismiss()
         });
@@ -58,7 +66,11 @@ export class LoginPage implements OnInit {
     else {
       this.authService.login(this.credentials.value).subscribe(
         async (res) => {
-          this.sharedData.goHomepage();
+          this.sharedData.loadDataUser().then((result) => {
+            console.log('result '+result)
+            this.bluetoothService.enableAllUserBeacon();
+            this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
+          });
           await loading.dismiss();
         },
         async (res) => {
