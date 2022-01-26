@@ -29,12 +29,13 @@ import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
 import { Snap4CityService } from '../app/data/snap4-city.service'
 import { AutoLoginGuard } from '../app/guards/auto-login.guard'
 import { AuthenticationService } from '../app/services/authentication.service'
+import { IonicStorageModule } from '@ionic/storage-angular';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,
-            IonicModule.forRoot(), AppRoutingModule,HttpClientModule,MaterialModule
+            IonicModule.forRoot(), AppRoutingModule,HttpClientModule,MaterialModule,IonicStorageModule.forRoot()
             ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     Contacts,
