@@ -31,7 +31,9 @@ export class ReadNFCPage implements OnInit {
       let flags = this.nfc.FLAG_READER_NFC_A | this.nfc.FLAG_READER_NFC_V;
       var readerMode = this.nfc.readerMode(flags).subscribe(
         tag => {
+          console.log(tag)
           this.scannedCode = JSON.stringify(tag)
+          window.open(tag.ndefMessage.toString())
           console.log(this.scannedCode)
         },
         err => this.create_message('Error reading tag: ' + err)

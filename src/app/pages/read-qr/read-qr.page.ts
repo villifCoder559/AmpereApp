@@ -45,15 +45,16 @@ export class ReadQRPage implements OnInit {
             this.qrScanner.show();
             this.previewCamera = true;
             this.qrScanner.scan().subscribe((text: string) => {
-              console.log('camera')
+              console.log('camera');
               console.log(this.isOn);
               this.scannedCode = text;
               alert('Scanned something: ' + text);
-              window.open(text);
               console.log(this.scannedCode)
               this.closePreviewCamera();
               this.changeRef.detectChanges();
               $("ion-app").show(500);
+              //this.NGSIv2Query.registerEntity()
+              window.open(text);
             });
           })
         } else if (status.denied) {
