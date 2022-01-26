@@ -16,7 +16,7 @@ export class DialogScanBluetoothComponent implements OnInit {
   //bs: any;
   devices = [];
   selectedOptions;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,private detectChange:ChangeDetectorRef, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private detectChange: ChangeDetectorRef, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
     this.platform.ready().then(() => {
       //this.bluetoothService.startRegisterBeacon();
       this.scan();
@@ -38,16 +38,17 @@ export class DialogScanBluetoothComponent implements OnInit {
   }
   scan() {
     this.bluetoothService.detectedValue.subscribe((value) => {
-      console.log(value);
-      if (value != null){
+      //console.log(value);
+      if (value != null) {
         this.devices.push(value);
         this.detectChange.detectChanges();
       }
-    })
+    }, (err) => console.log(err))
     this.bluetoothService.scanBLE(15000).then((scanList: []) => {
       $('#matSpinner').hide()
       //this.devices = scanList;
-      //console.log(scanList)
+      console.log('LISTA')
+      console.log(this.devices)
     });
   }
   connect(i) {
