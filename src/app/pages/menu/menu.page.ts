@@ -16,6 +16,14 @@ export class MenuPage implements OnInit {
       url: '/profile/menu/homepage'
     },
     {
+      title: 'Emergency contacts',
+      url: '/profile/menu/callemergencycontacts'
+    },
+    {
+      title: 'Webpage',
+      url: '/profile/menu/webpage'
+    },
+    {
       title: 'Devices Status',
       url: '/profile/menu/testAlert'
     },
@@ -26,8 +34,7 @@ export class MenuPage implements OnInit {
     {
       title: 'Privacy Policy',
       url: '/profile/menu/privacyPolicy'
-    },
-
+    }
   ]
   selectedPath = ''
   constructor(private ctrlMenu: MenuController, private router: Router, private authService: AuthenticationService, public shared_data: SharedDataService) {
