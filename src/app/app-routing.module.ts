@@ -26,6 +26,14 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule),
     canLoad: [AutoLoginGuard],
+  },
+  {
+    path: 'webpage',
+    loadChildren: () => import('./pages/webpage/webpage.module').then( m => m.WebpagePageModule)
+  },
+  {
+    path: 'callemergencycontacts',
+    loadChildren: () => import('./pages/callemergencycontacts/callemergencycontacts.module').then( m => m.CallemergencycontactsPageModule)
   }
 ];
 @NgModule({
