@@ -11,5 +11,25 @@
 </ion-header>
 
 <ion-content>
-
+  <form id="emergency_contacts" [formGroup]="formGroup">
+    <mat-card *ngFor="let contact of this.shared_data.user_data.emergency_contacts;let i=index">
+      <div class="matCardEmergencyContact">
+        <mat-card-header>
+          <mat-card-title>Emergency Contact</mat-card-title>
+        </mat-card-header>
+        <mat-form-field appearance="fill">
+          <mat-label>Name</mat-label>
+          <input matInput value="{{contact.name}}" [readonly]="true" placeholder="">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Phone number</mat-label>
+          <input matInput [readonly]="true" value="{{contact.number}}" placeholder="">
+        </mat-form-field>
+      </div>
+      <div style="justify-content: center; display:flex">
+        <button style="margin: 10px 0 10px;background-color: green;color: #fff;" mat-raised-button
+          (click)="call(contact)">Call</button>
+      </div>
+    </mat-card>
+  </form>
 </ion-content>
