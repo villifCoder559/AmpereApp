@@ -9,6 +9,7 @@ import { WebpagePageRoutingModule } from './webpage-routing.module';
 import { WebpagePage } from './webpage.page';
 
 import { MaterialModule } from '../../material-module'
+import { SafePipe } from 'src/app/app.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -17,6 +18,6 @@ import { MaterialModule } from '../../material-module'
     WebpagePageRoutingModule,
     MaterialModule
   ],
-  declarations: [WebpagePage]
+  declarations: [WebpagePage,SafePipe]
 })
 export class WebpagePageModule {}
