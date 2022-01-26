@@ -22,6 +22,11 @@ export class BluetoothService {
   /*52414449-5553-4e45-5457-4f524b53434f*/
   beacon_regions = [];
   detectedValue = new BehaviorSubject(null);
+  stopScan(){
+    this.ble.stopScan().then(()=>{
+      console.log('stop scan')
+    })
+  }
   scanBLE(scanningTime: number = 10000) /*milliseconds */ {
     return new Promise((resolve, reject) => {
       //var array = [];
@@ -60,6 +65,7 @@ export class BluetoothService {
         console.log('HEX DATA')
         var int8View = new Int8Array(peripheralData.advertising);
         var hex = this.toHexString(int8View);
+        console.log(hex)
         var manufacturer_id = hex[10] + hex[11] + hex[12] + hex[13];
         if (manufacturer_id != '4c00') {//4c00->manufacturer Apple
           peripheralData.protocol = 'ble';
