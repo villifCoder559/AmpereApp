@@ -218,7 +218,7 @@
                 <div class="container-button">
                   <button style="display: flex;" mat-raised-button (click)="openDialogContacts(i)">Import</button>
                   <button style="display: flex;" mat-raised-button color="warn"
-                    (click)="remove_contact(i)">Remove</button>
+                    (click)="remove_contact(contact)">Remove</button>
                 </div>
               </div>
             </mat-card>
@@ -323,5 +323,4 @@
       <!-- </ng-template> -->
     </mat-step>
   </mat-stepper>
-  <ion-button (click)="testScanContinuosly()">TestScanCont.</ion-button>
 </ion-content>

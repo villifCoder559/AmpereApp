@@ -54,7 +54,7 @@ export class SignupPage implements OnInit {
     name: ['', Validators.required],
     surname: ['', Validators.required],
     nickname: ['', Validators.required],
-    email:['',Validators.email],
+    email: ['', Validators.email],
     phoneNumber: ['', Validators.required],
     birthdate: ['', Validators.compose([DateValidator.dateVaidator])],
     gender: [''],
@@ -146,7 +146,7 @@ export class SignupPage implements OnInit {
         name: this.shared_data.user_data.name,
         surname: this.shared_data.user_data.surname,
         nickname: this.shared_data.user_data.nickname,
-        email:this.shared_data.user_data.email,
+        email: this.shared_data.user_data.email,
         phoneNumber: this.shared_data.user_data.phoneNumber,
         birthdate: this.shared_data.user_data.birthdate,
         gender: this.shared_data.user_data.gender,
@@ -223,7 +223,7 @@ export class SignupPage implements OnInit {
             date += day
         }
       }
-      if (date != ''){
+      if (date != '') {
         this.firstFormGroup.controls['birthdate'].setValue(date);
         console.log(date)
       }
@@ -243,20 +243,10 @@ export class SignupPage implements OnInit {
   }
   add_Contact() {
     this.getFormValidationErrors(this.thirdFormGroup)
-    if (this.countNumberContactsDone < 5 && !this.thirdFormGroup.hasError('required')) {
-      this.countNumberContactsDone++;
-      const app = new Emergency_Contact()
-      this.shared_data.user_data.emergency_contacts.push(app)
-    }
+
   }
-  remove_contact(id) {
-    this.shared_data.user_data.emergency_contacts.splice(id, 1)
-    this.countNumberContactsDone--;
-    var mat_card_number = "contact" + (id) + "number";
-    var mat_card_name = "contact" + (id) + "name";
-    this.thirdFormGroup.get(mat_card_name).setValue("");
-    this.thirdFormGroup.get(mat_card_number).setValue(undefined);
-    this.shared_data.user_data.emergency_contacts[id] = new Emergency_Contact();
+  remove_contact(contact) {
+
   }
   openDialogContacts(id): void {
     const dialogRef = this.dialog.open(DialogExampleComponent, {
@@ -277,7 +267,8 @@ export class SignupPage implements OnInit {
     });
   }
   openBeaconDialog(): void {
-    if (this.shared_data.user_data.paired_devices[0] != null && this.shared_data.user_data.paired_devices[1] != null) {
+    console.log(this.shared_data.user_data.paired_devices)
+    if (this.shared_data.user_data.paired_devices[0] == null || this.shared_data.user_data.paired_devices[1] == null) {
       const dialogRef = this.dialog.open(DialogScanBluetoothComponent, {
         maxWidth: '90vw',
         minWidth: '40vw'
@@ -300,8 +291,8 @@ export class SignupPage implements OnInit {
     console.log('delete pos ' + index + " -> " + device.uuid)
     var a = $('#device' + index).hide(400, () => {
       this.shared_data.user_data.paired_devices.splice(index, 1);
-      this.shared_data.saveData();
       //this.shared_data.user_data.paired_devices[index] = null;
+      this.shared_data.saveData();
       console.log(this.shared_data.user_data.paired_devices)
     })
   }
@@ -365,7 +356,7 @@ export class SignupPage implements OnInit {
       var index = i + '';
       var mat_card_name = "contact" + (index) + "name";
       var mat_card_number = "contact" + (index) + "number";
-      var contact: Emergency_Contact = { name: '', number: '' };
+      var contact: Emergency_Contact = { name: '', number: '', surname: '' };
       contact.name = this.thirdFormGroup.get(mat_card_name)?.value;
       contact.number = this.thirdFormGroup.get(mat_card_number)?.value
       if (contact.name != '' && contact.number != '') {
