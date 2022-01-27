@@ -1,0 +1,27 @@
+<form [formGroup]="contactCard">
+  <div class="tablet_view">
+    <mat-card>
+      <div class="matCardEmergencyContact">
+        <mat-card-header>
+          <mat-card-title>Emergency Contact</mat-card-title>
+        </mat-card-header>
+        <mat-form-field appearance="fill">
+          <mat-label>Name</mat-label>
+          <input matInput maxlength="20" formControlName="contactName" placeholder="">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Surname</mat-label>
+          <input matInput maxlength="20" formControlName="contactSurname" placeholder="">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Phone number</mat-label>
+          <input type="tel" matInput maxlength="15" formControlName="contactNumber" placeholder="">
+        </mat-form-field>
+        <div class="container-button">
+          <button style="display: flex;" mat-raised-button (click)="openDialogFromContacts()">Import</button>
+          <button style="display: flex;" mat-raised-button (click)="save()">Save</button>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</form>
