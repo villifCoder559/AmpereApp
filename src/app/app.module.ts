@@ -30,11 +30,11 @@ import { Snap4CityService } from '../app/data/snap4-city.service'
 import { AutoLoginGuard } from '../app/guards/auto-login.guard'
 import { AuthenticationService } from '../app/services/authentication.service'
 import { IonicStorageModule } from '@ionic/storage-angular';
-
+import { FormsModule } from '@angular/forms';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,
+  imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,FormsModule,
             IonicModule.forRoot(), AppRoutingModule,HttpClientModule,MaterialModule,IonicStorageModule.forRoot()
             ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
