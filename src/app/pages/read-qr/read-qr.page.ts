@@ -71,7 +71,8 @@ export class ReadQRPage implements OnInit {
   ngOnInit() {
   }
   addQR() {
-    this.NGSIv2Query.getEntity(Entity.NFC,)
+    if (this.sharedData.user_data.qr_code.length < 4)
+      this.NGSIv2Query.getEntity(Entity.NFC,)
   }
   delete(device, index) {
     console.log('delete pos ' + index + " -> " + device.id)

@@ -18,7 +18,8 @@ export class ReadNFCPage implements OnInit {
     console.log(this.shared_data.user_data)
   }
   addNFC() {
-    this.NGSIv2Query.getEntity(Entity.NFC)
+    if (this.shared_data.user_data.nfc_code.length < 4)
+      this.NGSIv2Query.getEntity(Entity.NFC)
   }
   ngOnInit() {
     this.nfc.enabled().then(() => {
