@@ -27,7 +27,7 @@ mat-stepper{
   background-color: #FAFAFA;
 }
 #emergency_contacts mat-card{
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 mat-card-title{
@@ -82,6 +82,10 @@ mat-form-field{
 // }
 .align_checkbox{
   align-items: center;
+}
+.field{
+  display: flex;
+  
 }
 @media screen and(min-width: 800px) { 
   .tablet_view{
