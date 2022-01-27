@@ -40,6 +40,11 @@ export class Emergency_Contact {
   number: string = '';
   name: string = '';
   surname: string = '';
+  constructor(name, surname, number) {
+    this.name = name;
+    this.surname = surname;
+    this.number = number;
+  }
 }
 /**accuray:'15',major:125,mior:758,proximity:'Near',rssi:'-69',tx:'10db',uuid:'51446-54564w-fwfffw4-56d4we5d1e5113d2e1' */
 
@@ -64,13 +69,12 @@ export class UserData {
   pin: string = ''
   allergies: string = ''
   medications: string = ''
-  password: string = ''
   disabilities = [false, false]
-  emergency_contacts = [new Emergency_Contact, new Emergency_Contact, new Emergency_Contact, new Emergency_Contact, new Emergency_Contact]
+  emergency_contacts = []
   public_emergency_contacts = { 112: false, 115: false, 118: false }
-  paired_devices = [null, null]
-  qr_code = [new QRCode(), new QRCode(), new QRCode(), new QRCode()]
-  nfc_code = [new NFCCode(), new NFCCode(), new NFCCode(), new NFCCode()]
+  paired_devices = []
+  qr_code = []
+  nfc_code = []
   constructor() { }
 }
 
@@ -89,9 +93,6 @@ export class SharedDataService {
       this.nativeAudio.preloadSimple('sendData', 'assets/sounds/send_data.mp3').then(() => { }, (err) => console.log(err));
     })
   }
-  getkeycloak() {
-
-  }
   async createToast(header) {
     let toast = await this.toastCtrl.create({
       header: header,
@@ -105,33 +106,6 @@ export class SharedDataService {
   saveData() {
     this.storage.set('user_data', this.user_data);
     console.log('storage')
-  }
-  setAllUserData(userData) {
-    // this.user_data.value;
-    // this.user_data.address = userData.address
-    // this.user_data.allergies = userData.allergies
-    // this.user_data.birthdate = userData.birthdate
-    // this.user_data.city = userData.city
-    // this.user_data.description = userData.description
-    // this.user_data.disabilities = [userData.disabilities[0], userData.disabilities[1]]
-    // this.user_data.email = 'email@mail.com'
-    // this.user_data.emergency_contacts = [{ number: '8541254732', name: 'Paul Rid' }]
-    // this.user_data.ethnicity = 'white'
-    // this.user_data.gender = 'male'
-    // this.user_data.height = '185'
-    // this.user_data.locality = 'Careggi'
-    // this.user_data.medications = ''
-    // this.user_data.name = 'Wayne'
-    // this.user_data.weight = '85'
-    // this.user_data.surname = 'Richards'
-    // this.user_data.phoneNumber = '2587436910'
-    // this.user_data.public_emergency_contacts = { 113: false, "115": false, "118": true }
-    // this.user_data.paired_devices = []
-    // this.user_data.password = ''
-    // this.user_data.pin = '0258'
-    // this.user_data.purpose = 'Personal safety'
-    // this.user_data.qr_code = [qr_code]
-    // this.user_data.nfc_code = [nfc_code]
   }
   loadDataUser() {
     //console.log('data from service')
@@ -161,7 +135,7 @@ export class SharedDataService {
           this.user_data.description = 'brown hair blue eyes'
           this.user_data.disabilities = [false, true]
           this.user_data.email = 'email@mail.com'
-          this.user_data.emergency_contacts = [{ number: '8541254732', name: 'Paul', surname: 'Rid' }]
+          this.user_data.emergency_contacts = [new Emergency_Contact('Paul', 'Rid', '785232145202')]
           this.user_data.ethnicity = 'white'
           this.user_data.gender = 'male'
           this.user_data.height = '185'
@@ -173,7 +147,6 @@ export class SharedDataService {
           this.user_data.phoneNumber = '2587436910'
           this.user_data.public_emergency_contacts = { 112: false, "115": false, "118": true }
           this.user_data.paired_devices = []
-          this.user_data.password = ''
           this.user_data.pin = '0258'
           this.user_data.purpose = 'Personal safety'
           this.user_data.qr_code = [qr_code]
@@ -200,8 +173,5 @@ export class SharedDataService {
     this.backgroundMode.enable();
     this.backgroundMode.overrideBackButton();
     this.backgroundMode.disableWebViewOptimizations();
-  }
-  disableBackgaundMode() {
-    // this.backgroundMode.disable();
   }
 }
