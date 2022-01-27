@@ -11,6 +11,7 @@ import { Contacts } from '@ionic-native/contacts/ngx'
 import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
 import { BLE } from '@ionic-native/ble/ngx'
 import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component'
+import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -21,7 +22,7 @@ import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-na
     MaterialModule,
     HttpClientModule
   ],
-  declarations: [SignupPage, DialogModifyNameComponent, DialogExampleComponent, DialogScanBluetoothComponent],
+  declarations: [SignupPage, DialogModifyNameComponent, DialogExampleComponent, DialogScanBluetoothComponent,DialogAddEmergencyContactComponent],
   providers: [Contacts, BLE],
   entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent, DialogModifyNameComponent]
 })

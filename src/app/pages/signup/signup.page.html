@@ -23,53 +23,6 @@
 </ion-header>
 <ion-content #content>
   <mat-stepper #stepper [linear]="false" orientation="vertical">
-    <!-- <mat-step [stepControl]="zeroFormGroup">
-      <ng-template matStepLabel>Login credentials</ng-template>
-      <ng-template matStepContent>
-        <form id="login_credential" [formGroup]="zeroFormGroup">
-          <div class="tablet_view">
-            <mat-form-field appearance="fill">
-              <mat-label>Email</mat-label>
-              <input matInput type="email" formControlName="email" placeholder="" required>
-            </mat-form-field>
-            <mat-form-field *ngIf="this.authService.isAuthenticated.getValue() && psw_editable" appearance="fill" id="matcardResize">
-              <mat-label>Old Password</mat-label>
-              <input matInput [type]="hideold?'text':'password'" formControlName="old_psw" placeholder="" required>
-              <button mat-icon-button matSuffix (click)="hideold = !hideold">
-                <mat-icon>{{hideold ? 'visibility' : 'visibility_off'}}</mat-icon>
-              </button>
-              <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="fill" id="matcardResize" *ngIf="psw_editable || !this.authService.isAuthenticated.getValue()">
-              <mat-label *ngIf="this.authService.isAuthenticated.getValue()">New Password</mat-label>
-              <mat-label *ngIf="!this.authService.isAuthenticated.getValue()">Password</mat-label>
-              <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required>
-              <button mat-icon-button matSuffix (click)="hidepsw = !hidepsw">
-                <mat-icon>{{hidepsw ? 'visibility' : 'visibility_off'}}</mat-icon>
-              </button>
-              <mat-error *ngIf="zeroFormGroup.get('psw').hasError('required')">Field Required</mat-error>
-              <mat-error *ngIf="zeroFormGroup.get('psw').hasError('minlength')">Password length more than 7</mat-error>
-              <mat-error *ngIf="zeroFormGroup.get('psw').hasError('pattern')">At leat one special char</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="fill" id="matcardResize" *ngIf="psw_editable || !this.authService.isAuthenticated.getValue()">
-              <mat-label>Confirm Password</mat-label>
-              <input matInput [type]="hide?'text':'password'" formControlName="confirm_psw" placeholder="" required>
-              <button mat-icon-button matSuffix (click)="hide = !hide">
-                <mat-icon>{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
-              </button>
-              <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match
-              </mat-error>
-            </mat-form-field>
-          </div>
-          <div class="tablet_view" style="justify-content: center;">
-            <button mat-button matStepperNext (click)="click_next()">Next</button>
-            <button mat-button (click)="change_EmailPassword()" *ngIf="this.authService.isAuthenticated.getValue()">{{psw_editable? 'Close edit ':'Edit
-              '}}psw</button>
-          </div>
-        </form>
-      </ng-template>
-    </mat-step> -->
     <mat-step [stepControl]="firstFormGroup">
       <ng-template matStepLabel>Personal Information</ng-template>
       <ng-template matStepContent>
@@ -200,7 +153,7 @@
     <mat-step [stepControl]="thirdFormGroup">
       <ng-template matStepLabel>Emergency Contacts</ng-template>
       <ng-template matStepContent>
-        <form id="emergency_contacts" [formGroup]="thirdFormGroup">
+        <div id="emergency_contacts">
           <div class="tablet_view">
             <mat-card *ngFor="let contact of this.shared_data.user_data.emergency_contacts;let i=index">
               <div class="matCardEmergencyContact">
@@ -209,29 +162,34 @@
                 </mat-card-header>
                 <mat-form-field appearance="fill">
                   <mat-label>Name</mat-label>
-                  <input matInput maxlength="20" formControlName="contact{{i}}name" placeholder="">
+                  <input matInput value="{{contact.name}}" readonly=true>
                 </mat-form-field>
                 <mat-form-field appearance="fill">
-                  <mat-label>Phone number</mat-label>
-                  <input type="tel" matInput maxlength="15" formControlName="contact{{i}}number" placeholder="">
+                  <mat-label>Surname</mat-label>
+                  <input matInput value='{{contact.surname}}' readonly=true>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>Number</mat-label>
+                  <input matInput value='{{contact.number}}' readonly=true>
                 </mat-form-field>
                 <div class="container-button">
-                  <button style="display: flex;" mat-raised-button (click)="openDialogContacts(i)">Import</button>
+                  <button style="display: flex;" mat-raised-button
+                    (click)="openDialogEmergencyContact(contact,i)">Modify</button>
                   <button style="display: flex;" mat-raised-button color="warn"
-                    (click)="remove_contact(contact)">Remove</button>
+                    (click)="remove_contact(index)">Remove</button>
                 </div>
               </div>
             </mat-card>
           </div>
           <div style="justify-content: center; display:flex">
-            <button *ngIf="countNumberContactsDone < 5" style="margin: 10px 0 10px;" mat-raised-button
-              (click)="add_Contact()">Add Contact</button>
+            <button *ngIf="this.shared_data.user_data.emergency_contacts.length < 5" style="margin: 10px 0 10px;"
+              mat-raised-button (click)="openDialogEmergencyContact(0,-1)">Add Contact</button>
           </div>
           <div class="tablet_view" style="justify-content: center;">
             <button mat-button matStepperPrevious>Back</button>
             <button mat-button matStepperNext (click)="click_next()">Next</button>
           </div>
-        </form>
+        </div>
       </ng-template>
     </mat-step>
 

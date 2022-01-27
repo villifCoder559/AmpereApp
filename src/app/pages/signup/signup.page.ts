@@ -25,6 +25,7 @@ import { Entity, NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
 import { BluetoothService } from '../../data/bluetooth.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
 import { AuthenticationService } from '../../services/authentication.service'
+import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -72,24 +73,13 @@ export class SignupPage implements OnInit {
     allergies: ['', [Validators.required, Validators.maxLength(200)]],
     medications: ['', Validators.maxLength(200)]
   });
-  thirdFormGroup = this._formBuilder.group({
-    contact0name: [''],
-    contact0number: [''],
-    contact1name: [''],
-    contact1number: [''],
-    contact2name: [''],
-    contact2number: [''],
-    contact3name: [''],
-    contact3number: [''],
-    contact4name: [''],
-    contact4number: [''],
-  });
+  //emergency_Contacts = new Array<Emergency_Contact>(5);
   fourthFormGroup = this._formBuilder.group({
     call_112: ['', Validators.required],
     call_115: ['', Validators.required],
     call_118: ['', Validators.required]
   });
-  readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.thirdFormGroup, this.fourthFormGroup]
+  readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.fourthFormGroup]
   stepperOrientation: Observable<StepperOrientation>;
   constructor(private platform: Platform, public authService: AuthenticationService, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     // this.stepperOrientation = breakpointObserver.observe('(min-width: 1000px)')
@@ -98,17 +88,6 @@ export class SignupPage implements OnInit {
   findErrorsAllFormsGroup() {
     console.log(this.arrayFormGroup.length)
     var error = false;
-    var count = 0;
-    for (var i = 0; i < 5; i++) {
-      var name = this.thirdFormGroup.get('contact' + i + 'name')?.value;
-      var number = this.thirdFormGroup.get('contact' + i + 'number')?.value;
-      console.log(name.length > 0)
-      console.log(number.length)
-      if (number.length > 0 && number.length > 8)
-        count++;
-    }
-    if (count == 0)
-      return 4
     for (var i = 0; i < this.arrayFormGroup.length && !error; i++) {
       var result = this.getFormValidationErrors(this.arrayFormGroup[i]);
       if (result.length != 0) {
@@ -170,14 +149,6 @@ export class SignupPage implements OnInit {
         call_115: this.shared_data.user_data.public_emergency_contacts[115],
         call_118: this.shared_data.user_data.public_emergency_contacts[118]
       })
-      for (var i = 0; i < 5; i++) {
-        var mat_card_number = "contact" + (i) + "number";
-        var mat_card_name = "contact" + (i) + "name";
-        if (this.shared_data.user_data.emergency_contacts[i] != undefined && this.shared_data.user_data.emergency_contacts[i].number != '') {
-          this.thirdFormGroup.get(mat_card_name).setValue(this.shared_data.user_data.emergency_contacts[i].name);
-          this.thirdFormGroup.get(mat_card_number).setValue(this.shared_data.user_data.emergency_contacts[i].number);
-        }
-      }
       console.log(this.shared_data.user_data.paired_devices)
       this.changeDetection.detectChanges();
       if (this.router.getCurrentNavigation().extras.state?.page == 6) {
@@ -241,30 +212,39 @@ export class SignupPage implements OnInit {
       this.firstFormGroup.controls[id].setValue(txt.substring(0, txt.length - 1))
     }
   }
-  add_Contact() {
-    this.getFormValidationErrors(this.thirdFormGroup)
-
+  remove_contact(index) {
+    //var index = this.shared_data.user_data.emergency_contacts.findIndex((element) => element = contact);
+    this.shared_data.user_data.emergency_contacts.splice(index, 1);
   }
-  remove_contact(contact) {
+  openDialogEmergencyContact(value, index): void {
+    var ok = true;
+    console.log('pass')
+    if (value == 0) {
+      value = { name: '', surnamne: '', number: '' }
+      if (this.shared_data.user_data.emergency_contacts.length > 4)
+        ok = false
+    }
+    if (ok) {
+      const dialogRef = this.dialog.open(DialogAddEmergencyContactComponent, {
+        maxWidth: '90vw',
+        minWidth: '40vw',
+        data: {
+          contact: value,
+          index: index
+        }
+      });
 
-  }
-  openDialogContacts(id): void {
-    const dialogRef = this.dialog.open(DialogExampleComponent, {
-      maxWidth: '90vw',
-      minWidth: '40vw',
-      data: {
-        contact: { name: '', number: '' }
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      var app = 'contact' + id + 'name';
-      if (result?.name != undefined && result?.number != undefined) {
-        this.thirdFormGroup.get(app).setValue(result.name)
-        var app = 'contact' + id + 'number';
-        this.thirdFormGroup.get(app).setValue(result.number)
-      }
-    });
+      dialogRef.afterClosed().subscribe(result => {
+        console.log(result);
+        if (result.index == -1)
+          this.shared_data.user_data.emergency_contacts.push(new Emergency_Contact(result.data.name, result.data.surname, result.data.number))
+        else
+          this.shared_data.user_data.emergency_contacts[result.index] = new Emergency_Contact(result.data.name, result.data.surname, result.data.number);
+        console.log(this.shared_data.user_data.emergency_contacts)
+      });
+    }
+    else
+      this.shared_data.createToast('You can register max 5 people!')
   }
   openBeaconDialog(): void {
     console.log(this.shared_data.user_data.paired_devices)
@@ -296,15 +276,38 @@ export class SignupPage implements OnInit {
       console.log(this.shared_data.user_data.paired_devices)
     })
   }
+  getAllDataFromForm(){
+    this.shared_data.user_data.email = this.firstFormGroup.get('email')?.value;
+    this.shared_data.user_data.name = this.firstFormGroup.get('name')?.value;
+    this.shared_data.user_data.surname = this.firstFormGroup.get('surname')?.value;
+    this.shared_data.user_data.nickname=this.firstFormGroup.get('nickname')?.value;
+    this.shared_data.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
+    this.shared_data.user_data.birthdate = this.firstFormGroup.get('birthdate')?.value;
+    this.shared_data.user_data.gender = this.firstFormGroup.get('gender')?.value;
+    this.shared_data.user_data.address = this.firstFormGroup.get('address')?.value;
+    this.shared_data.user_data.locality = this.firstFormGroup.get('locality')?.value;
+    this.shared_data.user_data.city = this.firstFormGroup.get('city')?.value;
+    this.shared_data.user_data.height = this.firstFormGroup.get('height')?.value;
+    this.shared_data.user_data.weight = this.firstFormGroup.get('weight')?.value;
+    this.shared_data.user_data.ethnicity = this.firstFormGroup.get('ethnicity')?.value;
+    this.shared_data.user_data.description = this.firstFormGroup.get('description')?.value;
+    this.shared_data.user_data.purpose = this.firstFormGroup.get('purpose')?.value;
+    this.shared_data.user_data.pin = this.firstFormGroup.get('pin')?.value;
+    this.shared_data.user_data.allergies = this.secondFormGroup.get('allergies')?.value;
+    this.shared_data.user_data.medications = this.secondFormGroup.get('medications')?.value;
+    this.shared_data.user_data.public_emergency_contacts[112] = this.fourthFormGroup.get('call_112')?.value;
+    this.shared_data.user_data.public_emergency_contacts[115] = this.fourthFormGroup.get('call_115')?.value;
+    this.shared_data.user_data.public_emergency_contacts[118] = this.fourthFormGroup.get('call_118')?.value;
+  }
   save_data() {
     //conyrollo
     // console.log(this.zeroFormGroup.errors);
     // console.log(this.getFormValidationErrors(this.zeroFormGroup))
-    this.register_user();
     var error = this.findErrorsAllFormsGroup();
     if (!error)      //check if change is registred in db
     {
       this.NGSIv2QUERY.updateEntity(Entity.USERID).then((value) => {
+        this.getAllDataFromForm();
         console.log(value);
         this.shared_data.saveData();
         this.shared_data.createToast('Data updated!');
@@ -327,46 +330,17 @@ export class SignupPage implements OnInit {
         });
       }
     });
-
     return result;
   }
   register_user() {
-    // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
-    this.shared_data.user_data.email = this.firstFormGroup.get('email')?.value;
-    this.shared_data.user_data.name = this.firstFormGroup.get('name')?.value;
-    this.shared_data.user_data.surname = this.firstFormGroup.get('surname')?.value;
-    this.shared_data.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
-    this.shared_data.user_data.birthdate = this.firstFormGroup.get('birthdate')?.value;
-    this.shared_data.user_data.gender = this.firstFormGroup.get('gender')?.value;
-    this.shared_data.user_data.address = this.firstFormGroup.get('address')?.value;
-    this.shared_data.user_data.locality = this.firstFormGroup.get('locality')?.value;
-    this.shared_data.user_data.city = this.firstFormGroup.get('city')?.value;
-    this.shared_data.user_data.height = this.firstFormGroup.get('height')?.value;
-    this.shared_data.user_data.weight = this.firstFormGroup.get('weight')?.value;
-    this.shared_data.user_data.ethnicity = this.firstFormGroup.get('ethnicity')?.value;
-    this.shared_data.user_data.description = this.firstFormGroup.get('description')?.value;
-    this.shared_data.user_data.purpose = this.firstFormGroup.get('purpose')?.value;
-    this.shared_data.user_data.pin = this.firstFormGroup.get('pin')?.value;
-    this.shared_data.user_data.allergies = this.secondFormGroup.get('allergies')?.value;
-    this.shared_data.user_data.medications = this.secondFormGroup.get('medications')?.value;
-    this.shared_data.user_data.public_emergency_contacts[112] = this.fourthFormGroup.get('call_112')?.value;
-    this.shared_data.user_data.public_emergency_contacts[115] = this.fourthFormGroup.get('call_115')?.value;
-    this.shared_data.user_data.public_emergency_contacts[118] = this.fourthFormGroup.get('call_118')?.value;
-    for (var i = 0; i < this.shared_data.user_data.emergency_contacts.length; i++) {
-      var index = i + '';
-      var mat_card_name = "contact" + (index) + "name";
-      var mat_card_number = "contact" + (index) + "number";
-      var contact: Emergency_Contact = { name: '', number: '', surname: '' };
-      contact.name = this.thirdFormGroup.get(mat_card_name)?.value;
-      contact.number = this.thirdFormGroup.get(mat_card_number)?.value
-      if (contact.name != '' && contact.number != '') {
-        this.shared_data.user_data.emergency_contacts[i] = contact;
-      }
-    }
-    this.shared_data.setUserData(this.shared_data.user_data)
-    // this.snap4CityService.getUserPayload().then(() => {
+    if(this.shared_data.user_data.paired_devices.length>0){
+      this.getAllDataFromForm();
+      // this.snap4CityService.registerUser().then(() => {
     //   this.shared_data.createToast('Successfull registered')
     // }, (err) => this.shared_data.createToast(err));
+    }
+    else
+      this.shared_data.createToast('You must pair at least one device!')
   }
   toggle_checkbox_disabilities(index) {
     this.shared_data.user_data.disabilities[index] = !this.shared_data.user_data.disabilities[index];
@@ -405,24 +379,5 @@ class DateValidator {
       return { dateValidator: true };
     }
     return null;
-  }
-}
-class ValidatePassword {
-  static ConfirmValidator(name: string, checkName: string): ValidatorFn {
-    return (controls: AbstractControl) => {
-      const control = controls.get(name);
-      const checkControl = controls.get(checkName);
-      if (checkControl.errors && !checkControl.errors.matching) { //avoid errors when confirm_password is not yet insert
-        return null;
-      }
-      if (control.value !== checkControl.value) {
-        controls.get(checkName).setErrors({ matching: true });
-        return { matching: true }
-      }
-      else {
-        controls.get(checkName).setErrors(null)
-        return null
-      }
-    }
   }
 }
