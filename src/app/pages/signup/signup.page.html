@@ -150,7 +150,7 @@
         </form>
       </ng-template>
     </mat-step>
-    <mat-step [stepControl]="thirdFormGroup">
+    <mat-step >
       <ng-template matStepLabel>Emergency Contacts</ng-template>
       <ng-template matStepContent>
         <div id="emergency_contacts">
@@ -176,7 +176,7 @@
                   <button style="display: flex;" mat-raised-button
                     (click)="openDialogEmergencyContact(contact,i)">Modify</button>
                   <button style="display: flex;" mat-raised-button color="warn"
-                    (click)="remove_contact(index)">Remove</button>
+                    (click)="remove_contact(i)">Remove</button>
                 </div>
               </div>
             </mat-card>

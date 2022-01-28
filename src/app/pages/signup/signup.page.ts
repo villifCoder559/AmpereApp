@@ -42,15 +42,6 @@ export class SignupPage implements OnInit {
   @ViewChild('tooltip') tooltip: MatTooltip;
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
-  pswValidator: Validators = [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[|!"£/()?@#$%^&+=]).*$')];
-  // zeroFormGroup = this._formBuilder.group({
-  //   email: ['', Validators.email],
-  //   psw: [''],
-  //   confirm_psw: [''],
-  //   old_psw: ['']
-  // }, {
-  //   validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
-  // })
   firstFormGroup = this._formBuilder.group({
     name: ['', Validators.required],
     surname: ['', Validators.required],
@@ -74,6 +65,7 @@ export class SignupPage implements OnInit {
     medications: ['', Validators.maxLength(200)]
   });
   //emergency_Contacts = new Array<Emergency_Contact>(5);
+  
   fourthFormGroup = this._formBuilder.group({
     call_112: ['', Validators.required],
     call_115: ['', Validators.required],
@@ -287,7 +279,7 @@ export class SignupPage implements OnInit {
     var error = this.findErrorsAllFormsGroup();
     if (!error)      //check if change is registred in db
     {
-      this.NGSIv2QUERY.updateEntity(Entity.USERID).then((value) => {
+      this.NGSIv2QUERY.sendUserProfile(new Date().toISOString()).then((value) => {
         this.getAllDataFromForm();
         console.log(value);
         this.shared_data.saveData();
