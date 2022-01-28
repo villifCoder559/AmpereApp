@@ -7,6 +7,7 @@ import * as Keycloak from 'keycloak-ionic/keycloak';
 })
 export class AuthenticationService {
   isAuthenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  username: string = '';
   public keycloak: Keycloak.KeycloakInstance;
   constructor() {
     //this.loadToken();
@@ -26,7 +27,7 @@ export class AuthenticationService {
   // }
 
   login(credentials: { email, password }): Observable<any> {
-    
+
     this.isAuthenticated.next(true)
     return this.isAuthenticated
     // return this.http.post(`https://reqres.in/api/login`, credentials).pipe(
@@ -62,6 +63,10 @@ export class AuthenticationService {
         })
         if (autentication) {
           this.isAuthenticated.next(true);
+          this.keycloak.loadUserProfile().then((info: any) => {
+            this.username = info.username;
+            console.log(this.username)
+          })
           console.log('idtoken ' + this.keycloak.idToken)
           console.log('sessionID ' + this.keycloak.sessionId)
           console.log('token ' + this.keycloak.token)
