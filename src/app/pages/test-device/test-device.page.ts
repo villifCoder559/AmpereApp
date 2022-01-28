@@ -14,7 +14,7 @@ export class TestDevicePage implements OnInit {
   ngOnInit() {
   }
   go_to_deviceSettings() {
-    this.router.navigateByUrl('/profile/menu/profile', { replaceUrl: true, state: { page: 6 } })
+    this.router.navigateByUrl('/profile/menu/profile', { replaceUrl: true, state: { page: 5 } })
   }
   isBeaconInRegion(index){
     this.bluetoothService.checkRangeBeaconsInRegion(index);
