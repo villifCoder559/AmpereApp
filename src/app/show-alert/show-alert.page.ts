@@ -10,7 +10,7 @@ import { SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
-import { NGSIv2QUERYService,Entity } from '../data/ngsiv2-query.service'
+import { NGSIv2QUERYService, Entity } from '../data/ngsiv2-query.service'
 /*
   OK Fix view page OK
   OK Add sound when I click button and when the time expires OK
@@ -31,7 +31,7 @@ export class ShowAlertPage implements OnInit {
     formatDate: ({ date }) => `${date / 1000}`,
     // notify: 1
   };;
-  constructor(private NGSIv2Query:NGSIv2QUERYService, private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
+  constructor(private NGSIv2Query: NGSIv2QUERYService, private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
     private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.localNotifications.schedule({
       id: 1,
@@ -97,7 +97,7 @@ export class ShowAlertPage implements OnInit {
       alert.dismiss();
     });
   }
-  async send_Emergency(event) {
+  send_Emergency(event) {
     console.log(event)
     if (event.action == 'done')
       this.sendEmergency();
@@ -131,7 +131,7 @@ export class ShowAlertPage implements OnInit {
   private sendEmergency() {
     this.currentLocPosition().then((data) => {
       console.log(data)
-      this.NGSIv2Query.registerEntity(Entity.EVENT, 0, data).then((result) => {
+      this.NGSIv2Query.sendEvent(1,2,3,4,5,6,7,8,9,10,11).then((result) => {
         this.nativeAudio.play('sendData').catch(
           (err) => console.log(err))
         this.data_device_motion();
@@ -155,13 +155,23 @@ export class ShowAlertPage implements OnInit {
     });
   }
   private data_device_motion() {
-    var sub = this.deviceMotion.watchAcceleration({ frequency: 1500 }).subscribe((acceleration: DeviceMotionAccelerationData) => {
-      this.NGSIv2Query.updateEntityAttribute(Entity.EVENT, 'accelX', acceleration.x)
-      this.NGSIv2Query.updateEntityAttribute(Entity.EVENT, 'accelY', acceleration.y)
-      this.NGSIv2Query.updateEntityAttribute(Entity.EVENT, 'accelZ', acceleration.z)
+    var avgx = 0, avgy = 0, avgz = 0;
+    var vx = 0, vy = 0, vz = 0;
+    var count = 0;
+    var freq = 1000;
+    var sub = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
+      vx = (acceleration.x - 0.6) * (freq / 1000);
+      vy = (acceleration.y - 0.4) * (freq / 1000);
+      vz = (acceleration.z - 0.3 - 9.81) * (freq / 1000);
+      console.log('velocity--> ' + (Math.abs(vx) + Math.abs(vy) + Math.abs(vz)))
+      count++;
+      //send new data accelerometer
       console.log(acceleration)
     }, (err) => { console.log(err) })
     setTimeout(() => {
+      console.log('avgX-> ' + (avgx / (60000 / freq)))
+      console.log('avgY-> ' + (avgy / (60000 / freq)))
+      console.log('avgZ-> ' + (avgz / (60000 / freq)))
       sub.unsubscribe()
     }, 60000)
   }
