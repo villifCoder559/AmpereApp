@@ -44,7 +44,7 @@ export class HomepagePage implements OnInit {
         if (!result.valueOf())
           this.localNotifications.requestPermission()
       }, (err) => console.log(err))
-      this.checkPermission()
+      this.checkPermission();
     }, (err) => console.log(err))
   }
   ngOnInit() {
@@ -102,13 +102,16 @@ export class HomepagePage implements OnInit {
     }, (err) => console.log(err))
   }
   testAPIEntry() {
-    this.ngsi.testAPIGetEntities().then((result) => {
+    this.ngsi.getEntity('ampereuser1QR-NFC-Event').then((result) => {
       console.log(result)
     }, (err) => console.log(err))
   }
   testWriteQuery() {
-    this.ngsi.testWriteAPI().then((result) => {
+    this.ngsi.testWriteAPI('ampereuser1QR-NFC-Event').then((result) => {
       console.log(result)
     }, (err) => console.log(err))
+  }
+  openAlertPage(){
+    this.router.navigateByUrl('/show-alert', { replaceUrl: true })
   }
 }
