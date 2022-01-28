@@ -56,7 +56,7 @@ export class SignupPage implements OnInit {
     surname: ['', Validators.required],
     nickname: ['', Validators.required],
     email: ['', Validators.email],
-    phoneNumber: ['', Validators.required],
+    phoneNumber: ['', Validators.compose([Validators.required,Validators.pattern('[- +()0-9]+')])],
     birthdate: ['', Validators.compose([DateValidator.dateVaidator])],
     gender: [''],
     address: ['', Validators.required],
@@ -96,26 +96,6 @@ export class SignupPage implements OnInit {
     }
     return error;
   }
-  /*Creates generalised check foreach formGroup field. this specific implementation working fine*/
-  // change_EmailPassword() {
-  //   this.psw_editable = !this.psw_editable;
-  //   if (!this.psw_editable) {
-  //     this.zeroFormGroup.controls['psw'].setErrors(null);
-  //     this.zeroFormGroup.controls['confirm_psw'].setErrors(null);
-  //     this.zeroFormGroup.controls['old_psw'].setErrors(null);
-  //     console.log('clear')
-  //   }
-  //   else {
-  //     this.zeroFormGroup.controls['psw'].setErrors(this.pswValidator)
-  //     this.zeroFormGroup.controls['confirm_psw'].setErrors([Validators.required])
-  //     this.zeroFormGroup.controls['old_psw'].setErrors([Validators.required])
-  //     this.shared_data.createToast('If you don\'t want to modify your password, click close Edit psw')
-  //   }
-  //   this.zeroFormGroup.updateValueAndValidity();
-
-  // }
-  button_hash() {
-  }
   ngOnInit() {
     if (this.authService.isAuthenticated.getValue()) {
       console.log('data from signup')
@@ -151,13 +131,14 @@ export class SignupPage implements OnInit {
       })
       console.log(this.shared_data.user_data.paired_devices)
       this.changeDetection.detectChanges();
-      if (this.router.getCurrentNavigation().extras.state?.page == 6) {
+      var index=this.router.getCurrentNavigation().extras.state?.page;
+      if (this.router.getCurrentNavigation().extras.state?.page) {
         setTimeout(() => {
-          this.stepper.selectedIndex = 5;
+          this.stepper.selectedIndex = index-1;
           this.stepper.animationDone.subscribe(() => {
             this.content.scrollToBottom(500)
           })
-        }, 250);
+        }, 350);
       }
     }
   }
