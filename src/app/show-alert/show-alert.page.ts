@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, Platform } from '@ionic/angular';
 import { CountdownConfig, CountdownModule } from 'ngx-countdown';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SMS } from '@ionic-native/sms/ngx';
 import { SharedDataService, UserData } from '../data/shared-data.service'
@@ -26,6 +26,19 @@ import { NGSIv2QUERYService, Entity } from '../data/ngsiv2-query.service'
 })
 export class ShowAlertPage implements OnInit {
   pin = ['', '', '', '']
+  details_emergency = {
+    latitude: 0.0,
+    longitude: 0.0,
+    dateObserved: new Date().toISOString(),
+    quote: 0.0,
+    velocity: 0.0,
+    evolution: 'notHandled',
+    deviceID: 0,
+    accelX: 0.0,
+    accelY: 0.0,
+    accelZ: 0.0,
+    status: 'EmergencySent'
+  };
   config: CountdownConfig = {
     leftTime: 20,
     formatDate: ({ date }) => `${date / 1000}`,
@@ -40,11 +53,13 @@ export class ShowAlertPage implements OnInit {
     });
   }
   ngOnInit() {
+    this.route.queryParams.subscribe((params) => {
+      this.details_emergency.deviceID = params['id']
+    })
   }
 
   onDigitInput(event) {
     console.log(event);
-    // console.log(event.target.attributes.getNamedItem('ng-reflect-name').value)
     let element;
     console.log(this.pin)
     if (event.key !== 'Backspace')
@@ -70,7 +85,7 @@ export class ShowAlertPage implements OnInit {
         ok = false
     }
     if (!ok) {
-      await this.presentAlert('PIN wrong', 500).then(() => {
+      await this.presentAlert('PIN wrong', 200).then(() => {
         for (var i = this.pin.length - 1; i >= 0; i--) {
           (<HTMLInputElement>document.getElementById(i.toString())).value = '';
           if (i == 0)
@@ -80,7 +95,7 @@ export class ShowAlertPage implements OnInit {
 
     }
     else {
-      this.presentAlert('PIN correct', 1500);
+      this.presentAlert('PIN correct', 1200);
       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }
   }
@@ -97,7 +112,7 @@ export class ShowAlertPage implements OnInit {
       alert.dismiss();
     });
   }
-  send_Emergency(event) {
+  send_Emergency(event) {//when time is expired
     console.log(event)
     if (event.action == 'done')
       this.sendEmergency();
@@ -117,54 +132,81 @@ export class ShowAlertPage implements OnInit {
         accellZ: 0.0,
         status: 0
       };
-      this.geolocation.getCurrentPosition().then((response) => {
-        details_emergency.latitude = response.coords.latitude;
-        details_emergency.longitude = response.coords.longitude;
-        details_emergency.dateObserved = new Date().getTime();
-        resolve(details_emergency);
-      }).catch((error) => {
-        alert('Error: ' + error);
-        reject(error)
-      });
     })
   }
+  // private sendEmergency() {
+  //   this.currentLocPosition().then((data) => {
+  //     console.log(data)
+  //     this.NGSIv2Query.sendEvent(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11).then((result) => {
+  //       this.nativeAudio.play('sendData').catch(
+  //         (err) => console.log(err))
+  //       this.data_device_motion();
+  //       this.localNotifications.schedule({
+  //         id: 2,
+  //         text: 'Emergency sent!',
+  //         data: ""
+  //       });
+  //       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+  //     }, (err) => {
+  //       setTimeout(() => {
+  //         console.log(err);
+  //         this.sendEmergency();
+  //       }, 2000);
+  //     })
+  //   }, (err) => {
+  //     setTimeout(() => {
+  //       console.log(err);
+  //       this.sendEmergency();
+  //     }, 2000);
+  //   });
+  // }
   private sendEmergency() {
-    this.currentLocPosition().then((data) => {
-      console.log(data)
-      this.NGSIv2Query.sendEvent(1,2,3,4,5,6,7,8,9,10,11).then((result) => {
-        this.nativeAudio.play('sendData').catch(
-          (err) => console.log(err))
-        this.data_device_motion();
-        this.localNotifications.schedule({
-          id: 2,
-          text: 'Emergency sent!',
-          data: ""
-        });
-        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-      }, (err) => {
-        setTimeout(() => {
-          console.log(err);
-          this.sendEmergency();
-        }, 2000);
-      })
+    var avgx = 0, avgy = 0, avgz = 0;
+    var vx = 0, vy = 0, vz = 0;
+    var freq = 1000;
+    var position=this.geolocation.watchPosition().subscribe((response: Geoposition) => {
+      this.details_emergency.latitude = response.coords.latitude;
+      this.details_emergency.longitude = response.coords.longitude;
     }, (err) => {
-      setTimeout(() => {
-        console.log(err);
-        this.sendEmergency();
-      }, 2000);
-    });
+      console.log(err);
+    })
+    var sub = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
+      vx = (acceleration.x - 0.6) * (freq / 1000); //value in seconds
+      vy = (acceleration.y - 0.4) * (freq / 1000);
+      vz = (acceleration.z - 0.3 - 9.81) * (freq / 1000);
+      this.details_emergency.accelX = acceleration.x;
+      this.details_emergency.accelY = acceleration.y;
+      this.details_emergency.accelZ = acceleration.z;
+      this.details_emergency.velocity = Math.sqrt(vx * vx + vy * vy + vz * vz)
+      console.log(this.details_emergency.velocity);
+      console.log(acceleration)
+    }, (err) => { console.log(err) })
+    var intervalSendEmergency = setInterval(() => {
+      this.details_emergency.dateObserved = new Date().toISOString();
+      this.NGSIv2Query.sendEvent(this.details_emergency);
+    }, freq)
+    setTimeout(() => {
+      clearInterval(intervalSendEmergency);
+      console.log('avgX-> ' + (avgx / (60000 / freq)))
+      console.log('avgY-> ' + (avgy / (60000 / freq)))
+      console.log('avgZ-> ' + (avgz / (60000 / freq)))
+      sub.unsubscribe();
+      position.unsubscribe();
+    }, 60000)
   }
   private data_device_motion() {
     var avgx = 0, avgy = 0, avgz = 0;
     var vx = 0, vy = 0, vz = 0;
     var count = 0;
     var freq = 1000;
+    var velocity = 0;
     var sub = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
       vx = (acceleration.x - 0.6) * (freq / 1000);
       vy = (acceleration.y - 0.4) * (freq / 1000);
       vz = (acceleration.z - 0.3 - 9.81) * (freq / 1000);
       console.log('velocity--> ' + (Math.abs(vx) + Math.abs(vy) + Math.abs(vz)))
       count++;
+      velocity = (Math.abs(vx) + Math.abs(vy) + Math.abs(vz))
       //send new data accelerometer
       console.log(acceleration)
     }, (err) => { console.log(err) })
