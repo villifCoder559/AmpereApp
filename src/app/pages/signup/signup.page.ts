@@ -47,7 +47,7 @@ export class SignupPage implements OnInit {
     surname: ['', Validators.required],
     nickname: ['', Validators.required],
     email: ['', Validators.email],
-    phoneNumber: ['', Validators.compose([Validators.required,Validators.pattern('[- +()0-9]+')])],
+    phoneNumber: ['', Validators.compose([Validators.required, Validators.pattern('[- +()0-9]+')])],
     birthdate: ['', Validators.compose([DateValidator.dateVaidator])],
     gender: [''],
     address: ['', Validators.required],
@@ -65,7 +65,7 @@ export class SignupPage implements OnInit {
     medications: ['', Validators.maxLength(200)]
   });
   //emergency_Contacts = new Array<Emergency_Contact>(5);
-  
+
   fourthFormGroup = this._formBuilder.group({
     call_112: ['', Validators.required],
     call_115: ['', Validators.required],
@@ -123,10 +123,10 @@ export class SignupPage implements OnInit {
       })
       console.log(this.shared_data.user_data.paired_devices)
       this.changeDetection.detectChanges();
-      var index=this.router.getCurrentNavigation().extras.state?.page;
+      var index = this.router.getCurrentNavigation().extras.state?.page;
       if (this.router.getCurrentNavigation().extras.state?.page) {
         setTimeout(() => {
-          this.stepper.selectedIndex = index-1;
+          this.stepper.selectedIndex = index - 1;
           this.stepper.animationDone.subscribe(() => {
             this.content.scrollToBottom(500)
           })
@@ -188,10 +188,13 @@ export class SignupPage implements OnInit {
   remove_contact(index) {
     //var index = this.shared_data.user_data.emergency_contacts.findIndex((element) => element = contact);
     this.shared_data.user_data.emergency_contacts.splice(index, 1);
+    if (this.authService.isAuthenticated.getValue())
+      this.NGSIv2QUERY.sendUserProfile(new Date().toISOString());
   }
   openDialogEmergencyContact(value, index): void {
     var ok = true;
-    console.log('pass')
+    console.log('pass');
+    var oldList = this.shared_data.user_data.paired_devices;
     if (value == 0) {
       value = { name: '', surnamne: '', number: '' }
       if (this.shared_data.user_data.emergency_contacts.length > 4)
@@ -213,6 +216,9 @@ export class SignupPage implements OnInit {
           this.shared_data.user_data.emergency_contacts.push(new Emergency_Contact(result.data.name, result.data.surname, result.data.number))
         else
           this.shared_data.user_data.emergency_contacts[result.index] = new Emergency_Contact(result.data.name, result.data.surname, result.data.number);
+        console.log(oldList != this.shared_data.user_data.paired_devices)
+        if (this.authService.isAuthenticated.getValue() && oldList != this.shared_data.user_data.paired_devices)
+          this.NGSIv2QUERY.sendUserProfile(new Date().toISOString());
         console.log(this.shared_data.user_data.emergency_contacts)
       });
     }
@@ -249,11 +255,11 @@ export class SignupPage implements OnInit {
       console.log(this.shared_data.user_data.paired_devices)
     })
   }
-  getAllDataFromForm(){
+  getAllDataFromForm() {
     this.shared_data.user_data.email = this.firstFormGroup.get('email')?.value;
     this.shared_data.user_data.name = this.firstFormGroup.get('name')?.value;
     this.shared_data.user_data.surname = this.firstFormGroup.get('surname')?.value;
-    this.shared_data.user_data.nickname=this.firstFormGroup.get('nickname')?.value;
+    this.shared_data.user_data.nickname = this.firstFormGroup.get('nickname')?.value;
     this.shared_data.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
     this.shared_data.user_data.birthdate = this.firstFormGroup.get('birthdate')?.value;
     this.shared_data.user_data.gender = this.firstFormGroup.get('gender')?.value;
@@ -306,11 +312,11 @@ export class SignupPage implements OnInit {
     return result;
   }
   register_user() {
-    if(this.shared_data.user_data.paired_devices.length>0){
+    if (this.shared_data.user_data.paired_devices.length > 0) {
       this.getAllDataFromForm();
       // this.snap4CityService.registerUser().then(() => {
-    //   this.shared_data.createToast('Successfull registered')
-    // }, (err) => this.shared_data.createToast(err));
+      //   this.shared_data.createToast('Successfull registered')
+      // }, (err) => this.shared_data.createToast(err));
     }
     else
       this.shared_data.createToast('You must pair at least one device!')
