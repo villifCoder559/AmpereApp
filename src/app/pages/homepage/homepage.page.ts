@@ -94,7 +94,7 @@ export class HomepagePage implements OnInit {
   }
   showAlert() {
     //take bluetooth singal
-    this.sharedData.showAlert();
+    this.sharedData.showAlert(0);
   }
   testQuery() {
     this.ngsi.getDeviceData().then((result) => {
@@ -102,12 +102,12 @@ export class HomepagePage implements OnInit {
     }, (err) => console.log(err))
   }
   testAPIEntry() {
-    this.ngsi.getEntity('ampereuser1QR-NFC-Event').then((result) => {
+    this.ngsi.getEntity('QR-NFC-Event').then((result) => {
       console.log(result)
     }, (err) => console.log(err))
   }
   testWriteQuery() {
-    this.ngsi.testWriteAPI('ampereuser1QR-NFC-Event').then((result) => {
+    this.ngsi.testWriteAPI('QR-NFC-Event').then((result) => {
       console.log(result)
     }, (err) => console.log(err))
   }
