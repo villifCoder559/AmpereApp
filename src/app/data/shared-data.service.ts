@@ -132,7 +132,7 @@ export class SharedDataService {
             this.user_data.nickname = 'KL15'
             this.user_data.address = 'Viale Morgagni 87'
             this.user_data.allergies = 'gluten'
-            this.user_data.birthdate = '10/25/1947'
+            this.user_data.birthdate = '1950/08/09'
             this.user_data.city = 'Florence'
             this.user_data.description = 'brown hair blue eyes'
             this.user_data.disabilities = [false, false]
@@ -157,24 +157,24 @@ export class SharedDataService {
           }
         }, err => console.log(err));
       }
-  })
-}
-// goHomepage() {
-//   //load user data from database
-//   this.loadDataUser()
-//   this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
-// }
-showAlert() {
-  //take bluetooth signal, create handler that takes the signal
-  this.nativeAudio.play('alert')
-  this.router.navigateByUrl('/show-alert', { replaceUrl: true })
-  //this.sendEmergency();
-}
+    })
+  }
+  // goHomepage() {
+  //   //load user data from database
+  //   this.loadDataUser()
+  //   this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
+  // }
+  showAlert(id) {
+    //take bluetooth signal, create handler that takes the signal
+    this.nativeAudio.play('alert')
+    this.router.navigate(['/show-alert', { deviceId: id }], { replaceUrl: true })
+    //this.sendEmergency();
+  }
 
-enableAllBackgroundMode() {
-  console.log('enableBackgroundMode')
-  this.backgroundMode.enable();
-  this.backgroundMode.overrideBackButton();
-  this.backgroundMode.disableWebViewOptimizations();
-}
+  enableAllBackgroundMode() {
+    console.log('enableBackgroundMode')
+    this.backgroundMode.enable();
+    this.backgroundMode.overrideBackButton();
+    this.backgroundMode.disableWebViewOptimizations();
+  }
 }
