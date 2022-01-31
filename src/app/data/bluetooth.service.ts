@@ -22,8 +22,8 @@ export class BluetoothService {
   /*52414449-5553-4e45-5457-4f524b53434f*/
   beacon_regions = [];
   detectedValue = new BehaviorSubject(null);
-  stopScan(){
-    this.ble.stopScan().then(()=>{
+  stopScan() {
+    this.ble.stopScan().then(() => {
       console.log('stop scan')
     })
   }
@@ -72,7 +72,7 @@ export class BluetoothService {
           this.ble.autoConnect(peripheralData.id, () => {
             console.log('detected ')
             if (this.authService.isAuthenticated.value)
-              this.shared_data.showAlert();
+              this.shared_data.showAlert(peripheralData.id);
           }, (err) => {
             console.log(err)
           })
@@ -83,7 +83,7 @@ export class BluetoothService {
           var uuid = hex.substring(18, 26) + '-' + hex.substring(26, 30) + '-' + hex.substring(30, 34) + '-' + hex.substring(34, 38) + '-' + hex.substring(38, 50);
           peripheralData.uuid = uuid;
           console.log('uuid-> ' + uuid);
-          this.startRegisterBeacon(uuid);
+          this.startRegisterBeacon(uuid, hex[50] + hex[51], hex[52] + hex[53]);
           console.log(id)
         }
         this.addPairedDeviceANDregister(peripheralData)
@@ -104,16 +104,22 @@ export class BluetoothService {
     }
     this.shared_data.saveData();
   }
+  enableAllUserBeaconFromSnap4City() {
+    this.shared_data.user_data.paired_devices.forEach((element) => {
+      console.log(element)
+      this.startRegisterBeacon(element, -1, -1);
+    }, err => console.log(err))
+  }
   enableAllUserBeacon() {
     console.log('enableUserBeacon')
     console.log(this.shared_data.user_data)
     this.shared_data.user_data.paired_devices.forEach((element) => {
       console.log(element)
       if (element != null) {
-        if (element.protocol == 'ibeacon') {
+        if (element?.protocol == 'ibeacon') {
           console.log('ibeacon');
           console.log(element)
-          this.startRegisterBeacon(element.uuid);
+          this.startRegisterBeacon(element.uuid, element.minor, element.major);
         }
         else {
           console.log('ble');
@@ -121,7 +127,7 @@ export class BluetoothService {
           this.ble.autoConnect(element.id, () => {
             console.log('autoconnection')
             if (this.authService.isAuthenticated.value)
-              this.shared_data.showAlert();
+              this.shared_data.showAlert(element.id);
           }, (err) => {
             console.log(err);
           })
@@ -152,11 +158,15 @@ export class BluetoothService {
         error => console.error()
       );
   }
-  startRegisterBeacon(uuid) {
+  startRegisterBeacon(uuid, minor, major) {
     this.ibeacon.requestAlwaysAuthorization();
     // create a new delegate and register it with the native layer
     let delegate = this.ibeacon.Delegate();
-    let beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + uuid, uuid);
+    let beaconRegion;
+    if (minor != -1 && major != -1)
+      beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + uuid, uuid, major, minor, true);
+    else
+      beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + uuid, uuid, null, null, true);
     //let beaconRegion = this.ibeacon.BeaconRegion('test', null, null, null);
     console.log(beaconRegion)
     //console.log('uuid-> ' + uuid)
@@ -180,7 +190,10 @@ export class BluetoothService {
             console.log(this.shared_data.user_data.paired_devices)
             if (data.region.identifier == 'Beacon_' + this.shared_data.user_data.paired_devices[0].uuid || data.region.identifier == 'Beacon_' + this.shared_data.user_data.paired_devices[1].uuid) {
               console.log('Detected uuid ' + data.region.identifier);
-              this.shared_data.showAlert();
+              var index = 0;
+              if (data.region.identifier == 'Beacon_' + this.shared_data.user_data.paired_devices[1].uuid)
+                index = 1;
+              this.shared_data.showAlert(this.shared_data.user_data.paired_devices[index].id);
             }
           }
         }, err => console.log(err)
