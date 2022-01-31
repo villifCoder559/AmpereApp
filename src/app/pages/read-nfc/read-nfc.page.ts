@@ -35,7 +35,20 @@ export class ReadNFCPage implements OnInit {
           console.log(tag)
           this.scannedCode = JSON.stringify(tag)
           window.open(tag.ndefMessage.toString())
-          console.log(this.scannedCode)
+          var id = parseInt(tag.ndefMessage.toString());
+          if (!isNaN(id)) {
+            this.shared_data.createToast('Valid NFC');
+            this.NGSIv2Query.getEntity('QRNFCDictionary' + id).then((response: any) => {
+              var action: string = response.action;
+              this.NGSIv2Query.sendQRNFCEvent('NFC', action, new Date().toISOString(), response.identifier);
+              window.open(action);
+            }, (err) => {
+              alert(err);
+            })
+          }
+          else {
+            alert('Not valid NFC')
+          }
         },
         err => this.create_message('Error reading tag: ' + err)
       );
