@@ -10,7 +10,7 @@ import { SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
-import { NGSIv2QUERYService, Entity } from '../data/ngsiv2-query.service'
+import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
 /*
   OK Fix view page OK
   OK Add sound when I click button and when the time expires OK
