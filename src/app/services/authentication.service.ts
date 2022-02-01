@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, from, Observable, Subject } from 'rxjs';
 import * as Keycloak from 'keycloak-ionic/keycloak';
+import { SharedDataService } from '../data/shared-data.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
   isAuthenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
-  username: string = '';
   public keycloak: Keycloak.KeycloakInstance;
-  constructor() {
+  constructor(private shareData: SharedDataService) {
     //this.loadToken();
   }
 
@@ -64,8 +64,8 @@ export class AuthenticationService {
         if (autentication) {
           this.isAuthenticated.next(true);
           this.keycloak.loadUserProfile().then((info: any) => {
-            this.username = info.username;
-            console.log(this.username)
+            this.shareData.user_data.id = info.username;
+            console.log(this.shareData.user_data.id)
           })
           console.log('idtoken ' + this.keycloak.idToken)
           console.log('sessionID ' + this.keycloak.sessionId)
