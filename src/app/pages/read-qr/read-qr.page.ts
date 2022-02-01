@@ -4,8 +4,8 @@ import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 import { ToastController } from '@ionic/angular';
 import * as $ from "jquery";
 import { ChangeDetectorRef } from '@angular/core';
-import { SharedDataService } from 'src/app/data/shared-data.service';
-import { NGSIv2QUERYService, Entity } from 'src/app/data/ngsiv2-query.service'
+import { SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
+import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service'
 import { AuthenticationService } from 'src/app/services/authentication.service';
 /* QR-Code has 3 fields:{"description":"","link":"","code":""} */
 
@@ -56,16 +56,22 @@ export class ReadQRPage implements OnInit {
               this.changeRef.detectChanges();
               $("ion-app").show(500);
               if (!isNaN(id)) {
-                this.sharedData.createToast('Valid QR')
-                this.NGSIv2Query.getEntity('QRNFCDictionary' + id).then((response: any) => {
-                  var action: string = response.action;
-                  this.NGSIv2Query.sendQRNFCEvent('QR', action, new Date().toISOString(), response.identifier);
-                  window.open(action);
-                  resolve(true);
-                }, (err) => {
-                  alert(err);
-                  reject(err);
-                })
+                if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, id)) {
+                  this.sharedData.createToast('Valid QR')
+                  this.NGSIv2Query.getEntity('QRNFCDictionary' + id, 'DictionaryOfQRNFC').then((response: any) => {
+                    var action: string = response.action;
+                    this.NGSIv2Query.sendQRNFCEvent('QR', action, new Date().toISOString(), response.identifier);
+                    window.open(action);
+                    resolve(true);
+                  }, (err) => {
+                    alert(err);
+                    reject(err);
+                  })
+                }
+                else {
+                  this.sharedData.createToast('Permission denied!')
+                  reject('Permission denied')
+                }
               }
               else {
                 alert('Not valid QR')
@@ -86,10 +92,21 @@ export class ReadQRPage implements OnInit {
 
   }
   ngOnInit() {
+    this.fillListQRCode()
+  }
+  fillListQRCode() {
+    console.log(this.sharedData.user_data.qr_code)
+    this.sharedData.user_data.qr_code.forEach((element) => {
+      console.log(element)
+      this.NGSIv2Query.getEntity('QRNFCDictionary' + element.id, 'DictionaryOfQRNFC').then((data: any) => {
+        if (data.QRIDorNFC == 'QR') {
+          this.sharedData.user_data.qr_code[data.identifier].action = data.action;
+        }
+      })
+    })
   }
   addQR() {
-    if (this.sharedData.user_data.qr_code.length < 4)
-      this.NGSIv2Query.getEntity(Entity.NFC,)
+
   }
   delete(device, index) {
     console.log('delete pos ' + index + " -> " + device.id)
