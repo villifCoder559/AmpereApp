@@ -102,8 +102,9 @@ export class HomepagePage implements OnInit {
     }, (err) => console.log(err))
   }
   testAPIEntry() {
-    this.ngsi.getEntity('QR-NFC-Event').then((result) => {
+    this.ngsi.getEntity('Profile',"AmpereUserProfile").then((result:any) => {
       console.log(result)
+      console.log(result.address.value)
     }, (err) => console.log(err))
   }
   testWriteQuery() {
