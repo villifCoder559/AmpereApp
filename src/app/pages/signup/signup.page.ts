@@ -21,7 +21,7 @@ import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 import * as moment from 'moment';
 import { Contacts, ContactName, ContactField } from '@ionic-native/contacts/ngx';
 import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
-import { Entity, NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
+import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
 import { BluetoothService } from '../../data/bluetooth.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
 import { AuthenticationService } from '../../services/authentication.service'
