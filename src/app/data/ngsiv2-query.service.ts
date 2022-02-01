@@ -1,13 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, NgModule } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
-import { Snap4CityService } from '../data/snap4-city.service'
 import { SharedDataService } from '../data/shared-data.service'
-export enum Entity {
-  USERID = 'UserID',
+export enum DeviceType {
+  USERID = 'AmpereUserProfile',
   EVENT = 'Event',
-  NFC = 'NFC',
-  QR = ''
+  NFC_QR = 'QR-NFC-Event',
+  NFC_QR_DICTIONARY = 'QRNFCDictionary'
 }
 @NgModule({
   providers: [HttpClient]
@@ -16,9 +15,9 @@ export enum Entity {
   providedIn: 'root'
 })
 export class NGSIv2QUERYService {
-  constructor(private shared_data: SharedDataService, public http: HttpClient, private authService: AuthenticationService, private adapterS4C: Snap4CityService) { }
+  constructor(private shared_data: SharedDataService, public http: HttpClient, private authService: AuthenticationService) { }
   sendQRNFCEvent(qridornfc, action, dateObserved, identifier) {
-    var id = this.authService.username;
+    var id = this.shared_data.user_data.id;
     $.ajax({
       url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + id + "QR-NFC-Event/attrs?elementid=" + id + "QR-NFC-Event&type=QR-NFC-Event",
       headers: {
@@ -54,8 +53,6 @@ export class NGSIv2QUERYService {
   sendUserProfile(dateObserved) {
     return new Promise((resolve, reject) => {
       var data: any = this.shared_data.user_data;
-      var id = this.authService.username;
-      data.id = id;
       data.type = 'AmpereUserProfile'
       data.dateObserved = dateObserved;
       data.status = 'active';
@@ -84,7 +81,7 @@ export class NGSIv2QUERYService {
       delete data.qr_code;
       delete data.nfc_code;
       $.ajax({
-        url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + id + "AmpereUserProfile/attrs?elementid=" + id + "AmpereUserProfile&type=AmpereUserProfile",
+        url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + data.id + "AmpereUserProfile/attrs?elementid=" + data.id + "AmpereUserProfile&type=AmpereUserProfile",
         headers: {
           'Authorization': 'Bearer ' + this.authService.keycloak.refreshToken,
           'Content-Type': 'application/json'
@@ -114,7 +111,7 @@ export class NGSIv2QUERYService {
   }
   sendEvent(details_emergency) {
     return new Promise((resolve, reject) => {
-      var id = this.authService.username;
+      var id = this.shared_data.user_data.id;
       var JSONdetails = JSON.stringify(details_emergency);
       $.ajax({
         url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + id + "Event/attrs?elementid=" + id + "Event&type=Event",
@@ -146,7 +143,7 @@ export class NGSIv2QUERYService {
   }
   updateEntity(attrName, attrValue, type) {
     return new Promise((resolve, reject) => {
-      var id = this.authService.username;
+      var id = this.shared_data.user_data.id;
       var JSONdetails = JSON.stringify(attrValue);
       $.ajax({
         url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + id + type + "/attrs/+" + attrName + "/value?elementid=" + id + "Event&type=" + type,
@@ -179,7 +176,7 @@ export class NGSIv2QUERYService {
   }
   testWriteAPI(type) {
     return new Promise((resolve, reject) => {
-      var username = this.authService.username;
+      var username = this.shared_data.user_data.id;
       if (username == '')
         username = 'ampereuser1'
       //console.log(JSON.stringify(data))
@@ -220,15 +217,21 @@ export class NGSIv2QUERYService {
       });
     })
   }
-  getEntity(type) {
+  getEntity(name,type) {
     return new Promise((resolve, reject) => {
-      var username = this.authService.username;
+      var username = this.shared_data.user_data.id;
       console.log(username)
       if (username == '')
         username = 'ampereuser1'
+      // var type = name
+      // console.log(name)
+      // switch (name) {
+      //   case 'AmpereUserProfile':
+      //     type = 'Profile'; break;
+      // }
       //console.log(JSON.stringify(data))
       $.ajax({
-        url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + username + type + "?elementid=" + username + type + "&type=" + type,
+        url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + username + name + "?elementid=" + username + name + "&type=" + type,
         type: "GET",
         headers: {
         },
