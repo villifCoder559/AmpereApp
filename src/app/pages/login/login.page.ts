@@ -43,59 +43,65 @@ export class LoginPage implements OnInit {
     await loading.present();
     if (platform == 'snap4city') {
       try {
-        this.authService.loginSnap4City().then(async (auth) => {
+        this.authService.loginSnap4City().then((auth) => {
           console.log('IN')
-          await loading.dismiss();
+          loading.dismiss();
           console.log('end_auth')
           console.log(auth)
           if (auth) {
             //this.sharedData.enableAllBackgroundMode();
-            this.ngsi.getEntity('AmpereUserProfile').then((data: any) => {
-              console.log(data)
-              this.sharedData.user_data.nickname = data.nickname
-              this.sharedData.user_data.address = data.address
-              this.sharedData.user_data.allergies = data.allergies
-              this.sharedData.user_data.birthdate = data.dateofborn
-              this.sharedData.user_data.city = data.city
-              this.sharedData.user_data.description = data.description
-              this.sharedData.user_data.disabilities = [data.visionImpaired, data.wheelchairUser]
-              this.sharedData.user_data.email = data.email
+            this.ngsi.getEntity('Profile','AmpereUserProfile').then((data: any) => {
+              console.log(data.nickanme) //fix spelling database
+              console.log(data['emergencyContact'+1+'Name'])
+              console.log(data['address'])
+              this.sharedData.user_data.nickname = data.nickname.value
+              this.sharedData.user_data.address = data.address.value
+              this.sharedData.user_data.allergies = data.allergies.value
+              this.sharedData.user_data.birthdate = data.dateofborn.value
+              this.sharedData.user_data.city = data.city.value
+              this.sharedData.user_data.description = data.description.value
+              this.sharedData.user_data.disabilities = [data.visionImpaired.value, data.wheelchairUser.value]
+              this.sharedData.user_data.email = data.email.value
               for (var i = 0; i < 5; i++) {
                 var name = data['emergencyContact' + (i + 1) + 'Name'];
                 var surname = data['emergencyContact' + (i + 1) + 'Surname'];
                 var number = data['emergencyContact' + (i + 1) + 'Number'];
-                if (name != '' && surname != '' && number.length != 0)
+                console.log(name)
+                console.log(surname)
+                console.log(number)
+                if (name != '' && surname != '' && number != '')
                   this.sharedData.user_data.emergency_contacts.push(new Emergency_Contact(name, surname, number))
               }
               for (var i = 0; i < 4; i++) {
-                var qrcode = data['QR' + (i + 1)];
-                var nfccode = data['NFC' + (i + 1)];
+                var qrcode = data['QR' + (i + 1)].value;
+                var nfccode = data['NFC' + (i + 1)].value;
                 if (qrcode != '')
                   this.sharedData.user_data.qr_code.push(qrcode)
                 if (nfccode != '')
                   this.sharedData.user_data.nfc_code.push(nfccode)
               }
-              this.sharedData.user_data.ethnicity = data.ethnicity
-              this.sharedData.user_data.gender = data.gender
-              this.sharedData.user_data.height = data.height
-              this.sharedData.user_data.locality = data.locality
-              this.sharedData.user_data.medications = data.medications
-              this.sharedData.user_data.name = data.name
-              this.sharedData.user_data.weight = data.weight
-              this.sharedData.user_data.surname = data.surname
-              this.sharedData.user_data.phoneNumber = data.PhoneNumber
-              this.sharedData.user_data.public_emergency_contacts = { "112": data.call_113, "115": data.call_115, "118": data.call_118 }
-              if (data.Jewel1ID != '')
-                this.sharedData.user_data.paired_devices.push(data.Jewel1ID)
-              if (data.Jewel2ID)
-                this.sharedData.user_data.paired_devices.push(data.Jewel2ID)
-              this.sharedData.user_data.pin = data.pin
-              this.sharedData.user_data.purpose = data.purpose
-
+              this.sharedData.user_data.ethnicity = data.ethnicity.value
+              this.sharedData.user_data.gender = data.gender.value
+              this.sharedData.user_data.height = data.height.value
+              this.sharedData.user_data.locality = data.locality.value
+              this.sharedData.user_data.medications = data.medications.value
+              this.sharedData.user_data.name = data.name.value
+              this.sharedData.user_data.weight = data.weight.value
+              this.sharedData.user_data.surname = data.surname.value
+              console.log('phoneNumber')
+              this.sharedData.user_data.phoneNumber = data.phoneNumber.value
+              this.sharedData.user_data.public_emergency_contacts = { "112": data.call_112.value, "115": data.call_115.value, "118": data.call_118.value }
+              if (data.jewel1ID.value != '')
+                this.sharedData.user_data.paired_devices.push(data.jewel1ID.value)
+              if (data.jewel2ID.value != '')
+                this.sharedData.user_data.paired_devices.push(data.jewel2ID.value)
+              this.sharedData.user_data.pin = data.pin.value
+              this.sharedData.user_data.purpose = data.purpose.value
+              console.log(this.sharedData.user_data.paired_devices)
               this.bluetoothService.enableAllUserBeaconFromSnap4City();
               this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
             }, err => alert(err))
-            this.sharedData.loadDataUser().then((result) => {
+            this.sharedData.loadDataUser(true).then((result) => {
               console.log('result ' + result)
 
             });
@@ -112,7 +118,7 @@ export class LoginPage implements OnInit {
     else {
       this.authService.login(this.credentials.value).subscribe(
         async (res) => {
-          this.sharedData.loadDataUser().then((result) => {
+          this.sharedData.loadDataUser(true).then((result) => {
             console.log('result ' + result)
             this.bluetoothService.enableAllUserBeacon();
             this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
