@@ -166,7 +166,7 @@ export class BluetoothService {
     if (minor != -1 && major != -1)
       beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + uuid, uuid, major, minor, true);
     else
-      beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + uuid, uuid, null, null, true);
+      beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + uuid, uuid);
     //let beaconRegion = this.ibeacon.BeaconRegion('test', null, null, null);
     console.log(beaconRegion)
     //console.log('uuid-> ' + uuid)
