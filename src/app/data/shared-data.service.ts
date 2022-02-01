@@ -14,7 +14,6 @@ import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { CountdownConfig, CountdownModule } from 'ngx-countdown';
 import { Storage } from '@ionic/storage-angular'
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { AuthenticationService } from '../services/authentication.service'
 /**fix logout */
 @NgModule({
   imports: [
@@ -33,7 +32,7 @@ export class NFCCode {
 }
 export class QRCode {
   description: string = '';
-  link: string = '';
+  action: string = '';
   code: string = '';
   id: number = -1;
 }
@@ -51,7 +50,12 @@ export class Emergency_Contact {
 
 /*check iBeacon library OK
   save data */
+export enum typeChecking {
+  NFC_CODE = 'nfc_code',
+  QR_CODE = 'qr_code'
+}
 export class UserData {
+  id: string = ''
   name: string = '';
   surname: string = ''
   nickname: string = ''
@@ -85,7 +89,7 @@ export class UserData {
 export class SharedDataService {
   public user_data: UserData = new UserData();
   gps_enable = false;
-  constructor(private auth: AuthenticationService, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     //console.log('contructor')
     this.storage.create();
     this.platform.ready().then(() => {
@@ -108,11 +112,12 @@ export class SharedDataService {
     this.storage.set('user_data', this.user_data);
     console.log('storage')
   }
-  loadDataUser() {
+
+  loadDataUser(auth) {
     //console.log('data from service')
     //console.log(this.user_data)
     return new Promise((resolve, reject) => {
-      if (this.auth.isAuthenticated.getValue()) {
+      if (auth) {
         this.storage.get('user_data').then((storageData) => {
           if (storageData != null) {
             console.log('TRUE_BLOCK')
@@ -124,22 +129,21 @@ export class SharedDataService {
           else {
             console.log('ELSE_BLOCK')
             var qr_code = new QRCode();
-            qr_code.id = 2;
-            qr_code.description = "Call Simon smartphone"
+            qr_code.id = 40;
             var nfc_code = new NFCCode();
-            nfc_code.id = 1;
-            nfc_code.description = "How to take Aspirina"
+            nfc_code.id = 42;
+            this.user_data.id = 'ampereuser1'
             this.user_data.nickname = 'KL15'
-            this.user_data.address = 'Viale Morgagni 87'
+            this.user_data.address = 'VialeMorgagni87' //database no spaces available
             this.user_data.allergies = 'gluten'
-            this.user_data.birthdate = '1950/08/09'
+            this.user_data.birthdate = '1950-08-09'
             this.user_data.city = 'Florence'
-            this.user_data.description = 'brown hair blue eyes'
-            this.user_data.disabilities = [false, false]
-            this.user_data.email = 'email@mail.com'
+            this.user_data.description = 'brownHairBlueEyes' //no spaces
+            this.user_data.disabilities = [false, true] // vision,wheelchair
+            this.user_data.email = 'email@mail.com' // no @
             this.user_data.emergency_contacts = [new Emergency_Contact('Paul', 'Rid', '785232145202')]
             this.user_data.ethnicity = 'white'
-            this.user_data.gender = 'male'
+            this.user_data.gender = '0' //0->Male 1->Female
             this.user_data.height = '185'
             this.user_data.locality = 'Careggi'
             this.user_data.medications = ''
@@ -147,10 +151,10 @@ export class SharedDataService {
             this.user_data.weight = '85'
             this.user_data.surname = 'Richards'
             this.user_data.phoneNumber = '2587436910'
-            this.user_data.public_emergency_contacts = { 112: false, "115": false, "118": true }
+            this.user_data.public_emergency_contacts = { 112: true, "115": false, "118": true }
             this.user_data.paired_devices = []
             this.user_data.pin = '0258'
-            this.user_data.purpose = 'Personal safety'
+            this.user_data.purpose = 'PersonalSafety'
             this.user_data.qr_code = [qr_code]
             this.user_data.nfc_code = [nfc_code];
             resolve(false)
@@ -176,5 +180,13 @@ export class SharedDataService {
     this.backgroundMode.enable();
     this.backgroundMode.overrideBackButton();
     this.backgroundMode.disableWebViewOptimizations();
+  }
+
+  checkIDValidityNFCorQR(type: typeChecking, id) {
+    this.user_data[type].forEach(element => {
+      if (element == id)
+        return true
+    });
+    return false;
   }
 }
