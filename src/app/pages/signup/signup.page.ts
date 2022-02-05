@@ -16,7 +16,7 @@ import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
 import { AlertController, IonContent, Platform, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SharedDataService, UserData, Emergency_Contact } from '../../data/shared-data.service'
+import { SharedDataService, UserData, Emergency_Contact, typeChecking, DeviceType } from '../../data/shared-data.service'
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 import * as moment from 'moment';
 import { Contacts, ContactName, ContactField } from '@ionic-native/contacts/ngx';
@@ -42,13 +42,15 @@ export class SignupPage implements OnInit {
   @ViewChild('tooltip') tooltip: MatTooltip;
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
+  //add native-langauage field
+  //fix dimension when resize the screen
   firstFormGroup = this._formBuilder.group({
     name: ['', Validators.required],
     surname: ['', Validators.required],
     nickname: ['', Validators.required],
     email: ['', Validators.email],
     phoneNumber: ['', Validators.compose([Validators.required, Validators.pattern('[- +()0-9]+')])],
-    birthdate: ['', Validators.compose([DateValidator.dateVaidator])],
+    dateofborn: ['', Validators.compose([DateValidator.dateVaidator])],
     gender: [''],
     address: ['', Validators.required],
     locality: ['', Validators.required],
@@ -65,7 +67,6 @@ export class SignupPage implements OnInit {
     medications: ['', Validators.maxLength(200)]
   });
   //emergency_Contacts = new Array<Emergency_Contact>(5);
-
   fourthFormGroup = this._formBuilder.group({
     call_112: ['', Validators.required],
     call_115: ['', Validators.required],
@@ -99,7 +100,7 @@ export class SignupPage implements OnInit {
         nickname: this.shared_data.user_data.nickname,
         email: this.shared_data.user_data.email,
         phoneNumber: this.shared_data.user_data.phoneNumber,
-        birthdate: this.shared_data.user_data.birthdate,
+        dateofborn: this.shared_data.user_data.dateofborn,
         gender: this.shared_data.user_data.gender,
         address: this.shared_data.user_data.address,
         locality: this.shared_data.user_data.locality,
@@ -134,28 +135,28 @@ export class SignupPage implements OnInit {
       }
     }
   }
-  checkData(ev) {
+  checkDate(ev) {
     console.log(ev)
     //if(backspace) delete 2 chars
     if (ev.inputType != 'deleteContentBackward') {
       var value: string = ev.target.value;
-      var split = value.split('/');
+      var split = value.split('-');
       var year = parseInt(split[0]);
       var month = parseInt(split[1]);
       var day = parseInt(split[2]);
       var date: string = '';
       if (value.length > 3) {
-        date = year + '/'
+        date = year + '-'
         if (!isNaN(month)) {
           if (month.toString().length < 2)
             if (month > 1)
-              date += '0' + month.toString() + '/';
+              date += '0' + month.toString() + '-';
             else {
               date += month.toString()
               console.log(date)
             }
           else
-            date += month + '/'
+            date += month + '-'
         }
         if (!isNaN(day)) {
           if (day.toString().length < 2)
@@ -168,7 +169,7 @@ export class SignupPage implements OnInit {
         }
       }
       if (date != '') {
-        this.firstFormGroup.controls['birthdate'].setValue(date);
+        this.firstFormGroup.controls['dateofborn'].setValue(date);
         console.log(date)
       }
     }
@@ -189,7 +190,7 @@ export class SignupPage implements OnInit {
     //var index = this.shared_data.user_data.emergency_contacts.findIndex((element) => element = contact);
     this.shared_data.user_data.emergency_contacts.splice(index, 1);
     if (this.authService.isAuthenticated.getValue())
-      this.NGSIv2QUERY.sendUserProfile(new Date().toISOString());
+      this.NGSIv2QUERY.sendUserProfile();
   }
   openDialogEmergencyContact(value, index): void {
     var ok = true;
@@ -212,13 +213,20 @@ export class SignupPage implements OnInit {
 
       dialogRef.afterClosed().subscribe(result => {
         console.log(result);
-        if (result.index == -1)
+        var old_contacts = Object.assign(this.shared_data.user_data.emergency_contacts);
+        if (result.index == -1) //new element
           this.shared_data.user_data.emergency_contacts.push(new Emergency_Contact(result.data.name, result.data.surname, result.data.number))
-        else
+        else //old element modified
           this.shared_data.user_data.emergency_contacts[result.index] = new Emergency_Contact(result.data.name, result.data.surname, result.data.number);
         console.log(oldList != this.shared_data.user_data.paired_devices)
-        if (this.authService.isAuthenticated.getValue() && oldList != this.shared_data.user_data.paired_devices)
-          this.NGSIv2QUERY.sendUserProfile(new Date().toISOString());
+        let i = index == -1 ? this.shared_data.user_data.emergency_contacts.length - 1 : index
+        var contacts = this.NGSIv2QUERY.getEmergencyContactsToSend(this.shared_data.user_data.emergency_contacts)
+        this.NGSIv2QUERY.updateEntity(contacts, DeviceType.PROFILE).then(() => {
+          this.shared_data.createToast('Contact added succesfully')
+        }, err => {
+          this.shared_data.user_data.emergency_contacts = Object.assign(old_contacts);
+          alert(err + 'Recovered last data available')
+        })
         console.log(this.shared_data.user_data.emergency_contacts)
       });
     }
@@ -226,16 +234,33 @@ export class SignupPage implements OnInit {
       this.shared_data.createToast('You can register max 5 people!')
   }
   openBeaconDialog(): void {
+    //this.shared_data.user_data.paired_devices[0] == null || this.shared_data.user_data.paired_devices[1] == null
     console.log(this.shared_data.user_data.paired_devices)
-    if (this.shared_data.user_data.paired_devices[0] == null || this.shared_data.user_data.paired_devices[1] == null) {
+    if (this.shared_data.user_data.paired_devices.length < 2) {
       const dialogRef = this.dialog.open(DialogScanBluetoothComponent, {
         maxWidth: '90vw',
         minWidth: '40vw'
-      });
+      }).afterClosed().subscribe((result) => {
+        if (result != '')
+          this.addPairedDeviceANDregister(result);
+      }, err => (console.log(err)));
     }
     else
       this.shared_data.createToast('You have already 2 paired devices!');
   };
+  addPairedDeviceANDregister(device) {
+    var indexOf = this.shared_data.user_data.paired_devices.indexOf(device);
+    if (indexOf == -1) {
+      var attr = {}
+      attr['jewel' + this.shared_data.user_data.paired_devices.length + 'ID'] = device
+      this.NGSIv2QUERY.updateEntity(attr, DeviceType.PROFILE).then(() => {
+        this.shared_data.user_data.paired_devices.push(device);
+        alert('Device registered correctly')
+      }, (err) => alert(err))
+    }
+    else
+      alert('Device already registred')
+  }
   click_next() {
     for (var i = 0; i < this.countNumberContactsDone; i++) {
       if (this.shared_data.user_data.emergency_contacts[i].name === '')
@@ -249,9 +274,18 @@ export class SignupPage implements OnInit {
   delete(device, index) {
     console.log('delete pos ' + index + " -> " + device.uuid)
     var a = $('#device' + index).hide(400, () => {
-      this.shared_data.user_data.paired_devices.splice(index, 1);
+      var newContacts = this.shared_data.user_data.emergency_contacts;
+      newContacts.splice(index, 1);
+      var data_to_send = this.NGSIv2QUERY.getEmergencyContactsToSend(newContacts);
+      this.NGSIv2QUERY.updateEntity(data_to_send, DeviceType.PROFILE).then(() => {
+        this.shared_data.user_data.paired_devices.splice(index, 1);
+        this.shared_data.createToast('Successfully deleted')
+      }, err => {
+        alert('Error ' + err);
+      })
+      //.then(()=>{ alert('Successfully updated)},err=>aler('Update error' + err))
       //this.shared_data.user_data.paired_devices[index] = null;
-      this.shared_data.saveData();
+      //this.shared_data.saveData();
       console.log(this.shared_data.user_data.paired_devices)
     })
   }
@@ -261,7 +295,7 @@ export class SignupPage implements OnInit {
     this.shared_data.user_data.surname = this.firstFormGroup.get('surname')?.value;
     this.shared_data.user_data.nickname = this.firstFormGroup.get('nickname')?.value;
     this.shared_data.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
-    this.shared_data.user_data.birthdate = this.firstFormGroup.get('birthdate')?.value;
+    this.shared_data.user_data.dateofborn = this.firstFormGroup.get('dateofborn')?.value;
     this.shared_data.user_data.gender = this.firstFormGroup.get('gender')?.value;
     this.shared_data.user_data.address = this.firstFormGroup.get('address')?.value;
     this.shared_data.user_data.locality = this.firstFormGroup.get('locality')?.value;
@@ -283,14 +317,19 @@ export class SignupPage implements OnInit {
     // console.log(this.zeroFormGroup.errors);
     // console.log(this.getFormValidationErrors(this.zeroFormGroup))
     var error = this.findErrorsAllFormsGroup();
-    if (!error)      //check if change is registred in db
-    {
-      this.NGSIv2QUERY.sendUserProfile(new Date().toISOString()).then((value) => {
-        this.getAllDataFromForm();
-        console.log(value);
-        this.shared_data.saveData();
+    if (!error) {      //check if change is registred in db
+      this.NGSIv2QUERY.sendUserProfile().then((value) => {
         this.shared_data.createToast('Data updated!');
-      }, (err) => this.shared_data.createToast(err))
+      }, (err) => {
+        this.shared_data.user_data = Object.assign(this.shared_data.old_user_data);
+        alert('Error ' + err + '. Recovered old data available')
+      })
+      // this.NGSIv2QUERY.sendUserProfile(new Date().toISOString()).then((value) => {
+      //   this.getAllDataFromForm();
+      //   console.log(value);
+      //   this.shared_data.saveData();
+      //   this.shared_data.createToast('Data updated!');
+      // }, (err) => this.shared_data.createToast(err))
     }
     else
       this.shared_data.createToast('Error in step number ' + (error));
@@ -311,7 +350,7 @@ export class SignupPage implements OnInit {
     });
     return result;
   }
-  register_user() {
+  register_user() { //vedere che cambia con il save_data
     if (this.shared_data.user_data.paired_devices.length > 0) {
       this.getAllDataFromForm();
       // this.snap4CityService.registerUser().then(() => {
@@ -331,30 +370,30 @@ export class SignupPage implements OnInit {
     this.router.navigateByUrl('/', { replaceUrl: true });
   }
   modifyNameDevice(i) {
-    const dialogRef = this.dialog.open(DialogModifyNameComponent, {
-      maxWidth: '90vw',
-      minWidth: '40vw',
-      data: {
-        name: ''
-      }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
-      if (result != undefined && result != '') {
-        console.log(i)
-        console.log(this.shared_data.user_data.paired_devices[i])
-        this.shared_data.user_data.paired_devices[i].name = result;
-        //this.save_data()
-      }
-      console.log(this.shared_data.user_data.paired_devices)
-    });
+    // const dialogRef = this.dialog.open(DialogModifyNameComponent, {
+    //   maxWidth: '90vw',
+    //   minWidth: '40vw',
+    //   data: {
+    //     name: ''
+    //   }
+    // });
+    // dialogRef.afterClosed().subscribe(result => {
+    //   console.log(result)
+    //   if (result != undefined && result != '') {
+    //     console.log(i)
+    //     console.log(this.shared_data.user_data.paired_devices[i])
+    //     this.shared_data.user_data.paired_devices[i].name = result;
+    //     //this.save_data()
+    //   }
+    //   console.log(this.shared_data.user_data.paired_devices)
+    // });
   }
 
 }
 
 class DateValidator {
   static dateVaidator(AC: AbstractControl) {
-    if (AC && AC.value && (!moment(AC.value, 'YYYY/MM/DD', true).isValid() || (moment().diff(AC.value) < 0 || moment().diff(AC.value, 'day') > 365 * 150))) {
+    if (AC && AC.value && (!moment(AC.value, 'YYYY-MM-DD', true).isValid() || (moment().diff(AC.value) < 0 || moment().diff(AC.value, 'day') > 365 * 150))) {
       return { dateValidator: true };
     }
     return null;
