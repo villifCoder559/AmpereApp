@@ -5,6 +5,7 @@ import { Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { BluetoothService } from '../../../data/bluetooth.service'
 import { ChangeDetectorRef } from '@angular/core';
+import { SharedDataService } from 'src/app/data/shared-data.service';
 
 /* first pair device and then use Ibeacon Library  */
 @Component({
@@ -16,7 +17,7 @@ export class DialogScanBluetoothComponent implements OnInit {
   //bs: any;
   devices = [];
   selectedOptions;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private detectChange: ChangeDetectorRef, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private sharedData: SharedDataService, private detectChange: ChangeDetectorRef, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
     this.platform.ready().then(() => {
       //this.bluetoothService.startRegisterBeacon();
       this.scan();
@@ -54,8 +55,7 @@ export class DialogScanBluetoothComponent implements OnInit {
     console.log(i);
     // $('#matSpinner').hide();
     $('#matSpinner' + i).css('display', 'flex')
-    this.data = this.devices[i];
-    this.bluetoothService.connectDevice(this.data.id).then((peripheralData) => {
+    this.bluetoothService.connectDevice(this.devices[i]).then((peripheralData) => {
       $('#matSpinner' + i).hide();
       this.data = peripheralData;
       console.log(peripheralData)
@@ -67,6 +67,7 @@ export class DialogScanBluetoothComponent implements OnInit {
       alert('Error' + err)
     });
   }
+  
   closeDialog() {
     this.ngZone.run(() => {
       this.bluetoothService.stopScan();
