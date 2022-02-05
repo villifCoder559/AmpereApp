@@ -52,10 +52,8 @@ export class MenuPage implements OnInit {
   logout() {
     this.ctrlMenu.close().then(() => {
       console.log('logout');
-      this.authService.isAuthenticated.next(false)
       console.log('autentcated.next is false')
       this.authService.logout();
-      this.router.navigateByUrl('/login', { replaceUrl: true });
     })
   }
 }
