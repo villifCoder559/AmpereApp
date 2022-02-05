@@ -7,7 +7,6 @@ import { Emergency_Contact, SharedDataService } from '../../data/shared-data.ser
 import * as Keycloak from 'keycloak-ionic/keycloak';
 import { BluetoothService } from 'src/app/data/bluetooth.service';
 import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -25,8 +24,7 @@ export class LoginPage implements OnInit {
     private sharedData: SharedDataService,
     private toastCtrl: ToastController,
     private bluetoothService: BluetoothService,
-    private ngsi: NGSIv2QUERYService
-  ) { }
+    private ngsi: NGSIv2QUERYService) { }
 
   ngOnInit() {
     this.credentials = this.fb.group({
@@ -50,14 +48,14 @@ export class LoginPage implements OnInit {
           console.log(auth)
           if (auth) {
             //this.sharedData.enableAllBackgroundMode();
-            this.ngsi.getEntity('Profile','AmpereUserProfile').then((data: any) => {
+            this.ngsi.getEntity('Profile', 'Profile').then((data: any) => {
               console.log(data.nickanme) //fix spelling database
-              console.log(data['emergencyContact'+1+'Name'])
+              console.log(data['emergencyContact' + 1 + 'Name'])
               console.log(data['address'])
               this.sharedData.user_data.nickname = data.nickname.value
               this.sharedData.user_data.address = data.address.value
               this.sharedData.user_data.allergies = data.allergies.value
-              this.sharedData.user_data.birthdate = data.dateofborn.value
+              this.sharedData.user_data.dateofborn = data.dateofborn.value
               this.sharedData.user_data.city = data.city.value
               this.sharedData.user_data.description = data.description.value
               this.sharedData.user_data.disabilities = [data.visionImpaired.value, data.wheelchairUser.value]
@@ -74,9 +72,11 @@ export class LoginPage implements OnInit {
               }
               for (var i = 0; i < 4; i++) {
                 var qrcode = data['QR' + (i + 1)].value;
-                var nfccode = data['NFC' + (i + 1)].value;
                 if (qrcode != '')
                   this.sharedData.user_data.qr_code.push(qrcode)
+              }
+              for (var i = 0; i < 4; i++) {
+                var nfccode = data['NFC' + (i + 1)].value;
                 if (nfccode != '')
                   this.sharedData.user_data.nfc_code.push(nfccode)
               }
@@ -98,7 +98,8 @@ export class LoginPage implements OnInit {
               this.sharedData.user_data.pin = data.pin.value
               this.sharedData.user_data.purpose = data.purpose.value
               console.log(this.sharedData.user_data.paired_devices)
-              this.bluetoothService.enableAllUserBeaconFromSnap4City();
+              this.sharedData.old_user_data=Object.assign(this.sharedData.user_data);
+              //this.bluetoothService.enableAllUserBeaconFromSnap4City();
               this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
             }, err => alert(err))
             this.sharedData.loadDataUser(true).then((result) => {
