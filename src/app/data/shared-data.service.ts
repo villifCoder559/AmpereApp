@@ -48,20 +48,36 @@ export class Emergency_Contact {
 }
 /**accuray:'15',major:125,mior:758,proximity:'Near',rssi:'-69',tx:'10db',uuid:'51446-54564w-fwfffw4-56d4we5d1e5113d2e1' */
 
-/*check iBeacon library OK
+/* check iBeacon library OK
   save data */
+export enum FakeKeycloak {
+  token = '',
+  refresh_token=''
+}
 export enum typeChecking {
   NFC_CODE = 'nfc_code',
-  QR_CODE = 'qr_code'
+  QR_CODE = 'qr_code',
+  EMERGENCY_CONTACTS = 'emergency_contacts',
+  DISABILITIES = 'disabilities',
+  PUB_EMERGENCY_CONTACTS = 'public_emergency_contacts',
+  PAIRED_DEVICES = 'paired_devices'
 }
+export enum DeviceType {
+  ALERT_EVENT = 'AmpereEvent',
+  QR_NFC_EVENT = 'QR-NFC-Event	',
+  DICTIONARY = 'QRNFCDictionary',
+  PROFILE = 'Profile'
+}
+
 export class UserData {
   id: string = ''
   name: string = '';
   surname: string = ''
   nickname: string = ''
+  language: string = ''
   email: string = ''
   phoneNumber: string = ''
-  birthdate: string = ''
+  dateofborn: string = ''
   gender: string = ''
   address: string = ''
   locality: string = ''
@@ -74,19 +90,41 @@ export class UserData {
   pin: string = ''
   allergies: string = ''
   medications: string = ''
-  disabilities = [false, false]
-  emergency_contacts = []
+  disabilities = [false, false] /**[visionImapired,wheelchairUser] */
+  emergency_contacts: Array<Emergency_Contact> = []
   public_emergency_contacts = { 112: false, 115: false, 118: false }
   paired_devices = []
   qr_code = []
   nfc_code = []
   constructor() { }
 }
-
+export class AlertEvent {
+  latitude: number = 0.0
+  longitude: number = 0.0
+  quote: number = 0.0
+  velocity: number = 0.0
+  evolution: string = ''
+  deviceID: string = ''
+  accelX: number = 0.0
+  accelY: number = 0.0
+  accelZ: number = 0.0
+  status: number = 0
+}
+export class QRNFCEvent {
+  QRIDorNFC: string = ''
+  identifier: string = ''
+  action: string = ''
+  constructor(qridNfc, id, action) {
+    this.QRIDorNFC = qridNfc;
+    this.identifier = id;
+    this.action = action;
+  }
+}
 @Injectable({
   providedIn: 'root'
 })
 export class SharedDataService {
+  old_user_data;
   public user_data: UserData = new UserData();
   gps_enable = false;
   constructor(private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
@@ -136,7 +174,7 @@ export class SharedDataService {
             this.user_data.nickname = 'KL15'
             this.user_data.address = 'VialeMorgagni87' //database no spaces available
             this.user_data.allergies = 'gluten'
-            this.user_data.birthdate = '1950-08-09'
+            this.user_data.dateofborn = '1950-08-09'
             this.user_data.city = 'Florence'
             this.user_data.description = 'brownHairBlueEyes' //no spaces
             this.user_data.disabilities = [false, true] // vision,wheelchair
@@ -180,13 +218,18 @@ export class SharedDataService {
     this.backgroundMode.enable();
     this.backgroundMode.overrideBackButton();
     this.backgroundMode.disableWebViewOptimizations();
+    this.backgroundMode.disableBatteryOptimizations();
   }
 
-  checkIDValidityNFCorQR(type: typeChecking, id) {
+  checkIDValidityNFCorQR(type: typeChecking.QR_CODE | typeChecking.NFC_CODE, id) {
+    console.log('userData')
+    console.log(this.user_data[type])
+    var ok = false;
     this.user_data[type].forEach(element => {
-      if (element == id)
-        return true
+      console.log(parseInt(element.id) == id)
+      if (parseInt(element.id) == id)
+        return ok = true
     });
-    return false;
+    return ok;
   }
 }
