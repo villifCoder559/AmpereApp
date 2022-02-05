@@ -4,7 +4,7 @@ import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 import { ToastController } from '@ionic/angular';
 import * as $ from "jquery";
 import { ChangeDetectorRef } from '@angular/core';
-import { SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
+import { QRNFCEvent, SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
 import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service'
 import { AuthenticationService } from 'src/app/services/authentication.service';
 /* QR-Code has 3 fields:{"description":"","link":"","code":""} */
@@ -55,27 +55,30 @@ export class ReadQRPage implements OnInit {
               this.closePreviewCamera();
               this.changeRef.detectChanges();
               $("ion-app").show(500);
+              console.log(isNaN(id))
               if (!isNaN(id)) {
                 if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, id)) {
                   this.sharedData.createToast('Valid QR')
                   this.NGSIv2Query.getEntity('QRNFCDictionary' + id, 'DictionaryOfQRNFC').then((response: any) => {
                     var action: string = response.action;
-                    this.NGSIv2Query.sendQRNFCEvent('QR', action, new Date().toISOString(), response.identifier);
+                    this.NGSIv2Query.sendQRNFCEvent(new QRNFCEvent('QR', response.identifier, action))
+                    this.scannedCode = action;
+                    console.log(action)
                     window.open(action);
                     resolve(true);
                   }, (err) => {
                     alert(err);
-                    reject(err);
+                    resolve(err);
                   })
                 }
                 else {
                   this.sharedData.createToast('Permission denied!')
-                  reject('Permission denied')
+                  resolve('Permission denied')
                 }
               }
               else {
                 alert('Not valid QR')
-                reject('Not valid QR')
+                resolve('Not valid QR')
               }
             });
           })
@@ -96,14 +99,14 @@ export class ReadQRPage implements OnInit {
   }
   fillListQRCode() {
     console.log(this.sharedData.user_data.qr_code)
-    this.sharedData.user_data.qr_code.forEach((element) => {
-      console.log(element)
-      this.NGSIv2Query.getEntity('QRNFCDictionary' + element.id, 'DictionaryOfQRNFC').then((data: any) => {
-        if (data.QRIDorNFC == 'QR') {
-          this.sharedData.user_data.qr_code[data.identifier].action = data.action;
-        }
-      })
-    })
+    // this.sharedData.user_data.qr_code.forEach((element) => {
+    //   console.log(element)
+    //   this.NGSIv2Query.getEntity('QRNFCDictionary' + element.id, 'DictionaryOfQRNFC').then((data: any) => {
+    //     if (data.QRIDorNFC == 'QR') {
+    //       this.sharedData.user_data.qr_code[data.identifier].action = data.action;
+    //     }
+    //   })
+    // })
   }
   addQR() {
 

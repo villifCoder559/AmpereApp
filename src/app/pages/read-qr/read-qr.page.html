@@ -28,7 +28,7 @@
             <ion-item-sliding>
               <ion-item *ngIf="item.id !=-1 " class="ion-no-padding" id="item{{i}}">
                 <ion-label class="label_code">
-                  <h3>{{item.action}}</h3>
+                  <h3>Identification code-> {{item.id}}</h3>
                 </ion-label>
               </ion-item>
               <ion-item-options side="end" (ionSwipe)="delete(item,i)">
