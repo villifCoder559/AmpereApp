@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NFC, Ndef } from '@ionic-native/nfc/ngx'
 import { Platform, ToastController } from '@ionic/angular';
-import { NFCCode, SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
+import { NFCCode, QRNFCEvent, SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
 import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
 
 @Component({
@@ -49,7 +49,7 @@ export class ReadNFCPage implements OnInit {
               this.sharedData.createToast('Valid NFC');
               this.NGSIv2Query.getEntity('QRNFCDictionary' + id,'QRNFCDictionary').then((response: any) => {
                 var action: string = response.action;
-                this.NGSIv2Query.sendQRNFCEvent('NFC', action, new Date().toISOString(), response.identifier);
+                this.NGSIv2Query.sendQRNFCEvent(new QRNFCEvent('NFC',action, response.identifier));
                 window.open(action);
               }, (err) => {
                 alert(err);
