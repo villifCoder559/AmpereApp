@@ -6,8 +6,9 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 //import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
-import { SharedDataService } from '../../data/shared-data.service'
+import { DeviceType, SharedDataService } from '../../data/shared-data.service'
 import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
+import { Snap4CityService } from '../../data/snap4-city.service'
 
 @Component({
   selector: 'app-homepage',
@@ -15,6 +16,7 @@ import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
   styleUrls: ['./homepage.page.scss'],
 })
 /*TODO List:
+  0)Add alertButton
   1)Enable scroll page OK
   2)Fix validator foreach textarea OK
   3)Import contact from contacts of device TEST OK
@@ -38,7 +40,7 @@ import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
   */
 export class HomepagePage implements OnInit {
   gps_enable = true;
-  constructor(private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private s4c:Snap4CityService,private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
       this.localNotifications.hasPermission().then(result => {
         if (!result.valueOf())
@@ -102,7 +104,7 @@ export class HomepagePage implements OnInit {
     }, (err) => console.log(err))
   }
   testAPIEntry() {
-    this.ngsi.getEntity('Profile',"AmpereUserProfile").then((result:any) => {
+    this.ngsi.getEntity('Profile',"Profile").then((result:any) => {
       console.log(result)
       console.log(result.address.value)
     }, (err) => console.log(err))
@@ -114,5 +116,16 @@ export class HomepagePage implements OnInit {
   }
   openAlertPage(){
     this.router.navigateByUrl('/show-alert', { replaceUrl: true })
+  }
+  openWebPage(){
+    window.open('www.google.com')
+  }
+  createDevice(){
+    this.s4c.createDevice(DeviceType.PROFILE);
+  }
+  getInsertDataS4C(){
+    console.log(this.s4c.getUserIDPayload());
+    console.log(this.s4c.getAlertEventPayload())
+    console.log(this.s4c.getQRNFCEventPayload())
   }
 }
