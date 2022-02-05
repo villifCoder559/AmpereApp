@@ -27,7 +27,6 @@ export class AuthenticationService {
   // }
 
   login(credentials: { email, password }): Observable<any> {
-
     this.isAuthenticated.next(true)
     return this.isAuthenticated
     // return this.http.post(`https://reqres.in/api/login`, credentials).pipe(
@@ -89,10 +88,11 @@ export class AuthenticationService {
     })
   }
   logout() {
-    this.isAuthenticated.next(false);
     //this.bluetoothService.disableAll();
     window.localStorage.removeItem('TOKEN_KEY');
     if (this.keycloak != null)
-      this.keycloak.logout();
+      this.keycloak.logout().then(() => this.isAuthenticated.next(false));
+    else
+      this.isAuthenticated.next(false);
   }
 }
