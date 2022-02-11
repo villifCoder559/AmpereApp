@@ -1,16 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, Platform } from '@ionic/angular';
-import { CountdownConfig, CountdownModule } from 'ngx-countdown';
+import { CountdownComponent, CountdownConfig, CountdownModule } from 'ngx-countdown';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SMS } from '@ionic-native/sms/ngx';
-import { SharedDataService, UserData } from '../data/shared-data.service'
+import { DeviceType, SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
 import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
+import { Snap4CityService } from '../data/snap4-city.service'
+
 /*
   OK Fix view page OK
   OK Add sound when I click button and when the time expires OK
@@ -27,8 +29,8 @@ import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
 export class ShowAlertPage implements OnInit {
   pin = ['', '', '', '']
   details_emergency = {
-    latitude: 0.0,
-    longitude: 0.0,
+    latitude: -1000.0,
+    longitude: -1000.0,
     dateObserved: new Date().toISOString(),
     quote: 0.0,
     velocity: 0.0,
@@ -37,14 +39,15 @@ export class ShowAlertPage implements OnInit {
     accelX: 0.0,
     accelY: 0.0,
     accelZ: 0.0,
-    status: 'EmergencySent'
+    status: 'alert'
   };
+  @ViewChild('countdown', { static: false }) private countdown: CountdownComponent
   config: CountdownConfig = {
-    leftTime: 20,
+    leftTime: 2000,
     formatDate: ({ date }) => `${date / 1000}`,
     // notify: 1
   };;
-  constructor(private NGSIv2Query: NGSIv2QUERYService, private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
+  constructor(private changeRef: ChangeDetectorRef, private s4c: Snap4CityService, private NGSIv2Query: NGSIv2QUERYService, private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
     private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.localNotifications.schedule({
       id: 1,
@@ -57,7 +60,10 @@ export class ShowAlertPage implements OnInit {
       this.details_emergency.deviceID = params['id']
     })
   }
-
+  immediateEmergency() {
+    this.countdown.left = 1;
+    this.changeRef.detectChanges();
+  }
   onDigitInput(event) {
     console.log(event);
     let element;
@@ -85,7 +91,7 @@ export class ShowAlertPage implements OnInit {
         ok = false
     }
     if (!ok) {
-      await this.presentAlert('PIN wrong', 200).then(() => {
+      await this.presentAlert('PIN wrong', 70).then(() => {
         for (var i = this.pin.length - 1; i >= 0; i--) {
           (<HTMLInputElement>document.getElementById(i.toString())).value = '';
           if (i == 0)
@@ -160,20 +166,34 @@ export class ShowAlertPage implements OnInit {
   //     }, 2000);
   //   });
   // }
-  private sendEmergency() {
+  private activateSensors() {
     var avgx = 0, avgy = 0, avgz = 0;
     var vx = 0, vy = 0, vz = 0;
     var freq = 1000;
-    var position=this.geolocation.watchPosition().subscribe((response: Geoposition) => {
-      this.details_emergency.latitude = response.coords.latitude;
-      this.details_emergency.longitude = response.coords.longitude;
+    var intervall = null;
+    var position = this.geolocation.watchPosition({}).subscribe((response: Geoposition) => {
+      if (this.details_emergency.latitude == -1000 && this.details_emergency.longitude == -1000) {
+        this.details_emergency.latitude = response.coords.latitude;
+        this.details_emergency.longitude = response.coords.longitude;
+        console.log(response)
+      }
+      if (intervall == null)
+        intervall = setTimeout(() => {
+          if (this.distance(this.details_emergency.latitude, this.details_emergency.longitude, response.coords.latitude, response.coords.longitude) > 0.05) {
+            this.details_emergency.latitude = response.coords.latitude;
+            this.details_emergency.longitude = response.coords.longitude;
+            this.details_emergency.dateObserved = new Date().toISOString();
+            intervall = null;
+            this.sendEmergency();
+          }
+        }, 5000)
     }, (err) => {
       console.log(err);
     })
-    var sub = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
-      vx = (acceleration.x - 0.6) * (freq / 1000); //value in seconds
-      vy = (acceleration.y - 0.4) * (freq / 1000);
-      vz = (acceleration.z - 0.3 - 9.81) * (freq / 1000);
+    var acceleration = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
+      // vx = (acceleration.x - 0.6) * (freq / 1000); //value in seconds
+      // vy = (acceleration.y - 0.4) * (freq / 1000);
+      // vz = (acceleration.z - 0.3 - 9.81) * (freq / 1000);
       this.details_emergency.accelX = acceleration.x;
       this.details_emergency.accelY = acceleration.y;
       this.details_emergency.accelZ = acceleration.z;
@@ -181,18 +201,45 @@ export class ShowAlertPage implements OnInit {
       console.log(this.details_emergency.velocity);
       console.log(acceleration)
     }, (err) => { console.log(err) })
-    var intervalSendEmergency = setInterval(() => {
-      this.details_emergency.dateObserved = new Date().toISOString();
-      this.NGSIv2Query.sendEvent(this.details_emergency);
-    }, freq)
     setTimeout(() => {
-      clearInterval(intervalSendEmergency);
+      //clearInterval(intervalSendEmergency);
       console.log('avgX-> ' + (avgx / (60000 / freq)))
       console.log('avgY-> ' + (avgy / (60000 / freq)))
       console.log('avgZ-> ' + (avgz / (60000 / freq)))
-      sub.unsubscribe();
+      acceleration.unsubscribe();
       position.unsubscribe();
     }, 60000)
+  }
+  distance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;    // Math.PI / 180
+    var c = Math.cos;
+    var a = 0.5 - c((lat2 - lat1) * p) / 2 +
+      c(lat1 * p) * c(lat2 * p) *
+      (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+  }
+  private sendEvent() {
+    this.NGSIv2Query.sendEvent(this.details_emergency).then(() => {
+      this.localNotifications.schedule({
+        id: 2,
+        text: 'Emergency sent!',
+        data: ""
+      })
+    }, err => {
+      this.sendEvent()
+    })
+  }
+  private sendEmergency() {
+    this.activateSensors();
+    this.s4c.createDevice(DeviceType.ALERT_EVENT).then(() => {
+      this.sendEvent();
+    }, err => {
+      this.sendEmergency();
+    })
+    // var intervalSendEmergency = setInterval(() => {
+    //   this.details_emergency.dateObserved = new Date().toISOString();
+    //   this.NGSIv2Query.sendEvent(this.details_emergency);
+    // }, freq)
   }
   private data_device_motion() {
     var avgx = 0, avgy = 0, avgz = 0;
