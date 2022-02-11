@@ -14,7 +14,7 @@
       </ion-item>
       <div *ngIf="(password.dirty || password.touched) && password.errors" class="errors">
         <span *ngIf="password.errors?.required">Password is required</span>
-        <span *ngIf="password.errors?.minlength">Password needs to be 8 characters</span>
+        <span *ngIf="password.errors?.minlength">Password needs to be 6 characters</span>
       </div>
     </div>
     <ion-button class="button_forgotten" type="button" (click)="go_to_forgot_psw()" color="light" fill="clear">
