@@ -4,9 +4,10 @@ import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 import { ToastController } from '@ionic/angular';
 import * as $ from "jquery";
 import { ChangeDetectorRef } from '@angular/core';
-import { QRNFCEvent, SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
+import { DeviceType, QRNFCEvent, SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
 import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service'
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { Snap4CityService } from 'src/app/data/snap4-city.service';
 /* QR-Code has 3 fields:{"description":"","link":"","code":""} */
 
 @Component({
@@ -20,7 +21,7 @@ export class ReadQRPage implements OnInit {
   scannedCode = null;
   title = 'app';
   isOn = false;
-  constructor(private authService: AuthenticationService, public sharedData: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: QRScanner, private toastCtrl: ToastController) {
+  constructor(private s4c: Snap4CityService, public sharedData: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: QRScanner, private toastCtrl: ToastController) {
     document.addEventListener('ionBackButton', (ev) => {
       //console.log(ev)
       if (this.previewCamera) {
@@ -57,24 +58,9 @@ export class ReadQRPage implements OnInit {
               $("ion-app").show(500);
               console.log(isNaN(id))
               if (!isNaN(id)) {
-                if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, id)) {
-                  this.sharedData.createToast('Valid QR')
-                  this.NGSIv2Query.getEntity('QRNFCDictionary' + id, 'DictionaryOfQRNFC').then((response: any) => {
-                    var action: string = response.action;
-                    this.NGSIv2Query.sendQRNFCEvent(new QRNFCEvent('QR', response.identifier, action))
-                    this.scannedCode = action;
-                    console.log(action)
-                    window.open(action);
-                    resolve(true);
-                  }, (err) => {
-                    alert(err);
-                    resolve(err);
-                  })
-                }
-                else {
-                  this.sharedData.createToast('Permission denied!')
-                  resolve('Permission denied')
-                }
+                this.readURLFromServer(id).then(() => {
+                  resolve(true)
+                }, err => reject(err))
               }
               else {
                 alert('Not valid QR')
@@ -89,10 +75,39 @@ export class ReadQRPage implements OnInit {
           // then they can grant the permission from there
         } else {
           // permission was denied, but not permanently. You can ask for permission again at a later time.
+          alert('Grant the permission')
         }
       }).catch((e: any) => console.log('Error is', e));
     })
 
+  }
+  readURLFromServer(id) {
+    return new Promise((resolve, reject) => {
+      if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, id)) {
+        this.sharedData.createToast('Valid QR. Sending request...')
+        this.NGSIv2Query.getEntity('QRNFCDictionary' + id, 'DictionaryOfQRNFC').then((response: any) => {
+          var action: string = response.action;
+          var identifier_event = Math.floor(new Date().getTime() / 1000).toString() //seconds
+          this.s4c.createDevice(DeviceType.QR_NFC_EVENT, identifier_event).then(() => {//gestione numerazione device quando creo eventi
+            this.NGSIv2Query.sendQRNFCEvent(new QRNFCEvent('QR', response.identifier, action),identifier_event)
+            this.scannedCode = action;
+            console.log(action)
+            window.open(action);
+            resolve(true);
+          }, (err) => {
+            console.log(err)
+            reject(err)
+          })
+        }, (err) => {
+          alert(err);
+          resolve(err);
+        })
+      }
+      else {
+        this.sharedData.createToast('Permission denied!')
+        resolve('Permission denied')
+      }
+    })
   }
   ngOnInit() {
     this.fillListQRCode()
