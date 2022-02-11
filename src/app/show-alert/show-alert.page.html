@@ -7,13 +7,16 @@
       <div class="icon">
         <ion-icon name="alert-circle"></ion-icon>
       </div>
+      <div class="immediate_emergency">
+        <button mat-raised-button (click)="immediateEmergency()">Send immediatly Emergency</button>
+      </div>
       <div class="section">
         Accidentally triggered?
         No problem,enter your PIN to cancel.<br><br>
-        To send a message to your contact, please let the time expire
+        To send a message to your contact, please let the time expire or click the button above
       </div>
       <div class="section number">
-        <countdown [config]="config" (event)="send_Emergency($event)"></countdown>
+        <countdown #countdown [config]="config" (event)="send_Emergency($event)"></countdown>
       </div>
       <div class="container-box section">
         <input class="box" (keyup)="onDigitInput($event)" name="0" id="0" matInput type='number' [(ngModel)]="pin[0]">
