@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { Emergency_Contact, SharedDataService } from '../../data/shared-data.service'
+import { DeviceType, Emergency_Contact, SharedDataService } from '../../data/shared-data.service'
 import * as Keycloak from 'keycloak-ionic/keycloak';
 import { BluetoothService } from 'src/app/data/bluetooth.service';
 import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
@@ -48,25 +48,40 @@ export class LoginPage implements OnInit {
           console.log(auth)
           if (auth) {
             //this.sharedData.enableAllBackgroundMode();
-            this.ngsi.getEntity('Profile', 'Profile').then((data: any) => {
-              console.log(data.nickanme) //fix spelling database
-              console.log(data['emergencyContact' + 1 + 'Name'])
-              console.log(data['address'])
+            this.ngsi.getEntity(DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
+              this.authService.isAuthenticated.next(true);
               this.sharedData.user_data.nickname = data.nickname.value
               this.sharedData.user_data.address = data.address.value
               this.sharedData.user_data.allergies = data.allergies.value
               this.sharedData.user_data.dateofborn = data.dateofborn.value
               this.sharedData.user_data.city = data.city.value
               this.sharedData.user_data.description = data.description.value
-              this.sharedData.user_data.disabilities = [data.visionImpaired.value, data.wheelchairUser.value]
+              this.sharedData.user_data.disabilities.visionImpaired = data.visionImpaired.value
+              this.sharedData.user_data.disabilities.wheelchairUser = data.wheelchairUser.value
               this.sharedData.user_data.email = data.email.value
+              this.sharedData.user_data.ethnicity = data.ethnicity.value
+              this.sharedData.user_data.gender = data.gender.value
+              this.sharedData.user_data.height = data.height.value
+              this.sharedData.user_data.locality = data.locality.value
+              this.sharedData.user_data.medications = data.medications.value
+              this.sharedData.user_data.name = data.name.value
+              this.sharedData.user_data.weight = data.weight.value
+              this.sharedData.user_data.surname = data.surname.value
+              this.sharedData.user_data.phoneNumber = data.phoneNumber.value
+              this.sharedData.user_data.status = data.status.value
+              this.sharedData.user_data.pin = data.pin.value
+              this.sharedData.user_data.purpose = data.purpose.value
+              this.sharedData.user_data.public_emergency_contacts = { 112: data.call_112.value, 115: data.call_115.value, 118: data.call_118.value }
+              if (data.jewel1ID.value != '')
+                this.sharedData.user_data.paired_devices.push(data.jewel1ID.value)
+              if (data.jewel2ID.value != '')
+                this.sharedData.user_data.paired_devices.push(data.jewel2ID.value)
               for (var i = 0; i < 5; i++) {
                 var name = data['emergencyContact' + (i + 1) + 'Name'];
                 var surname = data['emergencyContact' + (i + 1) + 'Surname'];
                 var number = data['emergencyContact' + (i + 1) + 'Number'];
-                console.log(name)
-                console.log(surname)
-                console.log(number)
+                console.log('contact ' + i);
+                console.log(name + surname + number)
                 if (name != '' && surname != '' && number != '')
                   this.sharedData.user_data.emergency_contacts.push(new Emergency_Contact(name, surname, number))
               }
@@ -80,35 +95,21 @@ export class LoginPage implements OnInit {
                 if (nfccode != '')
                   this.sharedData.user_data.nfc_code.push(nfccode)
               }
-              this.sharedData.user_data.ethnicity = data.ethnicity.value
-              this.sharedData.user_data.gender = data.gender.value
-              this.sharedData.user_data.height = data.height.value
-              this.sharedData.user_data.locality = data.locality.value
-              this.sharedData.user_data.medications = data.medications.value
-              this.sharedData.user_data.name = data.name.value
-              this.sharedData.user_data.weight = data.weight.value
-              this.sharedData.user_data.surname = data.surname.value
-              console.log('phoneNumber')
-              this.sharedData.user_data.phoneNumber = data.phoneNumber.value
-              this.sharedData.user_data.public_emergency_contacts = { "112": data.call_112.value, "115": data.call_115.value, "118": data.call_118.value }
-              if (data.jewel1ID.value != '')
-                this.sharedData.user_data.paired_devices.push(data.jewel1ID.value)
-              if (data.jewel2ID.value != '')
-                this.sharedData.user_data.paired_devices.push(data.jewel2ID.value)
-              this.sharedData.user_data.pin = data.pin.value
-              this.sharedData.user_data.purpose = data.purpose.value
-              console.log(this.sharedData.user_data.paired_devices)
-              this.sharedData.old_user_data=Object.assign(this.sharedData.user_data);
+              this.sharedData.old_user_data = JSON.parse(JSON.stringify(this.sharedData.user_data))
               //this.bluetoothService.enableAllUserBeaconFromSnap4City();
               this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
-            }, err => alert(err))
-            this.sharedData.loadDataUser(true).then((result) => {
-              console.log('result ' + result)
-
-            });
+            }, err => {
+              console.log(err)
+              if (err.status == '401' || err.status == '404') {
+                this.router.navigateByUrl('/signup', { replaceUrl: true })
+              }
+            })
+            // this.sharedData.loadDataUser(true).then((result) => {
+            //   console.log('result ' + result)
+            // });
           }
         }, async (err) => {
-          console.log(err)
+          console.log('Orrore ' + err)
           await loading.dismiss()
         });
       } catch (e) {
@@ -117,25 +118,13 @@ export class LoginPage implements OnInit {
       }
     }
     else {
-      this.authService.login(this.credentials.value).subscribe(
-        async (res) => {
-          this.sharedData.loadDataUser(true).then((result) => {
-            console.log('result ' + result)
-            this.bluetoothService.enableAllUserBeacon();
-            this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
-          });
-          await loading.dismiss();
-        },
-        async (res) => {
-          await loading.dismiss();
-          const alert = await this.alertController.create({
-            header: 'Login failed',
-            message: res.error.error,
-            buttons: ['OK'],
-          });
-          await alert.present();
-        }
-      );
+      this.sharedData.loadDataUser(true).then(async (result) => {
+        console.log('result ' + result)
+        this.authService.isAuthenticated.next(true)
+        this.bluetoothService.enableAllUserBeacon();
+        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
+        await loading.dismiss();
+      })
     }
   }
   // Easy access for form fields
