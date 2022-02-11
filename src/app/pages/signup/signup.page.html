@@ -98,6 +98,10 @@
                 matTooltip="Use to cancel emergency call">
             </mat-form-field>
             <mat-form-field appearance="fill">
+              <mat-label>Native language</mat-label>
+              <input matInput formControlName="language" placeholder="english" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
               <mat-label>Address</mat-label>
               <input matInput formControlName="address" placeholder="" required>
             </mat-form-field>
@@ -124,16 +128,16 @@
           <div class="tablet_view">
             <mat-form-field appearance="fill" hintLabel="Max 200 characters">
               <mat-label>Allergies</mat-label>
-              <textarea #allergies matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
+              <textarea required #allergies matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
                 cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="pollen,Insect stings..."
                 formControlName="allergies"></textarea>
               <mat-hint align="end">{{allergies.value?.length || 0}}/200</mat-hint>
             </mat-form-field>
             <mat-card appearance="fill" id="matcardResize">
               <mat-card-title>Disabilities</mat-card-title>
-              <mat-checkbox [checked]="this.shared_data.user_data.disabilities[0]">Vision impaired
+              <mat-checkbox formControlName="visionImpaired">Vision impaired
               </mat-checkbox><br>
-              <mat-checkbox [checked]="this.shared_data.user_data.disabilities[1]">Wheelchair user
+              <mat-checkbox formControlName="wheelchairUser">Wheelchair user
               </mat-checkbox>
             </mat-card>
             <mat-form-field appearance="fill" hintLabel="Max 200 characters">
@@ -199,28 +203,28 @@
         <form id="public_contacts" [formGroup]="fourthFormGroup">
           <div class="tablet_view">
             <mat-card appearance="fill" style="width: fit-content;">
-              <mat-card-content style="display: flex; flex-direction: column; width: fit-content;">
+              <mat-card-content style="display: flex; flex-direction: column; width: fit-content; align-items: center;">
                 <mat-label>Would you like to contact the following numbers?</mat-label>
                 <mat-label>(without direct responsibility)</mat-label>
                 <mat-form-field appearance="fill">
                   <mat-label>Call 112</mat-label>
-                  <mat-select formControlName="call_112" required>
-                    <mat-option value="true">Yes</mat-option>
-                    <mat-option value="false">No</mat-option>
+                  <mat-select formControlName="112" required>
+                    <mat-option [value]=true>Yes</mat-option>
+                    <mat-option [value]=false>No</mat-option>
                   </mat-select>
                 </mat-form-field>
                 <mat-form-field appearance="fill">
                   <mat-label>Call 115</mat-label>
-                  <mat-select formControlName="call_115" required>
-                    <mat-option value="true">Yes</mat-option>
-                    <mat-option value="false">No</mat-option>
+                  <mat-select formControlName="115" required>
+                    <mat-option [value]=true>Yes</mat-option>
+                    <mat-option [value]=false>No</mat-option>
                   </mat-select>
                 </mat-form-field>
                 <mat-form-field appearance="fill">
                   <mat-label>Call 118</mat-label>
-                  <mat-select formControlName="call_118" required>
-                    <mat-option value="true">Yes</mat-option>
-                    <mat-option value="false">No</mat-option>
+                  <mat-select formControlName="118" required>
+                    <mat-option [value]=true>Yes</mat-option>
+                    <mat-option [value]=false>No</mat-option>
                   </mat-select>
                 </mat-form-field>
               </mat-card-content>
@@ -276,7 +280,9 @@
       </mat-card>
       <div class="tablet_view" style="justify-content: center;">
         <button mat-button matStepperPrevious>Back</button>
-        <button mat-button (click)="register_user()">Done</button>
+        <button *ngIf="!this.authService.isAuthenticated.getValue()" mat-button (click)="register_user()">Register</button>
+        <button *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">Done</button>
+
       </div>
       <!-- </ng-template> -->
     </mat-step>
