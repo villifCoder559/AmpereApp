@@ -7,15 +7,15 @@
         </mat-card-header>
         <mat-form-field appearance="fill">
           <mat-label>Name</mat-label>
-          <input matInput maxlength="20" formControlName="contactName" placeholder="">
+          <input matInput maxlength="20" required formControlName="contactName" placeholder="">
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Surname</mat-label>
-          <input matInput maxlength="20" formControlName="contactSurname" placeholder="">
+          <input matInput maxlength="20" required formControlName="contactSurname" placeholder="">
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Phone number</mat-label>
-          <input type="tel" matInput maxlength="15" formControlName="contactNumber" placeholder="">
+          <input type="tel" matInput maxlength="15" required formControlName="contactNumber" placeholder="">
         </mat-form-field>
         <div class="container-button">
           <button style="display: flex;" mat-raised-button (click)="openDialogFromContacts()">Import</button>

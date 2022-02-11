@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Emergency_Contact, SharedDataService } from '../../../data/shared-data.service';
 import { DialogExampleComponent } from '../dialog-example/dialog-example.component'
+import { SpecialCharValidator } from '../signup.page';
 
 @Component({
   selector: 'app-dialog-add-emergency-contact',
@@ -11,9 +12,9 @@ import { DialogExampleComponent } from '../dialog-example/dialog-example.compone
 })
 export class DialogAddEmergencyContactComponent implements OnInit {
   contactCard = this._formBuilder.group({
-    contactName: ['', Validators.required],
-    contactSurname: ['', Validators.required],
-    contactNumber: ['', [Validators.required, Validators.minLength(7), Validators.pattern('[- +()0-9]+')]]
+    contactName: ['', Validators.compose([Validators.required,SpecialCharValidator.specialCharValidator])],
+    contactSurname: ['', Validators.compose([Validators.required,SpecialCharValidator.specialCharValidator])],
+    contactNumber: ['', Validators.compose([SpecialCharValidator.specialCharValidator,Validators.required, Validators.minLength(7), Validators.pattern('[- + 0-9]+')])]
   });
   contact = {
     name: '',
