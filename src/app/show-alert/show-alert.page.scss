@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 .box{
     width: 40px;
@@ -38,4 +39,7 @@
     font-weight: bold;
     padding: 20px;
 }
-
+.immediate_emergency{
+    display: flex;
+    justify-content: center;
+}
