@@ -52,7 +52,7 @@ export class Emergency_Contact {
   save data */
 export enum FakeKeycloak {
   token = '',
-  refresh_token=''
+  refresh_token = ''
 }
 export enum typeChecking {
   NFC_CODE = 'nfc_code',
@@ -64,7 +64,7 @@ export enum typeChecking {
 }
 export enum DeviceType {
   ALERT_EVENT = 'AmpereEvent',
-  QR_NFC_EVENT = 'QR-NFC-Event	',
+  QR_NFC_EVENT = 'QR-NFC-Event',
   DICTIONARY = 'QRNFCDictionary',
   PROFILE = 'Profile'
 }
@@ -90,13 +90,15 @@ export class UserData {
   pin: string = ''
   allergies: string = ''
   medications: string = ''
-  disabilities = [false, false] /**[visionImapired,wheelchairUser] */
-  emergency_contacts: Array<Emergency_Contact> = []
+  disabilities = { visionImpaired: false, wheelchairUser: false } /**[visionImapired,wheelchairUser] */
+  emergency_contacts = []
   public_emergency_contacts = { 112: false, 115: false, 118: false }
   paired_devices = []
   qr_code = []
   nfc_code = []
+  status = 'active'
   constructor() { }
+
 }
 export class AlertEvent {
   latitude: number = 0.0
@@ -124,11 +126,10 @@ export class QRNFCEvent {
   providedIn: 'root'
 })
 export class SharedDataService {
-  old_user_data;
+  old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   gps_enable = false;
   constructor(private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
-    //console.log('contructor')
     this.storage.create();
     this.platform.ready().then(() => {
       this.enableAllBackgroundMode();
@@ -177,7 +178,8 @@ export class SharedDataService {
             this.user_data.dateofborn = '1950-08-09'
             this.user_data.city = 'Florence'
             this.user_data.description = 'brownHairBlueEyes' //no spaces
-            this.user_data.disabilities = [false, true] // vision,wheelchair
+            this.user_data.disabilities.visionImpaired = false
+            this.user_data.disabilities.wheelchairUser = true // vision,wheelchair
             this.user_data.email = 'email@mail.com' // no @
             this.user_data.emergency_contacts = [new Emergency_Contact('Paul', 'Rid', '785232145202')]
             this.user_data.ethnicity = 'white'
@@ -195,6 +197,7 @@ export class SharedDataService {
             this.user_data.purpose = 'PersonalSafety'
             this.user_data.qr_code = [qr_code]
             this.user_data.nfc_code = [nfc_code];
+            this.old_user_data = JSON.parse(JSON.stringify(this.user_data))
             resolve(false)
           }
         }, err => console.log(err));
@@ -226,10 +229,29 @@ export class SharedDataService {
     console.log(this.user_data[type])
     var ok = false;
     this.user_data[type].forEach(element => {
-      console.log(parseInt(element.id) == id)
-      if (parseInt(element.id) == id)
-        return ok = true
+      console.log(parseInt(element))
+      console.log(id)
+      console.log(parseInt(element) == id)
+      if (parseInt(element) == id)
+        ok = true
     });
     return ok;
+  }
+  textFromClientToServer() {
+    var data = Object.assign(this.user_data)
+    Object.keys(data).forEach(element => {
+      this.user_data[element].toString().replace(' ', '_');
+      if (element == 'email')
+        this.user_data[element].toString().replace('@', '|')
+    })
+    //console.log(data)
+    return data;
+  }
+  textFromServerToClient(data) {
+    Object.keys(data).forEach(element => {
+      this.user_data[element].toString().replace('_', ' ');
+      if (element == 'email')
+        this.user_data[element].toString().replace('|', '@');
+    })
   }
 }
