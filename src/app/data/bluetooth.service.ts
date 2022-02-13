@@ -56,10 +56,12 @@ export class BluetoothService {
       return ('0' + (byte & 0xFF).toString(16)).slice(-2);
     }).join('')
   }
-  connectDevice(id) { //major->1 minor->2
+  connectDevice(device) { //major->1 minor->2
+    console.log('DEVICE CONNECTION...')
+    console.log(device)
     return new Promise((resolve, reject) => {
       this.ble.stopScan();
-      this.ble.connect(id).subscribe((peripheralData) => {
+      this.ble.connect(device.id).subscribe((peripheralData) => {
         console.log(peripheralData)
         console.log('enable connection')
         console.log('HEX DATA')
@@ -75,7 +77,7 @@ export class BluetoothService {
         // var major = parseInt('' + hex[50] + hex[51] + hex[52] + hex[53])
         // var minor = parseInt('' + hex[54] + hex[55] + hex[56] + hex[57])
         this.startRegisterBeacon(uuid);
-        console.log(id)
+        console.log(device)
         resolve(uuid)
         // this.addPairedDeviceANDregister(uuid)
         // this.ble.autoConnect(peripheralData.id, () => {
