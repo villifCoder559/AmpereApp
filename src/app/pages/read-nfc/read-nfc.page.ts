@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NFC, Ndef } from '@ionic-native/nfc/ngx'
 import { Platform, ToastController } from '@ionic/angular';
-import { NFCCode, QRNFCEvent, SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
+import { DeviceType, NFCCode, QRNFCEvent, SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
 import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
+import { Snap4CityService } from 'src/app/data/snap4-city.service';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-read-nfc',
@@ -14,7 +16,7 @@ export class ReadNFCPage implements OnInit {
   NFC_data = '';
   NFC_enable = false;
   scannedCode = null;
-  constructor(private NGSIv2Query: NGSIv2QUERYService, public sharedData: SharedDataService, private toastCtrl: ToastController, private nfc: NFC, private ndef: Ndef, private platform: Platform) {
+  constructor(private s4c: Snap4CityService, private NGSIv2Query: NGSIv2QUERYService, public sharedData: SharedDataService, private toastCtrl: ToastController, private nfc: NFC, private ndef: Ndef, private platform: Platform) {
     console.log(this.sharedData.user_data)
   }
   addNFC() {
@@ -27,7 +29,7 @@ export class ReadNFCPage implements OnInit {
     }, err => this.create_message('Error :' + err))
     async () => {
       this.sharedData.user_data.nfc_code.forEach((element) => {
-        this.NGSIv2Query.getEntity('QRNFCDictionary' + element.id,'DictionaryOfQRNFC').then((data: any) => {
+        this.NGSIv2Query.getEntity('QRNFCDictionary' + element.id, 'DictionaryOfQRNFC').then((data: any) => {
           if (data.QRIDorNFC.toUpperCase() == 'NFC') {
             this.sharedData.user_data.nfc_code[data.identifier].action = data.action;
           }
@@ -47,12 +49,16 @@ export class ReadNFCPage implements OnInit {
           if (!isNaN(id)) {
             if (this.sharedData.checkIDValidityNFCorQR(typeChecking.NFC_CODE, id)) {
               this.sharedData.createToast('Valid NFC');
-              this.NGSIv2Query.getEntity('QRNFCDictionary' + id,'QRNFCDictionary').then((response: any) => {
-                var action: string = response.action;
-                this.NGSIv2Query.sendQRNFCEvent(new QRNFCEvent('NFC',action, response.identifier));
-                window.open(action);
+              this.NGSIv2Query.getEntity('QRNFCDictionary' + id, 'QRNFCDictionary').then((response: any) => {
+                var action: string = response.action.value;
+                this.s4c.createDevice(DeviceType.QR_NFC_EVENT).then(() => {
+                  this.NGSIv2Query.sendQRNFCEvent(new QRNFCEvent('NFC', action, response.identifier.value));
+                  window.open('https://' + action, '_system', 'location=yes')
+                }, err => {
+                  console.log(err);
+                })
               }, (err) => {
-                alert(err);
+                alert(err.msg);
               })
             }
             else {
@@ -72,7 +78,7 @@ export class ReadNFCPage implements OnInit {
         let tag = await this.nfc.scanNdef();
         this.scannedCode = JSON.stringify(tag);
       } catch (err) {
-        alert('Error reading tag ' + err);
+        alert('Error reading tag ' + err.msg);
       }
     }
   }
