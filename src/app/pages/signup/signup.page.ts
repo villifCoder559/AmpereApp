@@ -26,7 +26,7 @@ import { BluetoothService } from '../../data/bluetooth.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
 import { AuthenticationService } from '../../services/authentication.service'
 import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
-
+import { LoadingController } from '@ionic/angular';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -81,8 +81,6 @@ export class SignupPage implements OnInit {
   constructor(private platform: Platform, public authService: AuthenticationService, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     console.log('From signup')
     console.log(this.shared_data.user_data)
-    // this.stepperOrientation = breakpointObserver.observe('(min-width: 1000px)')
-    //   .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
   }
   findErrorsAllFormsGroup() {
     console.log(this.arrayFormGroup.length)
@@ -158,42 +156,6 @@ export class SignupPage implements OnInit {
           this.router.navigateByUrl('/signup', { replaceUrl: true })
         }
       })
-      // console.log('data from signup')
-      // console.log(this.shared_data.user_data)
-      // //this.firstFormGroup.get('email').setValue(this.shared_data.user_data.email)
-      // this.firstFormGroup.setValue({
-      //   name: this.shared_data.user_data.name,
-      //   surname: this.shared_data.user_data.surname,
-      //   nickname: this.shared_data.user_data.nickname,
-      //   email: this.shared_data.user_data.email,
-      //   phoneNumber: this.shared_data.user_data.phoneNumber,
-      //   dateofborn: this.shared_data.user_data.dateofborn,
-      //   gender: this.shared_data.user_data.gender,
-      //   address: this.shared_data.user_data.address,
-      //   locality: this.shared_data.user_data.locality,
-      //   city: this.shared_data.user_data.city,
-      //   height: this.shared_data.user_data.height,
-      //   weight: this.shared_data.user_data.weight,
-      //   ethnicity: this.shared_data.user_data.ethnicity,
-      //   description: this.shared_data.user_data.description,
-      //   purpose: this.shared_data.user_data.purpose,
-      //   pin: this.shared_data.user_data.pin,
-      //   language: this.shared_data.user_data.language
-      // });
-      // // this.user_data.disabilities saved thanks toogle_checkbox(i)
-      // this.secondFormGroup.setValue({
-      //   allergies: this.shared_data.user_data.allergies,
-      //   medications: this.shared_data.user_data.medications,
-      //   visionImpaired: this.shared_data.user_data.disabilities.visionImpaired,
-      //   wheelchairUser: this.shared_data.user_data.disabilities.wheelchairUser
-      // })
-      // this.fourthFormGroup.setValue({
-      //   112: this.shared_data.user_data.public_emergency_contacts[112],
-      //   115: this.shared_data.user_data.public_emergency_contacts[115],
-      //   118: this.shared_data.user_data.public_emergency_contacts[118]
-      // })
-      // //this.fourthFormGroup.updateValueAndValidity()
-      // console.log(this.shared_data.user_data.paired_devices)
       this.changeDetection.detectChanges();
       var index = this.router.getCurrentNavigation().extras.state?.page;
       if (this.router.getCurrentNavigation().extras.state?.page) {
@@ -281,7 +243,6 @@ export class SignupPage implements OnInit {
           index: index
         }
       });
-
       dialogRef.afterClosed().subscribe(result => {
         //console.log(result);
         var old_contacts = Object.assign(this.shared_data.user_data.emergency_contacts);
@@ -428,7 +389,7 @@ export class SignupPage implements OnInit {
         }
         case 'public_emergency_contacts': {
           Object.keys(this.shared_data.user_data[element]).forEach((number) => {
-            this.fourthFormGroup.get(number).setValue(this.shared_data.user_data[element][number]);
+            this.fourthFormGroup.get(number).setValue(this.shared_data.user_data[element][number] === 'true' ? true : false);
           })
           break;
         }
