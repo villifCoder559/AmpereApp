@@ -55,7 +55,7 @@
       <mat-grid-tile  [colspan]="1" [rowspan]="1">
         <button id="QR" mat-raised-button class="buttons" routerLink="/profile/menu/read-qr">
           <div class="homepage_button_content">
-            <ion-icon name="qr-code-outline"></ion-icon>
+            <mat-icon>qr_code_2</mat-icon>
             <h3>QR</h3>
           </div>
         </button>
@@ -71,7 +71,7 @@
       <mat-grid-tile [colspan]="2" [rowspan]="1">
         <button id="emergency" mat-raised-button class="buttons" (click)="openAlertPage()">
           <div class="homepage_button_content">
-            <ion-icon name="notifications-outline"></ion-icon>
+            <mat-icon>notifications</mat-icon>
             <h3>Emergency</h3>
           </div>
         </button>
@@ -79,7 +79,7 @@
       <mat-grid-tile [colspan]="1" [rowspan]="1">
         <button mat-raised-button class="buttons" routerLink="/profile/menu/profile">
           <div class="homepage_button_content">
-            <ion-icon name="person-outline"></ion-icon>
+            <mat-icon>person</mat-icon>
             <h3>Profile</h3>
           </div>
         </button>
@@ -87,7 +87,7 @@
       <mat-grid-tile [colspan]="1" [rowspan]="1" >
         <button mat-raised-button class="buttons " routerLink="/profile/menu/faq">
           <div class="homepage_button_content">
-            <ion-icon name="help-outline"></ion-icon>
+            <mat-icon>help</mat-icon>
             <h3>FAQ</h3>
           </div>
         </button>
@@ -97,7 +97,7 @@
   </mat-grid-list>
   <button mat-raised-button (click)="createDeviceFromModel()">createDeviceFromModel</button>
   <button mat-raised-button (click)="getInsertDataS4C()">GetPayload</button>
-  <button mat-raised-button (click)="sendUserProfile()">SendUserProfile</button>
+  <button mat-raised-button (click)="SendEventQRNFC()">SendEventQRNFC</button>
   <button mat-raised-button (click)="testWriteQuery()">Test Write</button> 
   <!-- <div *ngIf="!gps_enable" class="alert-msg">
     Localization is not enable!
