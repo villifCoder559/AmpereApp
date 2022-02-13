@@ -19,16 +19,13 @@
       <mat-card appearance="fill" id="bluetooth" class="custom_mat_card">
         <div class="title_list_Code">
           <mat-card-title>List of yours NFCs</mat-card-title>
-          <button mat-mini-fab color="primary" (click)="addNFC()">
-            <mat-icon class="resizeIcon">add</mat-icon>
-          </button>
         </div>
         <div>
           <ion-list *ngFor="let item of this.sharedData.user_data.nfc_code;let i=index;">
             <ion-item-sliding>
               <ion-item *ngIf="item.id !=-1" class="ion-no-padding" id="item{{i}}">
                 <ion-label class="label" class="label_code">
-                  <h3>{{item.action}}</h3>
+                  <h3>{{item}}</h3>
                 </ion-label>
               </ion-item>
               <ion-item-options side="end" (ionSwipe)="delete(item,i)">
