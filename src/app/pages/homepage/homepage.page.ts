@@ -6,9 +6,10 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 //import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
-import { DeviceType, SharedDataService } from '../../data/shared-data.service'
+import { DeviceType, QRNFCEvent, SharedDataService } from '../../data/shared-data.service'
 import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-homepage',
@@ -40,7 +41,7 @@ import { Snap4CityService } from '../../data/snap4-city.service'
   */
 export class HomepagePage implements OnInit {
   gps_enable = true;
-  constructor(private s4c:Snap4CityService,private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
       this.localNotifications.hasPermission().then(result => {
         if (!result.valueOf())
@@ -50,7 +51,7 @@ export class HomepagePage implements OnInit {
     }, (err) => console.log(err))
   }
   ngOnInit() {
-    
+
   }
   enableGPS() {
     this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
@@ -104,28 +105,51 @@ export class HomepagePage implements OnInit {
     }, (err) => console.log(err))
   }
   testAPIEntry() {
-    this.ngsi.getEntity('Profile',"Profile").then((result:any) => {
-      console.log(result)
-      console.log(result.address.value)
-    }, (err) => console.log(err))
+    return new Promise((resolve, reject) => {
+      this.http.get("https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/ampereuser1Profile" + "?elementid=" + 'ampereuser1Profile' + "&type=" + 'Profile', { observe: "response" })
+        .subscribe((result) => {
+          console.log(result)
+          resolve(result)
+        }, (err) => {
+          console.log(err.status)
+          reject(err)
+        })
+    })
+    // this.ngsi.getEntity(DeviceType.PROFILE, DeviceType.PROFILE).then((result: any) => {
+    //   console.log(result)
+    //   console.log(result.address.value)
+    // }, (err) => console.log(err))
   }
   testWriteQuery() {
     this.ngsi.testWriteAPI('QR-NFC-Event').then((result) => {
       console.log(result)
     }, (err) => console.log(err))
   }
-  openAlertPage(){
+  openAlertPage() {
     this.router.navigateByUrl('/show-alert', { replaceUrl: true })
   }
-  openWebPage(){
+  openWebPage() {
     window.open('www.google.com')
   }
-  createDevice(){
-    this.s4c.createDevice(DeviceType.PROFILE);
+  createDeviceFromModel() {
+    //this.s4c.createDeviceFromModel();
   }
-  getInsertDataS4C(){
-    console.log(this.s4c.getUserIDPayload());
+  getProfile() {
+    this.ngsi.getEntityHTTP(DeviceType.PROFILE, DeviceType.PROFILE).then((result) => {
+      console.log(result)
+    }, err => { })
+  }
+  getInsertDataS4C() {
+    console.log(this.s4c.getUserIDPayload(false));
     console.log(this.s4c.getAlertEventPayload())
     console.log(this.s4c.getQRNFCEventPayload())
+  }
+  sendUserProfile() {
+    this.ngsi.sendUserProfile().then(() => {
+      console.log('OK')
+    }, err => console.log(err))
+  }
+  SendEventQRNFC() {
+    var attr = this.ngsi.sendQRNFCEvent(new QRNFCEvent('','',''))
   }
 }
