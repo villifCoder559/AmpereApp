@@ -52,36 +52,26 @@ export class AuthenticationService {
       this.keycloak.init({
         onLoad: 'login-required',
         adapter: 'cordova'
-      }).then((autentication) => {
-        //console.log('autentication')
-        //console.log(autentication)
-        // this.keycloak.updateToken(30).then((result) => {
-        //   console.log('Token successfully refreshed')
-        //   console.log(this.keycloak.refreshToken)
-        // }, (err) => {
-        //   console.log(err)
-        // })
-        if (autentication) {
-          //this.isAuthenticated.next(true);
-          this.keycloak.loadUserProfile().then((info: any) => {
-            this.shareData.user_data.id = info.username;
-            console.log(this.shareData.user_data.id)
-            console.log('token ' + this.keycloak.token)
-            console.log('refresh_token ' + this.keycloak.refreshToken) //Use this token!
-            resolve(true);
-          })
-        }
-        else
-          this.keycloak.login().then((value) => {
-            //this.isAuthenticated.next(true)
-            console.log('authenticated else!');
-            console.log(value)
-            resolve(true)
-          });
-      }, (err) => {
-        alert(err);
-        reject(false)
       })
+        .then((autentication) => {
+          if (autentication) {
+            this.keycloak.loadUserProfile().then((info: any) => {
+              this.shareData.user_data.id = info.username;
+              console.log(this.shareData.user_data.id)
+              console.log('token ' + this.keycloak.token)
+              resolve(true);
+            })
+          }
+          else
+            this.keycloak.login().then((value) => {
+              console.log('authenticated else!');
+              console.log(value)
+              resolve(true)
+            });
+        }, (err) => {
+          alert(err);
+          reject(false)
+        })
     })
   }
   logout() {
