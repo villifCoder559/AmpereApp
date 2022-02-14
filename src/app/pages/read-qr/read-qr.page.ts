@@ -56,7 +56,7 @@ export class ReadQRPage implements OnInit {
             console.log(isNaN(id))
             if (!isNaN(id)) {
               this.readURLFromServer(id).then(() => {
-                //resolve(true)
+                
               }, err => alert(err.msg))
             }
             else
@@ -79,24 +79,27 @@ export class ReadQRPage implements OnInit {
   readURLFromServer(id) {
     return new Promise((resolve, reject) => {
       if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, id)) {
-        this.sharedData.createToast('Valid QR. Sending request...')
+        this.sharedData.presentLoading('Getting info from server')
         this.NGSIv2Query.getEntity('QRNFCDictionary' + id, 'DictionaryOfQRNFC').then((response: any) => {
+          var event=new QRNFCEvent('QR', response.identifier.value, action);
           var action: string = response.action.value;
-          var identifier_event = (Math.floor(new Date().getTime() / 1000)).toString() //seconds
+          var identifier_event = (Math.floor(new Date(event.dateObserved).getTime() / 1000)).toString() //seconds
           console.log(identifier_event)
           this.s4c.createDevice(DeviceType.QR_NFC_EVENT, identifier_event).then(() => {//gestione numerazione device quando creo eventi
-            this.NGSIv2Query.sendQRNFCEvent(new QRNFCEvent('QR', response.identifier.value, action), identifier_event)
+            this.sharedData.dismissLoading();
+            this.NGSIv2Query.sendQRNFCEvent(event, identifier_event)
             this.scannedCode = action;
             console.log(action);
             window.open('https://' + action, '_system', 'location=yes')
             resolve(true);
           }, (err) => {
+            this.sharedData.dismissLoading();
             console.log(err)
             reject(err)
           })
         }, (err) => {
-          alert(err);
-          resolve(err);
+          this.sharedData.dismissLoading()
+          reject(err);
         })
       }
       else {
