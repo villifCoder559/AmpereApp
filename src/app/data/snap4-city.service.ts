@@ -42,19 +42,12 @@ export class Snap4CityService {
       })
     })
   }
-  createDevice(type: DeviceType, name = '') {
+  createDevice(type: DeviceType, name = '',lat=42,long=12) {
     return new Promise((resolve, reject) => {
       console.log('CREATION')
       console.log(type)
       var attr = this.getAttributesPayload(type);
-      console.log(attr)
-      var lat = 42;
-      var long = 12;
-      if (attr['latitude'] != undefined && attr['longitude'] != undefined) {
-        lat = attr['latitude'];
-        long = attr['longitude'];
-      }
-      attr.push(this.createDateTimeField())
+      console.log(JSON.stringify(attr))
       var device_id = this.shared_data.user_data.id + type + name;
       console.log('NAME')
       console.log(device_id)
@@ -90,7 +83,7 @@ export class Snap4CityService {
             }, err => reject(err))
           }
           else {
-            console.log('error change visibility')
+            console.log('error create device')
             reject(mydata)
           }
         },
@@ -173,12 +166,27 @@ export class Snap4CityService {
       healthiness_value: 300
     }
   }
-  getAlertEventPayload() {
-    var newEvent = [];
-    Object.keys(new AlertEvent()).forEach((element) => {
-      newEvent[element] = this.createField(element, null)
+  getAlertEventPayload(createDevice = true, event = new AlertEvent()) {
+    var newEvent;
+    if (createDevice)
+      newEvent = [];
+    else
+      newEvent = {};
+    Object.keys(event).forEach((element) => {
+      if (element != 'latitude' && element != 'longitude')
+        if (createDevice)
+          if (element != 'dateObserved')
+            newEvent.push(this.createField(element, null))
+          else
+            newEvent.push(this.createDateTimeField());
+        else {
+          var newValue: any = event[element].toString();
+          newEvent[element] = { value: newValue }
+        }
     })
-    return newEvent
+    console.log('newEvent');
+    console.log(newEvent)
+    return newEvent;
   }
   getUserIDPayload(createDevice = true) {
     console.log(createDevice)
@@ -190,6 +198,13 @@ export class Snap4CityService {
     Object.keys(this.shared_data.user_data).forEach((field_name) => {
       switch (field_name) {
         case 'id': {
+          break;
+        }
+        case 'dateObserved': {
+          if (createDevice)
+            newUser.push(this.createDateTimeField())
+          else
+            newUser[field_name] = { value: this.shared_data.user_data.dateObserved }
           break;
         }
         case typeChecking.EMERGENCY_CONTACTS: {
@@ -272,7 +287,10 @@ export class Snap4CityService {
       newQRNFCEvent = {};
     Object.keys(event).forEach((element) => {
       if (createDevice)
-        newQRNFCEvent.push(this.createField(element, null))
+        if (element != 'dateObserved')
+          newQRNFCEvent.push(this.createField(element, null))
+        else
+          newQRNFCEvent.push(this.createDateTimeField());
       else
         newQRNFCEvent[element] = { value: event[element] }
     })
