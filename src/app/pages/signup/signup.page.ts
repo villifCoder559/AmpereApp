@@ -285,17 +285,21 @@ export class SignupPage implements OnInit {
       }, err => (console.log(err)));
     }
     else
-      this.shared_data.createToast('You have already 2 paired devices!');
+      this.shared_data.createToast('You have already paired 2 devices!');
   };
   addPairedDeviceANDregister(device) {
     var indexOf = this.shared_data.user_data.paired_devices.indexOf(device);
+    this.shared_data.user_data.paired_devices.push(device);
+    console.log(this.shared_data.user_data.paired_devices.length)
     if (indexOf == -1) {
       var attr = {}
-      attr['jewel' + this.shared_data.user_data.paired_devices.length + 'ID'] = device
+      attr['jewel' + this.shared_data.user_data.paired_devices.length + 'ID'] = { value: device }
       this.NGSIv2QUERY.updateEntity(attr, DeviceType.PROFILE).then(() => {
-        this.shared_data.user_data.paired_devices.push(device);
-        alert('Device registered correctly')
-      }, (err) => alert(err))
+        this.shared_data.createToast('Device registered correctly');
+      }, (err) => {
+        this.shared_data.user_data.paired_devices.pop();
+        alert(err + '. Device not corretly connected!');
+      })
     }
     else
       alert('Device already registred')
@@ -381,7 +385,7 @@ export class SignupPage implements OnInit {
     Object.keys(this.shared_data.user_data).forEach((element) => {
       console.log(element)
       switch (element) {
-        case 'id': case 'emergency_contacts': case 'paired_devices': case 'qr_code': case 'nfc_code': case 'status':
+        case 'id': case 'dateObserved': case 'emergency_contacts': case 'paired_devices': case 'qr_code': case 'nfc_code': case 'status':
           break;
         case 'allergies': case 'medications': {
           this.secondFormGroup.get(element).setValue(this.shared_data.user_data[element])
@@ -408,6 +412,7 @@ export class SignupPage implements OnInit {
     //conyrollo
     // console.log(this.zeroFormGroup.errors);
     // console.log(this.getFormValidationErrors(this.zeroFormGroup))
+    this.shared_data.user_data.dateObserved = new Date().toISOString();
     var error = this.findErrorsAllFormsGroup();
     console.log('OLD DATA')
     console.log(this.shared_data.old_user_data)
@@ -416,8 +421,10 @@ export class SignupPage implements OnInit {
     if (!error) {      //check if changes it is registred in db
       this.getAllDataFromForm();
       console.log(this.shared_data.user_data)
+      this.shared_data.presentLoading('Updating server')
       this.NGSIv2QUERY.sendUserProfile().then((value) => {
         this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
+        this.shared_data.dismissLoading();
         this.shared_data.createToast('Data updated!');
       }, (err) => {
         console.log(this.shared_data.old_user_data)
@@ -425,8 +432,9 @@ export class SignupPage implements OnInit {
         console.log('AFTER OBJECT')
         console.log(this.shared_data.user_data)
         this.setAllFromData();
-        this.changeDetection.detectChanges()
-        alert('Error ' + err + '. Recovered old data available')
+        this.changeDetection.detectChanges();
+        this.shared_data.dismissLoading();
+        this.shared_data.createToast('Error ' + err + '. Recovered old data available')
       })
       // this.NGSIv2QUERY.sendUserProfile(new Date().toISOString()).then((value) => {
       //   this.getAllDataFromForm();
@@ -457,24 +465,35 @@ export class SignupPage implements OnInit {
   register_user() {
     // var error = this.findErrorsAllFormsGroup();
     // if (!error)
-    if (this.shared_data.user_data.paired_devices.length > -1) {
+    if (this.shared_data.user_data.paired_devices.length > -1) {//FIX >0
       this.getAllDataFromForm();
       console.log(this.shared_data.user_data)
+      this.shared_data.presentLoading('Creating user')
       this.snap4CityService.createDevice(DeviceType.PROFILE).then(() => {
-        console.log('Device created')
+        console.log('DEVICE CRATED')
+        this.shared_data.user_data.dateObserved = new Date().toISOString();
         this.NGSIv2QUERY.sendUserProfile().then(() => {
+          this.shared_data.dismissLoading();
           this.shared_data.createToast('Successfully registered')
           this.authService.isAuthenticated.next(true);
           this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
           this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true })
-        }, (err) => console.log(err))
+        }, (err) => {
+          console.log('DELETING_DEVICE')
+          this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
+            console.log('Device deleted')
+          }, err => console.log(err))
+          this.shared_data.dismissLoading();
+          alert(err.msg)
+        })
       }, err => {
-        console.log(err)
+        console.log('DELETING_DEVICE')
         this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
           console.log('Device deleted')
         }, err => console.log(err))
+        this.shared_data.dismissLoading();
+        alert(err.msg)
       })
-
     }
     else
       this.shared_data.createToast('You must pair at least one device!')
