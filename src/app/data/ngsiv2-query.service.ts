@@ -15,7 +15,7 @@ export class NGSIv2QUERYService {
   sendQRNFCEvent(qrnfc_event: QRNFCEvent, name = '') {
     var id = this.shared_data.user_data.id;
     var attrs: any = this.s4c.getQRNFCEventPayload(false, qrnfc_event);
-    attrs.dateObserved = { value: new Date().toISOString() }
+    //attrs.dateObserved = { value: new Date().toISOString() }
     console.log(attrs)
     $.ajax({
       url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + id + DeviceType.QR_NFC_EVENT + name + "/attrs?elementid=" + id + DeviceType.QR_NFC_EVENT + name + "&type=" + DeviceType.QR_NFC_EVENT,
@@ -90,22 +90,24 @@ export class NGSIv2QUERYService {
       });
     })
   }
-  sendEvent(details_emergency) {
+  sendAlertEvent(details_emergency) {
     return new Promise((resolve, reject) => {
       var username = this.shared_data.user_data.id;
-      var JSONdetails = JSON.stringify(details_emergency);
+      var attr = this.s4c.getAlertEventPayload(false, details_emergency);
+      var name = Math.floor(new Date(details_emergency.dateObserved).getTime() / 1000).toString();
+      //attr.dateObserved=new Date().toISOString();
       $.ajax({
-        url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + username + "Event" + details_emergency.dateObserved + "/attrs?elementid=" + username + "Event" + details_emergency.dateObserved + "&type=Event",
+        url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + username + DeviceType.ALERT_EVENT + name + "/attrs?elementid=" + username + DeviceType.ALERT_EVENT + name + "&type=" + DeviceType.ALERT_EVENT,
         headers: {
           'Authorization': 'Bearer ' + this.authService.keycloak.token,
           'Content-Type': 'application/json'
         },
         type: "PATCH",
-        data: JSONdetails,
+        data: JSON.stringify(attr),
         async: true,
         dataType: 'json',
         success: function (mydata) {
-          if (mydata.status != 'ko') {
+          if (mydata?.status != 'ko') {
             console.log('Data')
             console.log(mydata);
             resolve(true)
@@ -137,7 +139,7 @@ export class NGSIv2QUERYService {
         async: true,
         dataType: 'json',
         success: function (mydata) {
-          if (mydata.status != 'ko') {
+          if (mydata?.status != 'ko') {
             console.log('Data')
             console.log(mydata);
             resolve(true)
