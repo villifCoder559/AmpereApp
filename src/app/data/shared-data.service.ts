@@ -1,9 +1,9 @@
 import { Injectable, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, Platform, ToastController } from '@ionic/angular';
+import { IonicModule, LoadingController, Platform, ToastController } from '@ionic/angular';
 // import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 // import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
@@ -90,6 +90,7 @@ export class UserData {
   pin: string = ''
   allergies: string = ''
   medications: string = ''
+  dateObserved = new Date().toISOString();
   disabilities = { visionImpaired: false, wheelchairUser: false } /**[visionImapired,wheelchairUser] */
   emergency_contacts = []
   public_emergency_contacts = { 112: false, 115: false, 118: false }
@@ -101,21 +102,23 @@ export class UserData {
 
 }
 export class AlertEvent {
-  latitude: number = 0.0
-  longitude: number = 0.0
-  quote: number = 0.0
-  velocity: number = 0.0
-  evolution: string = ''
-  deviceID: string = ''
-  accelX: number = 0.0
-  accelY: number = 0.0
-  accelZ: number = 0.0
-  status: number = 0
+  latitude = -1.0
+  longitude = -1.0
+  dateObserved = new Date().toISOString();
+  quote = 0.0
+  velocity = 0.0
+  evolution = 'notHandled'
+  deviceID = 0
+  accelX = 0.0
+  accelY = 0.0
+  accelZ = 0.0
+  status = 'alert'
 }
 export class QRNFCEvent {
   QRIDorNFC: string = ''
   identifier: string = ''
   action: string = ''
+  dateObserved=new Date().toISOString();
   constructor(qridNfc, id, action) {
     this.QRIDorNFC = qridNfc;
     this.identifier = id;
@@ -129,7 +132,7 @@ export class SharedDataService {
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   gps_enable = false;
-  constructor(private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.storage.create();
     this.platform.ready().then(() => {
       this.enableAllBackgroundMode();
@@ -143,6 +146,18 @@ export class SharedDataService {
       duration: 3500
     })
     toast.present();
+  }
+  loading;
+  async presentLoading(msg) {
+    this.loading = await this.loadingController.create({
+      cssClass: 'my-custom-class',
+      message: msg,
+      spinner: 'bubbles'
+    });
+    await this.loading.present();
+  }
+  async dismissLoading() {
+    this.loading.dismiss()
   }
   setUserData(data) {
     this.user_data = data
@@ -211,8 +226,12 @@ export class SharedDataService {
   // }
   showAlert(id) {
     //take bluetooth signal, create handler that takes the signal
-    this.nativeAudio.play('alert')
-    this.router.navigate(['/show-alert', { deviceId: id }], { replaceUrl: true })
+    let navigationExtras: NavigationExtras = {
+      state: { deviceID: id },
+      replaceUrl: true
+    };
+    this.nativeAudio.play('alert');
+    this.router.navigate(['/show-alert'], navigationExtras)
     //this.sendEmergency();
   }
 
