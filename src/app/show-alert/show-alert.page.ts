@@ -6,7 +6,7 @@ import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SMS } from '@ionic-native/sms/ngx';
-import { DeviceType, SharedDataService, UserData } from '../data/shared-data.service'
+import { AlertEvent, DeviceType, SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
@@ -28,22 +28,10 @@ import { Snap4CityService } from '../data/snap4-city.service'
 })
 export class ShowAlertPage implements OnInit {
   pin = ['', '', '', '']
-  details_emergency = {
-    latitude: -1000.0,
-    longitude: -1000.0,
-    dateObserved: new Date().toISOString(),
-    quote: 0.0,
-    velocity: 0.0,
-    evolution: 'notHandled',
-    deviceID: 0,
-    accelX: 0.0,
-    accelY: 0.0,
-    accelZ: 0.0,
-    status: 'alert'
-  };
+  details_emergency = new AlertEvent();
   @ViewChild('countdown', { static: false }) private countdown: CountdownComponent
   config: CountdownConfig = {
-    leftTime: 2000,
+    leftTime: 20,
     formatDate: ({ date }) => `${date / 1000}`,
     // notify: 1
   };;
@@ -57,8 +45,9 @@ export class ShowAlertPage implements OnInit {
   }
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
-      this.details_emergency.deviceID = params['id']
-    })
+      this.details_emergency.deviceID = this.router.getCurrentNavigation().extras.state.deviceID
+      console.log(this.details_emergency.deviceID)
+    }, err => console.log(err))
   }
   immediateEmergency() {
     this.countdown.left = 1;
@@ -98,7 +87,6 @@ export class ShowAlertPage implements OnInit {
             document.getElementById(i.toString()).focus();
         }
       })
-
     }
     else {
       this.presentAlert('PIN correct', 1200);
@@ -120,95 +108,73 @@ export class ShowAlertPage implements OnInit {
   }
   send_Emergency(event) {//when time is expired
     console.log(event)
-    if (event.action == 'done')
-      this.sendEmergency();
+    if (event.action == 'done') {
+      this.activateSensors().then(() => {
+        this.sendEmergency();
+      })
+    }
   }
-  private currentLocPosition() {
+  position;
+  acceleration;
+  interval
+  getPosition() {
     return new Promise((resolve, reject) => {
-      var details_emergency = {
-        latitude: 0.0,
-        longitude: 0.0,
-        dateObserved: 0,
-        quote: 0.0,
-        velocity: 0.0,
-        evolution: '',
-        deviceID: 0,
-        accellX: 0.0,
-        accellY: 0.0,
-        accellZ: 0.0,
-        status: 0
-      };
+      this.position = this.geolocation.watchPosition({ enableHighAccuracy: true }).subscribe((response: Geoposition) => {
+        if (this.interval === null)
+          this.interval = setTimeout(() => {
+            var distance = this.distance(this.details_emergency.latitude, this.details_emergency.longitude, response.coords.latitude, response.coords.longitude)
+            console.log('DISTANCE')
+            console.log(distance)
+            console.log(response)
+            if (distance > 0.05) {
+              this.details_emergency.latitude = response.coords.latitude;
+              this.details_emergency.longitude = response.coords.longitude;
+              this.details_emergency.quote = response.coords.altitude;
+              this.details_emergency.velocity = response.coords.speed !== null ? response.coords.speed : 0;
+              this.details_emergency.dateObserved = new Date().toISOString();
+              this.interval = null;
+              this.sendEmergency();
+            }
+          }, 5000)
+        if (this.details_emergency.latitude == -1 && this.details_emergency.longitude == -1) {
+          this.details_emergency.latitude = response.coords.latitude;
+          this.details_emergency.longitude = response.coords.longitude;
+          this.details_emergency.quote = response.coords.altitude;
+          this.details_emergency.velocity = response.coords.speed !== null ? response.coords.speed : 0;
+          resolve(true);
+        }
+      }, (err) => {
+        console.log(err);
+        reject(err);
+      })
     })
   }
-  // private sendEmergency() {
-  //   this.currentLocPosition().then((data) => {
-  //     console.log(data)
-  //     this.NGSIv2Query.sendEvent(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11).then((result) => {
-  //       this.nativeAudio.play('sendData').catch(
-  //         (err) => console.log(err))
-  //       this.data_device_motion();
-  //       this.localNotifications.schedule({
-  //         id: 2,
-  //         text: 'Emergency sent!',
-  //         data: ""
-  //       });
-  //       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-  //     }, (err) => {
-  //       setTimeout(() => {
-  //         console.log(err);
-  //         this.sendEmergency();
-  //       }, 2000);
-  //     })
-  //   }, (err) => {
-  //     setTimeout(() => {
-  //       console.log(err);
-  //       this.sendEmergency();
-  //     }, 2000);
-  //   });
-  // }
-  private activateSensors() {
-    var avgx = 0, avgy = 0, avgz = 0;
-    var vx = 0, vy = 0, vz = 0;
-    var freq = 1000;
-    var intervall = null;
-    var position = this.geolocation.watchPosition({}).subscribe((response: Geoposition) => {
-      if (this.details_emergency.latitude == -1000 && this.details_emergency.longitude == -1000) {
-        this.details_emergency.latitude = response.coords.latitude;
-        this.details_emergency.longitude = response.coords.longitude;
-        console.log(response)
-      }
-      if (intervall == null)
-        intervall = setTimeout(() => {
-          if (this.distance(this.details_emergency.latitude, this.details_emergency.longitude, response.coords.latitude, response.coords.longitude) > 0.05) {
-            this.details_emergency.latitude = response.coords.latitude;
-            this.details_emergency.longitude = response.coords.longitude;
-            this.details_emergency.dateObserved = new Date().toISOString();
-            intervall = null;
-            this.sendEmergency();
-          }
-        }, 5000)
-    }, (err) => {
-      console.log(err);
+  getAcceleration() {
+    return new Promise((resolve, reject) => {
+      var freq = 1000;
+      this.acceleration = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
+        this.details_emergency.accelX = acceleration.x;
+        this.details_emergency.accelY = acceleration.y;
+        this.details_emergency.accelZ = acceleration.z;
+        resolve(true);
+      }, (err) => {
+        console.log(err)
+        reject(err);
+      })
     })
-    var acceleration = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
-      // vx = (acceleration.x - 0.6) * (freq / 1000); //value in seconds
-      // vy = (acceleration.y - 0.4) * (freq / 1000);
-      // vz = (acceleration.z - 0.3 - 9.81) * (freq / 1000);
-      this.details_emergency.accelX = acceleration.x;
-      this.details_emergency.accelY = acceleration.y;
-      this.details_emergency.accelZ = acceleration.z;
-      this.details_emergency.velocity = Math.sqrt(vx * vx + vy * vy + vz * vz)
-      console.log(this.details_emergency.velocity);
-      console.log(acceleration)
-    }, (err) => { console.log(err) })
-    setTimeout(() => {
-      //clearInterval(intervalSendEmergency);
-      console.log('avgX-> ' + (avgx / (60000 / freq)))
-      console.log('avgY-> ' + (avgy / (60000 / freq)))
-      console.log('avgZ-> ' + (avgz / (60000 / freq)))
-      acceleration.unsubscribe();
-      position.unsubscribe();
-    }, 60000)
+  }
+  private activateSensors() {
+    return new Promise((resolve) => {
+      this.getPosition().then(() => {
+        this.getAcceleration().catch((err) => {console.log(err)})
+        setTimeout(() => {
+          this.acceleration.unsubscribe();
+          this.position.unsubscribe();
+        }, 60000)
+        resolve(true)
+      }, err => { console.log(err) })
+    })
+
   }
   distance(lat1, lon1, lat2, lon2) {
     var p = 0.017453292519943295;    // Math.PI / 180
@@ -219,49 +185,34 @@ export class ShowAlertPage implements OnInit {
     return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
   }
   private sendEvent() {
-    this.NGSIv2Query.sendEvent(this.details_emergency).then(() => {
+    this.NGSIv2Query.sendAlertEvent(this.details_emergency).then(() => {
       this.localNotifications.schedule({
         id: 2,
         text: 'Emergency sent!',
         data: ""
       })
+      this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }, err => {
-      this.sendEvent()
+      console.log(err)
+      //this.sendEvent();
     })
   }
   private sendEmergency() {
-    this.activateSensors();
-    this.s4c.createDevice(DeviceType.ALERT_EVENT).then(() => {
+    var id = new Date(this.details_emergency.dateObserved);
+    console.log('EMERGENCYDETAIL')
+    console.log(this.details_emergency.latitude)
+    console.log(this.details_emergency.latitude)
+    this.s4c.createDevice(DeviceType.ALERT_EVENT, Math.floor(id.getTime() / 1000).toString(), this.details_emergency.latitude, this.details_emergency.longitude).then(() => {
+      console.log('CREATE DEVICE')
       this.sendEvent();
+      this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }, err => {
-      this.sendEmergency();
+      console.log(err.msg);
+      //this.sendEmergency();
     })
     // var intervalSendEmergency = setInterval(() => {
     //   this.details_emergency.dateObserved = new Date().toISOString();
     //   this.NGSIv2Query.sendEvent(this.details_emergency);
     // }, freq)
-  }
-  private data_device_motion() {
-    var avgx = 0, avgy = 0, avgz = 0;
-    var vx = 0, vy = 0, vz = 0;
-    var count = 0;
-    var freq = 1000;
-    var velocity = 0;
-    var sub = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
-      vx = (acceleration.x - 0.6) * (freq / 1000);
-      vy = (acceleration.y - 0.4) * (freq / 1000);
-      vz = (acceleration.z - 0.3 - 9.81) * (freq / 1000);
-      console.log('velocity--> ' + (Math.abs(vx) + Math.abs(vy) + Math.abs(vz)))
-      count++;
-      velocity = (Math.abs(vx) + Math.abs(vy) + Math.abs(vz))
-      //send new data accelerometer
-      console.log(acceleration)
-    }, (err) => { console.log(err) })
-    setTimeout(() => {
-      console.log('avgX-> ' + (avgx / (60000 / freq)))
-      console.log('avgY-> ' + (avgy / (60000 / freq)))
-      console.log('avgZ-> ' + (avgz / (60000 / freq)))
-      sub.unsubscribe()
-    }, 60000)
   }
 }
