@@ -56,8 +56,11 @@ export class ReadQRPage implements OnInit {
             console.log(isNaN(id))
             if (!isNaN(id)) {
               this.readURLFromServer(id).then(() => {
-                
-              }, err => alert(err.msg))
+                this.sharedData.createToast('QR scanned succesfully')
+              }, err => {
+                this.sharedData.dismissLoading();
+                alert(err.msg)
+              })
             }
             else
               alert('Not valid QR')
@@ -72,64 +75,61 @@ export class ReadQRPage implements OnInit {
         // permission was denied, but not permanently. You can ask for permission again at a later time.
         alert('Grant the permission')
       }
-    }).catch((e: any) => console.log('Error is', e));
+    }).catch((e: any) => alert('Error is ' + e));
     //})
 
   }
   readURLFromServer(id) {
     return new Promise((resolve, reject) => {
-      if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, id)) {
-        this.sharedData.presentLoading('Getting info from server')
-        this.NGSIv2Query.getEntity('QRNFCDictionary' + id, 'DictionaryOfQRNFC').then((response: any) => {
-          var event=new QRNFCEvent('QR', response.identifier.value, action);
-          var action: string = response.action.value;
-          var identifier_event = (Math.floor(new Date(event.dateObserved).getTime() / 1000)).toString() //seconds
-          console.log(identifier_event)
-          this.s4c.createDevice(DeviceType.QR_NFC_EVENT, identifier_event).then(() => {//gestione numerazione device quando creo eventi
-            this.sharedData.dismissLoading();
-            this.NGSIv2Query.sendQRNFCEvent(event, identifier_event)
-            this.scannedCode = action;
-            console.log(action);
-            window.open('https://' + action, '_system', 'location=yes')
-            resolve(true);
+      this.sharedData.presentLoading('Getting info from server');
+      this.getListFromServer().then(() => {
+        if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, id)) {
+          this.NGSIv2Query.getEntity('QRNFCDictionary' + id, 'DictionaryOfQRNFC').then((response: any) => {
+            var event = new QRNFCEvent('QR', response.identifier.value, action);
+            var action: string = response.action.value;
+            var identifier_event = (Math.floor(new Date(event.dateObserved).getTime() / 1000)).toString() //seconds
+            console.log(identifier_event)
+            this.s4c.createDevice(DeviceType.QR_NFC_EVENT, identifier_event).then(() => {//gestione numerazione device quando creo eventi
+              this.sharedData.dismissLoading();
+              this.NGSIv2Query.sendQRNFCEvent(event, identifier_event)
+              this.scannedCode = action;
+              console.log(action);
+              window.open('https://' + action, '_system', 'location=yes')
+              resolve(true);
+            }, (err) => {
+              console.log(err)
+              reject(err)
+            })
           }, (err) => {
-            this.sharedData.dismissLoading();
-            console.log(err)
-            reject(err)
+            reject(err);
           })
-        }, (err) => {
-          this.sharedData.dismissLoading()
-          reject(err);
-        })
-      }
-      else {
-        this.sharedData.createToast('Permission denied!')
-        resolve('Permission denied')
-      }
+        }
+        else {
+          //this.sharedData.createToast('Permission denied!')
+          reject({ msg: 'Permission denied' })
+        }
+      }, err => {
+        console.log(err)
+        reject(err)
+      })
+    })
+  }
+  getListFromServer() {
+    return new Promise((resolve, reject) => {
+      this.NGSIv2Query.getEntity(DeviceType.PROFILE, DeviceType.PROFILE).then((data) => {
+        this.fillListQRCode(data);
+        resolve(true);
+      }, err => reject(err))
     })
   }
   ngOnInit() {
-    this.fillListQRCode()
   }
-  fillListQRCode() {
-    console.log(this.sharedData.user_data.qr_code)
-    // this.sharedData.user_data.qr_code.forEach((element) => {
-    //   console.log(element)
-    //   this.NGSIv2Query.getEntity('QRNFCDictionary' + element.id, 'DictionaryOfQRNFC').then((data: any) => {
-    //     if (data.QRIDorNFC == 'QR') {
-    //       this.sharedData.user_data.qr_code[data.identifier].action = data.action;
-    //     }
-    //   })
-    // })
-  }
-  addQR() {
-
-  }
-  delete(device, index) {
-    console.log('delete pos ' + index + " -> " + device.id)
-    var a = $('#item' + index).hide(400, () => {
-      this.sharedData.user_data.qr_code.splice(index, 1);
-      console.log(this.sharedData.user_data.qr_code)
-    })
+  fillListQRCode(data) {
+    this.sharedData.user_data.qr_code = [];
+    for (var i = 0; i < 4; i++) {
+      var qrcode = data['QR' + (i + 1)].value;
+      if (qrcode != '')
+        this.sharedData.user_data.qr_code.push(qrcode)
+    }
   }
 }
