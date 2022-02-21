@@ -8,6 +8,7 @@ import { DeviceType, QRNFCEvent, SharedDataService, typeChecking } from 'src/app
 import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service'
 import { LoadingController } from '@ionic/angular';
 import { Snap4CityService } from 'src/app/data/snap4-city.service';
+import { ReadingCodeService } from 'src/app/data/reading-code.service';
 /* QR-Code has 3 fields:{"description":"","link":"","code":""} */
 
 @Component({
@@ -21,9 +22,8 @@ export class ReadQRPage implements OnInit {
   scannedCode = null;
   title = 'app';
   isOn = false;
-  constructor(private s4c: Snap4CityService, public sharedData: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: QRScanner, private toastCtrl: ToastController) {
+  constructor(private readCode: ReadingCodeService, private s4c: Snap4CityService, public sharedData: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: QRScanner, private toastCtrl: ToastController) {
     document.addEventListener('ionBackButton', (ev) => {
-      //console.log(ev)
       if (this.previewCamera) {
         console.log('backbutton');
         this.closePreviewCamera();
@@ -47,23 +47,18 @@ export class ReadQRPage implements OnInit {
           this.qrScanner.show();
           this.previewCamera = true;
           this.qrScanner.scan().subscribe((text: string) => {
-            // this.scannedCode = text;
-            alert('Scanned something: ' + text);
-            var id = parseInt(text);
             this.closePreviewCamera();
             this.changeRef.detectChanges();
             $("ion-app").show(500);
-            console.log(isNaN(id))
-            if (!isNaN(id)) {
-              this.readURLFromServer(id).then(() => {
+            this.sharedData.presentLoading('Getting info from server').then(() => {
+              this.readCode.readURLFromServer(text, typeChecking.QR_CODE).then(() => {
                 this.sharedData.createToast('QR scanned succesfully')
-              }, err => {
                 this.sharedData.dismissLoading();
-                alert(err.msg)
+              }, err => {
+                this.sharedData.createToast(err?.msg)
+                this.sharedData.dismissLoading();
               })
-            }
-            else
-              alert('Not valid QR')
+            })
           });
         })
       } else if (status.denied) {
@@ -79,57 +74,57 @@ export class ReadQRPage implements OnInit {
     //})
 
   }
-  readURLFromServer(id) {
-    return new Promise((resolve, reject) => {
-      this.sharedData.presentLoading('Getting info from server');
-      this.getListFromServer().then(() => {
-        if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, id)) {
-          this.NGSIv2Query.getEntity('QRNFCDictionary' + id, 'DictionaryOfQRNFC').then((response: any) => {
-            var event = new QRNFCEvent('QR', response.identifier.value, action);
-            var action: string = response.action.value;
-            var identifier_event = (Math.floor(new Date(event.dateObserved).getTime() / 1000)).toString() //seconds
-            console.log(identifier_event)
-            this.s4c.createDevice(DeviceType.QR_NFC_EVENT, identifier_event).then(() => {//gestione numerazione device quando creo eventi
-              this.sharedData.dismissLoading();
-              this.NGSIv2Query.sendQRNFCEvent(event, identifier_event)
-              this.scannedCode = action;
-              console.log(action);
-              window.open('https://' + action, '_system', 'location=yes')
-              resolve(true);
-            }, (err) => {
-              console.log(err)
-              reject(err)
-            })
-          }, (err) => {
-            reject(err);
-          })
-        }
-        else {
-          //this.sharedData.createToast('Permission denied!')
-          reject({ msg: 'Permission denied' })
-        }
-      }, err => {
-        console.log(err)
-        reject(err)
-      })
-    })
-  }
-  getListFromServer() {
-    return new Promise((resolve, reject) => {
-      this.NGSIv2Query.getEntity(DeviceType.PROFILE, DeviceType.PROFILE).then((data) => {
-        this.fillListQRCode(data);
-        resolve(true);
-      }, err => reject(err))
-    })
-  }
+  // readURLFromServer(json_id) {
+  //   return new Promise((resolve, reject) => {
+  //     this.sharedData.presentLoading('Getting info from server');
+  //     this.getListFromServer().then(() => {
+  //       if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, json_id['deviceID'])) {
+  //         this.NGSIv2Query.getEntity(json_id['deviceID'], DeviceType.DICTIONARY, json_id['broker']).then((response: any) => {
+  //           var event = new QRNFCEvent('QR', response.identifier.value, action);
+  //           var action: string = response.action.value;
+  //           var identifier_event = (new Date(event.dateObserved).getTime()).toString() //seconds
+  //           console.log(identifier_event)
+  //           this.s4c.createDevice(DeviceType.QR_NFC_EVENT, identifier_event).then(() => {
+  //             this.sharedData.dismissLoading();
+  //             this.NGSIv2Query.sendQRNFCEvent(event, identifier_event)
+  //             this.scannedCode = action;
+  //             console.log(action);
+  //             window.open('https://' + action, '_system', 'location=yes')
+  //             resolve(true);
+  //           }, (err) => {
+  //             console.log(err)
+  //             reject(err)
+  //           })
+  //         }, (err) => {
+  //           reject(err);
+  //         })
+  //       }
+  //       else {
+  //         //this.sharedData.createToast('Permission denied!')
+  //         reject({ msg: 'Permission denied' })
+  //       }
+  //     }, err => {
+  //       console.log(err)
+  //       reject(err)
+  //     })
+  //   })
+  // }
+  // getListFromServer() {
+  //   return new Promise((resolve, reject) => {
+  //     this.NGSIv2Query.getEntity(this.sharedData.user_data.id + DeviceType.PROFILE, DeviceType.PROFILE).then((data) => {
+  //       this.fillListQRCode(data);
+  //       resolve(true);
+  //     }, err => reject(err))
+  //   })
+  // }
+  // fillListQRCode(data) {
+  //   this.sharedData.user_data.qr_code = [];
+  //   for (var i = 0; i < 4; i++) {
+  //     var qrcode = data['QR' + (i + 1)].value;
+  //     if (qrcode != '')
+  //       this.sharedData.user_data.qr_code.push(qrcode)
+  //   }
+  // }
   ngOnInit() {
-  }
-  fillListQRCode(data) {
-    this.sharedData.user_data.qr_code = [];
-    for (var i = 0; i < 4; i++) {
-      var qrcode = data['QR' + (i + 1)].value;
-      if (qrcode != '')
-        this.sharedData.user_data.qr_code.push(qrcode)
-    }
   }
 }
