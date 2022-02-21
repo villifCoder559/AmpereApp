@@ -2,10 +2,10 @@
   <h1 mat-dialog-title>Modify Device Name</h1>
   <mat-form-field appearance="outline" style="position: sticky;">
     <mat-label>New Name</mat-label>
-    <input matInput [(ngModel)]="name">
+    <input matInput [(ngModel)]="name" minlength="1">
   </mat-form-field>
   <div mat-dialog-actions>
-    <button mat-button mat-dialog-close=''>Close</button>
-    <button mat-button [mat-dialog-close]="name"  cdkFocusInitial>Ok</button>
+    <button mat-button mat-dialog-close='' (click)="action('no')">Close</button>
+    <button mat-button [mat-dialog-close]="name" (click)="action('yes')" cdkFocusInitial>Ok</button>
   </div>
 </div>

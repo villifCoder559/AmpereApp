@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 @Component({
   selector: 'app-dialog-modify-name',
   templateUrl: './dialog-modify-name.component.html',
@@ -7,11 +7,14 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class DialogModifyNameComponent implements OnInit {
   name;
-  constructor(@Inject(MAT_DIALOG_DATA) public dato) {
+  constructor(@Inject(MAT_DIALOG_DATA) public dato, public dialogRef: MatDialogRef<DialogModifyNameComponent>) {
     console.log(dato)
   }
-  log(value){
-    this.dato=value
+  action(action) {
+    if (action === 'yes') {
+      this.dato.name = this.name;
+      this.dialogRef.close({ value: this.dato })
+    }
   }
   ngOnInit() {
 
