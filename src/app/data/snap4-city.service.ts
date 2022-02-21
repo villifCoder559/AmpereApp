@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { resolve } from 'dns';
 import * as Keycloak from 'keycloak-ionic';
 import { element } from 'protractor';
-import { DeviceType, Emergency_Contact, QRNFCEvent, QRCode, SharedDataService, typeChecking, AlertEvent, FakeKeycloak } from '../data/shared-data.service'
+import { DeviceType, Emergency_Contact, QRNFCEvent, SharedDataService, typeChecking, AlertEvent, FakeKeycloak } from '../data/shared-data.service'
 import { AuthenticationService } from '../services/authentication.service'
 import { NGSIv2QUERYService } from './ngsiv2-query.service';
 @Injectable({
@@ -42,7 +42,7 @@ export class Snap4CityService {
       })
     })
   }
-  createDevice(type: DeviceType, name = '',lat=42,long=12) {
+  createDevice(type: DeviceType, name = '', lat = 42, long = 12, broker = 'orionAMPERE-UNIFI') {
     return new Promise((resolve, reject) => {
       console.log('CREATION')
       console.log(type)
@@ -58,7 +58,7 @@ export class Snap4CityService {
           token: this.authService.keycloak.token,
           id: device_id,
           type: type,
-          contextbroker: 'orionAMPERE-UNIFI',
+          contextbroker: broker,
           kind: 'sensor',
           format: 'json',
           latitude: lat,
@@ -173,6 +173,7 @@ export class Snap4CityService {
     else
       newEvent = {};
     Object.keys(event).forEach((element) => {
+      console.log(event[element])
       if (element != 'latitude' && element != 'longitude')
         if (createDevice)
           if (element != 'dateObserved')
@@ -180,8 +181,8 @@ export class Snap4CityService {
           else
             newEvent.push(this.createDateTimeField());
         else {
-          var newValue: any = event[element].toString();
-          newEvent[element] = { value: newValue }
+          var newValue = event[element];
+          newEvent[element] = { value: newValue.toString() }
         }
     })
     console.log('newEvent');
