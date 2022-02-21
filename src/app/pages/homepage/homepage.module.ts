@@ -13,6 +13,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 //import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { BackgroundGeolocation } from '@ionic-native/background-geolocation/ngx';
 
 @NgModule({
   imports: [
@@ -28,6 +29,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
     Geolocation,
     AndroidPermissions,
     LocalNotifications,
+    BackgroundGeolocation
     /*BackgroundMode*/
   ]
 })
