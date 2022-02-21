@@ -17,7 +17,7 @@ export class DialogScanBluetoothComponent implements OnInit {
   //bs: any;
   devices = [];
   selectedOptions;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private sharedData: SharedDataService, private detectChange: ChangeDetectorRef, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any = '', private sharedData: SharedDataService, private detectChange: ChangeDetectorRef, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
     this.platform.ready().then(() => {
       //this.bluetoothService.startRegisterBeacon();
       this.scan();
@@ -37,13 +37,18 @@ export class DialogScanBluetoothComponent implements OnInit {
     })
   }
   scan() {
+    this.devices = [];
+    $('#matSpinner').show()
+    this.detectChange.detectChanges();
+    console.log(this.devices)
     this.bluetoothService.detectedValue.subscribe((value) => {
       //console.log(value);
-      if (value != null) {
+      if (value !== null) {
         this.devices.push(value);
         this.detectChange.detectChanges();
       }
     }, (err) => console.log(err))
+
     this.bluetoothService.scanBLE(15000).then((scanList: []) => {
       $('#matSpinner').hide()
       //this.devices = scanList;
@@ -55,6 +60,7 @@ export class DialogScanBluetoothComponent implements OnInit {
     console.log(i);
     // $('#matSpinner').hide();
     $('#matSpinner' + i).css('display', 'flex')
+    //console.log(this.devices[i])
     this.bluetoothService.connectDevice(this.devices[i]).then((peripheralData) => {
       $('#matSpinner' + i).hide();
       this.data = peripheralData;
@@ -63,11 +69,12 @@ export class DialogScanBluetoothComponent implements OnInit {
       this.closeDialog();
     }, (err) => {
       $('#matSpinner' + i).hide();
+      this.data = '';
       console.log(err);
       alert('Error' + err)
     });
   }
-  
+
   closeDialog() {
     this.ngZone.run(() => {
       this.bluetoothService.stopScan();
