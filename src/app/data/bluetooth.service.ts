@@ -17,7 +17,7 @@ import { AuthenticationService } from '../services/authentication.service'
 })
 export class BluetoothService {
   beaconList: Beacon[] = [];
-  constructor(private authService: AuthenticationService, private ble: BLE, private ibeacon: IBeacon, private shared_data: SharedDataService,) {
+  constructor(private authService: AuthenticationService, private ble: BLE, private ibeacon: IBeacon, private shared_data: SharedDataService) {
   }
   /*52414449-5553-4e45-5457-4f524b53434f*/
   beacon_regions = [];
@@ -87,7 +87,7 @@ export class BluetoothService {
         // }, (err) => {
         //   console.log(err);
         // })
-        
+
       }, (err) => { reject(err) })
     })
   }
@@ -156,6 +156,7 @@ export class BluetoothService {
     delegate.didRangeBeaconsInRegion() //this can detect beacon in region
       .subscribe(
         data => {
+          // console.log(data)
           // console.log('didRangeBeaconsInRegion: ', data)
           // this.shared_data.user_data.paired_devices[index].inRegion = true;
           // let beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + this.shared_data.user_data.paired_devices[index].uuid, this.shared_data.user_data.paired_devices[index].uuid);
@@ -172,7 +173,7 @@ export class BluetoothService {
     let delegate = this.ibeacon.Delegate();
     let beaconRegion;
     // if (minor != -1 && major != -1)
-    beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + uuid, uuid);
+    beaconRegion = this.ibeacon.BeaconRegion(uuid, uuid);
     // else
     //   beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + uuid, uuid, major, minor);
     //let beaconRegion = this.ibeacon.BeaconRegion('test', null, null, null);
@@ -181,7 +182,7 @@ export class BluetoothService {
     //Subscribe to some of the delegate's event handlers
     delegate.didRangeBeaconsInRegion()//this can detect beacon in region
       .subscribe(
-
+        //data=>console.log('')
       );
     delegate.didStartMonitoringForRegion()
       .subscribe(
@@ -193,14 +194,19 @@ export class BluetoothService {
         data => {
           console.log('didEnterRegion: ', data);
           if (this.authService.isAuthenticated.value) {
-            console.log(data.region.identifier)
-            console.log(this.shared_data.user_data.paired_devices)
-            if (data.region.identifier == 'Beacon_' + this.shared_data.user_data?.paired_devices[0]?.uuid || data.region.identifier == 'Beacon_' + this.shared_data.user_data?.paired_devices[1]?.uuid) {
+            console.log('IdentifierRegion-> ' + data.region.identifier)
+            var found = false;
+            var index = 0;
+            console.log(this.shared_data.user_data.paired_devices.length)
+            for (index = 0; index < this.shared_data.user_data.paired_devices.length && !found; index++) {
+              console.log(this.shared_data.user_data.paired_devices[index])
+              console.log(this.shared_data.user_data.paired_devices[index] === data.region.identifier)
+              if (this.shared_data.user_data.paired_devices[index] === data.region.identifier)
+                found = true;
+            }
+            if (found) {
               console.log('Detected uuid ' + data.region.identifier);
-              var index = 0;
-              if (data.region.identifier == 'Beacon_' + this.shared_data.user_data?.paired_devices[1]?.uuid)
-                index = 1;
-              this.shared_data.showAlert(this.shared_data.user_data.paired_devices[index].id);
+              this.shared_data.showAlert(this.shared_data.user_data.paired_devices[index - 1]);
             }
           }
         }, err => console.log(err)
