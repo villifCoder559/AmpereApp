@@ -25,6 +25,6 @@ export class CallemergencycontactsPage implements OnInit {
     },err=>alert('error launching dialer'))
   }
   go_to_deviceSettings(){
-    this.router.navigateByUrl('/profile/menu/profile', { replaceUrl: true, state: { page: 3 } })
+    this.router.navigateByUrl('/profile/menu/profile', { replaceUrl: true, state: { page: 2 } })
   }
 }
