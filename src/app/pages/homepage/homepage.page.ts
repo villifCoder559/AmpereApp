@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 //import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
-import { DeviceType, QRNFCEvent, SharedDataService } from '../../data/shared-data.service'
+import { AlertEvent, DeviceType, QRNFCEvent, SharedDataService } from '../../data/shared-data.service'
 import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
 import { HttpClient } from '@angular/common/http';
@@ -51,7 +51,9 @@ export class HomepagePage implements OnInit {
     }, (err) => console.log(err))
   }
   ngOnInit() {
-
+  }
+  ngAfterViewInit() {
+    this.sharedData.dismissLoading();
   }
   enableGPS() {
     this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
@@ -126,7 +128,11 @@ export class HomepagePage implements OnInit {
     }, (err) => console.log(err))
   }
   openAlertPage() {
-    this.router.navigateByUrl('/show-alert', { replaceUrl: true })
+    let navigationExtras: NavigationExtras = {
+      state: { deviceID: 'APP' },
+      replaceUrl: true
+    };
+    this.router.navigate(['/show-alert'], navigationExtras)
   }
   openWebPage() {
     window.open('www.google.com')
@@ -150,6 +156,33 @@ export class HomepagePage implements OnInit {
     }, err => console.log(err))
   }
   SendEventQRNFC() {
-    var attr = this.ngsi.sendQRNFCEvent(new QRNFCEvent('','',''))
+    var attr = this.ngsi.sendQRNFCEvent(new QRNFCEvent('', '', ''))
+  }
+  testDeviceID() {
+    this.sharedData.showAlert('25a')
+  }
+  getAlertEventPayload() {
+    var event = new AlertEvent();
+    event.accelX = 18;
+    event.quote = 157;
+    event.status = 'test'
+    var test = this.s4c.getAlertEventPayload(false, event);
+    console.log(test)
+  }
+  testLoading() {
+    this.sharedData.presentLoading('TEST 1');
+    setTimeout(() => {
+      this.sharedData.dismissLoading();
+      this.sharedData.presentLoading('TEST 2')
+      setTimeout(() => {
+        this.sharedData.dismissLoading();
+      }, 3500)
+    }, 2000)
+  }
+  enableWatchPosition() {
+    this.sharedData.enableAllBackgroundMode();
+    this.geolocation.watchPosition().subscribe((data) => {
+      console.log(data)
+    })
   }
 }
