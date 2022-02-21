@@ -29,8 +29,11 @@ import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
 import { Snap4CityService } from '../app/data/snap4-city.service'
 import { AutoLoginGuard } from '../app/guards/auto-login.guard'
 import { AuthenticationService } from '../app/services/authentication.service'
+import { ReadingCodeService } from '../app/data/reading-code.service'
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { FormsModule } from '@angular/forms';
+import { BackgroundGeolocation } from '@awesome-cordova-plugins/background-geolocation/ngx'
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -54,7 +57,9 @@ import { FormsModule } from '@angular/forms';
     BluetoothLE,
     Snap4CityService,
     AutoLoginGuard,
-    AuthenticationService
+    AuthenticationService,
+    BackgroundGeolocation,
+    ReadingCodeService
   ],
   bootstrap: [AppComponent],
 })
