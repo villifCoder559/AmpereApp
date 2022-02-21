@@ -25,22 +25,18 @@
             <ion-item-sliding>
               <ion-item *ngIf="item.id !=-1 " class="ion-no-padding" id="item{{i}}">
                 <ion-label class="label_code">
-                  <h3>Identification code-> {{item}}</h3>
+                  <h3>{{item}}</h3>
                 </ion-label>
               </ion-item>
             </ion-item-sliding>
           </ion-list>
         </div>
       </mat-card>
+      <img src="assets/images/qr-reader.gif" alt="qr-reader" />
       <div class="scannerCode">
         <ion-button expand="full" (click)="scanCode()">
           Scan Code
         </ion-button>
-        <ion-card style="margin: 0;">
-          <ion-card-content>
-            Result from scan: {{scannedCode}}
-          </ion-card-content>
-        </ion-card>
       </div>
     </div>
   </div>
