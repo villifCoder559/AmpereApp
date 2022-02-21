@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpInterceptor } from '@angular/common/http';
 import { Injectable, NgModule } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
-import { DeviceType, Emergency_Contact, FakeKeycloak, QRNFCEvent, SharedDataService, typeChecking } from '../data/shared-data.service'
+import { AlertEvent, DeviceType, Emergency_Contact, FakeKeycloak, QRNFCEvent, SharedDataService, typeChecking } from '../data/shared-data.service'
 import { Snap4CityService } from '../data/snap4-city.service'
 
 @NgModule({
@@ -90,11 +90,13 @@ export class NGSIv2QUERYService {
       });
     })
   }
-  sendAlertEvent(details_emergency) {
+  sendAlertEvent(details_emergency: AlertEvent) {
     return new Promise((resolve, reject) => {
       var username = this.shared_data.user_data.id;
       var attr = this.s4c.getAlertEventPayload(false, details_emergency);
-      var name = Math.floor(new Date(details_emergency.dateObserved).getTime() / 1000).toString();
+      console.log('ATTRIBUTES')
+      console.log(attr)
+      var name = (new Date(details_emergency.dateObserved).getTime()).toString();
       //attr.dateObserved=new Date().toISOString();
       $.ajax({
         url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + username + DeviceType.ALERT_EVENT + name + "/attrs?elementid=" + username + DeviceType.ALERT_EVENT + name + "&type=" + DeviceType.ALERT_EVENT,
@@ -219,11 +221,10 @@ export class NGSIv2QUERYService {
     })
 
   }
-  getEntity(name, type) {
+  getEntity(id, type: DeviceType, broker = 'orionAMPERE-UNIFI') {
     return new Promise((resolve, reject) => {
-      var username = this.shared_data.user_data.id;
       $.ajax({
-        url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + username + name + "?elementid=" + username + name + "&type=" + type,
+        url: "https://iot-app.snap4city.org/orionfilter/" + broker + "/v2/entities/" + id + "?elementid=" + id + "&type=" + type,
         type: "GET",
         headers: {},
         async: true,
