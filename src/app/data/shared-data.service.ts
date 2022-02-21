@@ -8,12 +8,13 @@ import { IonicModule, LoadingController, Platform, ToastController } from '@ioni
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 // import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
+
 // import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 // import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
 import { CountdownConfig, CountdownModule } from 'ngx-countdown';
 import { Storage } from '@ionic/storage-angular'
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationEvents, BackgroundGeolocationResponse } from '@awesome-cordova-plugins/background-geolocation/ngx';
 /**fix logout */
 @NgModule({
   imports: [
@@ -23,17 +24,12 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
     CountdownModule
   ],
   providers: [
-    NativeAudio]
+    NativeAudio,BackgroundGeolocation]
 })
 export class NFCCode {
-  link: string = '';
   id: number = -1;
-  description: string = '';
 }
 export class QRCode {
-  description: string = '';
-  action: string = '';
-  code: string = '';
   id: number = -1;
 }
 export class Emergency_Contact {
@@ -99,7 +95,6 @@ export class UserData {
   nfc_code = []
   status = 'active'
   constructor() { }
-
 }
 export class AlertEvent {
   latitude = -1.0
@@ -108,7 +103,7 @@ export class AlertEvent {
   quote = 0.0
   velocity = 0.0
   evolution = 'notHandled'
-  deviceID = 0
+  deviceID: string = ''
   accelX = 0.0
   accelY = 0.0
   accelZ = 0.0
@@ -118,7 +113,7 @@ export class QRNFCEvent {
   QRIDorNFC: string = ''
   identifier: string = ''
   action: string = ''
-  dateObserved=new Date().toISOString();
+  dateObserved = new Date().toISOString();
   constructor(qridNfc, id, action) {
     this.QRIDorNFC = qridNfc;
     this.identifier = id;
@@ -129,13 +124,30 @@ export class QRNFCEvent {
   providedIn: 'root'
 })
 export class SharedDataService {
+  config: BackgroundGeolocationConfig = {
+    desiredAccuracy: 0,
+    stationaryRadius: 10,
+    distanceFilter: 30,
+    debug: true, //  enable this hear sounds for background-geolocation life-cycle.
+    stopOnTerminate: false, // enable this to clear background location settings when the app terminates
+    interval: 1000,
+    fastestInterval: 500,
+    activitiesInterval: 1000
+  };
+  nameDevices = [];
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   gps_enable = false;
-  constructor(private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private backgroundGeolocation: BackgroundGeolocation,private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.storage.create();
     this.platform.ready().then(() => {
-      this.enableAllBackgroundMode();
+      this.backgroundGeolocation.configure(this.config).then(() => {
+        this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe((location: BackgroundGeolocationResponse) => {
+          console.log('Locations', location);
+          console.log('Speed', location.speed);
+        });
+      });
+      //this.enableAllBackgroundMode();
       this.nativeAudio.preloadSimple('alert', 'assets/sounds/alert.mp3').then(() => { }, (err) => console.log(err));
       this.nativeAudio.preloadSimple('sendData', 'assets/sounds/send_data.mp3').then(() => { }, (err) => console.log(err));
     })
@@ -146,6 +158,16 @@ export class SharedDataService {
       duration: 3500
     })
     toast.present();
+  }
+  startBackgroundGeolocation() {
+    // start recording location
+    console.log('ACTIVATED_BACKGROUND')
+    //this.backgroundGeolocation.start();
+  }
+
+  stopBackgroundGeolocation() {
+    // If you wish to turn OFF background-tracking, call the #stop method.
+    //this.backgroundGeolocation.stop();
   }
   loading;
   async presentLoading(msg) {
@@ -166,7 +188,12 @@ export class SharedDataService {
     this.storage.set('user_data', this.user_data);
     console.log('storage')
   }
-
+  startBackgroundLocation() {
+    //this.backgroundGeolocation.start();
+  }
+  stop() {
+    this.backgroundGeolocation.stop();
+  }
   loadDataUser(auth) {
     //console.log('data from service')
     //console.log(this.user_data)
@@ -188,17 +215,17 @@ export class SharedDataService {
             nfc_code.id = 42;
             this.user_data.id = 'ampereuser1'
             this.user_data.nickname = 'KL15'
-            this.user_data.address = 'VialeMorgagni87' //database no spaces available
+            this.user_data.address = 'VialeMorgagni87'
             this.user_data.allergies = 'gluten'
             this.user_data.dateofborn = '1950-08-09'
             this.user_data.city = 'Florence'
-            this.user_data.description = 'brownHairBlueEyes' //no spaces
+            this.user_data.description = 'brownHairBlueEyes'
             this.user_data.disabilities.visionImpaired = false
-            this.user_data.disabilities.wheelchairUser = true // vision,wheelchair
-            this.user_data.email = 'email@mail.com' // no @
+            this.user_data.disabilities.wheelchairUser = true
+            this.user_data.email = 'email@mail.com'
             this.user_data.emergency_contacts = [new Emergency_Contact('Paul', 'Rid', '785232145202')]
             this.user_data.ethnicity = 'white'
-            this.user_data.gender = '0' //0->Male 1->Female
+            this.user_data.gender = 'male'
             this.user_data.height = '185'
             this.user_data.locality = 'Careggi'
             this.user_data.medications = ''
@@ -226,6 +253,7 @@ export class SharedDataService {
   // }
   showAlert(id) {
     //take bluetooth signal, create handler that takes the signal
+    console.log(id)
     let navigationExtras: NavigationExtras = {
       state: { deviceID: id },
       replaceUrl: true
@@ -234,43 +262,70 @@ export class SharedDataService {
     this.router.navigate(['/show-alert'], navigationExtras)
     //this.sendEmergency();
   }
-
+  moveToForeground(){
+    this.backgroundMode.moveToForeground()
+  }
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
     this.backgroundMode.enable();
-    this.backgroundMode.overrideBackButton();
+    //this.backgroundMode.overrideBackButton();
     this.backgroundMode.disableWebViewOptimizations();
     this.backgroundMode.disableBatteryOptimizations();
+    this.backgroundMode.wakeUp();
+    // this.backgroundMode.unlock();
   }
+  setNameDevice(device, name) {
+    var app = { id: '', name: '' };
+    app.id = device;
+    app.name = name === '' ? device : name;
+    var check = true;
+    if (this.nameDevices === null)
+      this.nameDevices = []
+    this.nameDevices.forEach(element => {
+      if (element.id === device) {
+        element.name = name;
+        check = false;
+      }
+    })
+    if (check)
+      this.nameDevices.push(app)
+    this.storage.set('nameDevices', this.nameDevices)
+  }
+  deleteDeviceFromNameDevice(device) {
+    var index = this.nameDevices.indexOf(device);
+    this.nameDevices.splice(index, 1)
+    this.storage.set('nameDevices', this.nameDevices)
+  }
+  getNameDevices() {
+    this.storage.get('nameDevices').then((result) => {
+      this.nameDevices = result;
+      console.log(this.nameDevices === null)
+      if (this.nameDevices === null) {
+        this.user_data.paired_devices.forEach(element => {
+          console.log('SETNAME')
+          this.setNameDevice(element, element)
+        })
+      }
+    })
+    if (this.nameDevices === null) {
+      this.user_data.paired_devices.forEach(element => {
+        this.setNameDevice(element, element)
+      })
+    }
+  }
+  
+  // saveNameDevice() {
+  //   var newData = []
+  //   this.user_data.paired_devices.forEach(paired_element => {
+  //     this.nameDevices.forEach(name_device => {
+  //       if (name_device.id === paired_element) {
+  //         var el;
+  //         el.id = paired_element;
+  //         el.name = 
+  //       }
+  //     })
+  //   })
+  //   this.storage.set('nameDevices', this.nameDevices)
+  // }
 
-  checkIDValidityNFCorQR(type: typeChecking.QR_CODE | typeChecking.NFC_CODE, id) {
-    console.log('userData')
-    console.log(this.user_data[type])
-    var ok = false;
-    this.user_data[type].forEach(element => {
-      console.log(parseInt(element))
-      console.log(id)
-      console.log(parseInt(element) == id)
-      if (parseInt(element) == id)
-        ok = true
-    });
-    return ok;
-  }
-  textFromClientToServer() {
-    var data = Object.assign(this.user_data)
-    Object.keys(data).forEach(element => {
-      this.user_data[element].toString().replace(' ', '_');
-      if (element == 'email')
-        this.user_data[element].toString().replace('@', '|')
-    })
-    //console.log(data)
-    return data;
-  }
-  textFromServerToClient(data) {
-    Object.keys(data).forEach(element => {
-      this.user_data[element].toString().replace('_', ' ');
-      if (element == 'email')
-        this.user_data[element].toString().replace('|', '@');
-    })
-  }
 }
