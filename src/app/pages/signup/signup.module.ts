@@ -10,8 +10,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { Contacts } from '@ionic-native/contacts/ngx'
 import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
 import { BLE } from '@ionic-native/ble/ngx'
-import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component'
 import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
+import {DialogSaveComponent} from './dialog-save/dialog-save.component'
+import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component';
+import { NgxPullToRefreshModule } from 'ngx-pull-to-refresh';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -20,10 +23,11 @@ import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-conta
     IonicModule,
     SignupPageRoutingModule,
     MaterialModule,
-    HttpClientModule
+    HttpClientModule,
+    NgxPullToRefreshModule
   ],
-  declarations: [SignupPage, DialogModifyNameComponent, DialogExampleComponent, DialogScanBluetoothComponent,DialogAddEmergencyContactComponent],
+  declarations: [SignupPage,DialogModifyNameComponent, DialogExampleComponent, DialogScanBluetoothComponent,DialogAddEmergencyContactComponent,DialogSaveComponent],
   providers: [Contacts, BLE],
-  entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent, DialogModifyNameComponent]
+  //entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent,DialogSaveComponent]
 })
 export class SignupPageModule { }
