@@ -35,51 +35,58 @@ export class LoginPage implements OnInit {
 
   async login(platform) {
     console.log(platform)
-    const loading = await this.loadingController.create();
-    console.log('LOAD DATA USER')
-    //this.sharedData.loadDataUser();
-    await loading.present();
+    await this.sharedData.presentLoading('Checking data...');
     if (platform == 'snap4city') {
       try {
         this.authService.loginSnap4City().then((auth) => {
           console.log('IN')
-          loading.dismiss();
           console.log('end_auth')
           console.log(auth)
           if (auth) {
             //this.sharedData.enableAllBackgroundMode();
-            this.ngsi.getEntity(DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
-              this.authService.isAuthenticated.next(true);
-              this.sharedData.user_data.nickname = data.nickname.value
-              this.sharedData.user_data.address = data.address.value
-              this.sharedData.user_data.allergies = data.allergies.value
-              this.sharedData.user_data.dateofborn = data.dateofborn.value
-              this.sharedData.user_data.city = data.city.value
-              this.sharedData.user_data.description = data.description.value
-              this.sharedData.user_data.disabilities.visionImpaired = data.visionImpaired.value
-              this.sharedData.user_data.disabilities.wheelchairUser = data.wheelchairUser.value
-              this.sharedData.user_data.email = data.email.value
-              this.sharedData.user_data.ethnicity = data.ethnicity.value
-              this.sharedData.user_data.gender = data.gender.value
-              this.sharedData.user_data.height = data.height.value
-              this.sharedData.user_data.locality = data.locality.value
-              this.sharedData.user_data.medications = data.medications.value
-              this.sharedData.user_data.name = data.name.value
-              this.sharedData.user_data.weight = data.weight.value
-              this.sharedData.user_data.surname = data.surname.value
-              this.sharedData.user_data.phoneNumber = data.phoneNumber.value
-              this.sharedData.user_data.status = data.status.value
-              this.sharedData.user_data.pin = data.pin.value
-              this.sharedData.user_data.purpose = data.purpose.value
+            this.ngsi.getEntity(this.sharedData.user_data.id + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
+              Object.keys(this.sharedData.user_data).forEach((element) => {
+                this.authService.isAuthenticated.next(true);
+                switch (element) {
+                  case 'id': case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
+                    break;
+                  case 'dateObserved': {
+                    this.sharedData.user_data[element] = new Date().toISOString();
+                    break;
+                  }
+                  case 'allergies': case 'medications': {
+                    this.sharedData.user_data[element] = data.value;
+                    break
+                  }
+                  case 'public_emergency_contacts': {
+                    Object.keys(this.sharedData.user_data[element]).forEach((number) => {
+                      console.log(number)
+                      console.log(this.sharedData.user_data[element][number])
+                      this.sharedData.user_data[element][number] = data.value;
+                    })
+                    break;
+                  }
+                  case 'disabilities': {
+                    console.log('DISABILITIES')
+                    //console.log(this.sharedData.user_data[element])
+                    Object.keys(this.sharedData.user_data[element]).forEach((dis) => {
+                      this.sharedData.user_data[element][dis] = data.value
+                    })
+                    break;
+                  }
+                  default:
+                    this.sharedData.user_data[element] = data.value
+                }
+              })
               this.sharedData.user_data.public_emergency_contacts = { 112: data.call_112.value, 115: data.call_115.value, 118: data.call_118.value }
               if (data.jewel1ID.value != '')
                 this.sharedData.user_data.paired_devices.push(data.jewel1ID.value)
               if (data.jewel2ID.value != '')
                 this.sharedData.user_data.paired_devices.push(data.jewel2ID.value)
               for (var i = 0; i < 5; i++) {
-                var name = data['emergencyContact' + (i + 1) + 'Name'];
-                var surname = data['emergencyContact' + (i + 1) + 'Surname'];
-                var number = data['emergencyContact' + (i + 1) + 'Number'];
+                var name = data['emergencyContact' + (i + 1) + 'Name'].value;
+                var surname = data['emergencyContact' + (i + 1) + 'Surname'].value;
+                var number = data['emergencyContact' + (i + 1) + 'Number'].value;
                 console.log('contact ' + i);
                 console.log(name + surname + number)
                 if (name != '' && surname != '' && number != '')
@@ -96,7 +103,8 @@ export class LoginPage implements OnInit {
                   this.sharedData.user_data.nfc_code.push(nfccode)
               }
               this.sharedData.old_user_data = JSON.parse(JSON.stringify(this.sharedData.user_data))
-              //this.bluetoothService.enableAllUserBeaconFromSnap4City();
+              this.bluetoothService.enableAllUserBeaconFromSnap4City();
+              console.log(this.sharedData.user_data)
               this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
             }, err => {
               console.log(err)
@@ -110,10 +118,10 @@ export class LoginPage implements OnInit {
           }
         }, async (err) => {
           console.log('Orrore ' + err)
-          await loading.dismiss()
+          await this.sharedData.dismissLoading();
         });
       } catch (e) {
-        await loading.dismiss();
+        await this.sharedData.dismissLoading();
         alert((e as Error).message)
       }
     }
@@ -123,7 +131,7 @@ export class LoginPage implements OnInit {
         this.authService.isAuthenticated.next(true)
         this.bluetoothService.enableAllUserBeacon();
         this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
-        await loading.dismiss();
+        await this.sharedData.dismissLoading();
       })
     }
   }
@@ -137,6 +145,12 @@ export class LoginPage implements OnInit {
   }
   go_to_signup() {
     this.router.navigateByUrl('/signup');
+  }
+  checkActiveUser() {
+    setInterval(() => {
+      this.sharedData.user_data.dateObserved = new Date().toISOString();
+      this.ngsi.sendUserProfile();
+    }, 86400 * 1000);
   }
   async go_to_forgot_psw() {
     if (this.email.hasError('email'))
