@@ -12,7 +12,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
 import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
 import { Snap4CityService } from '../data/snap4-city.service'
-
+//import * as backgroundGeolocation from '@mauron85/cordova-plugin-background-geolocation'
 /*
   OK Fix view page OK
   OK Add sound when I click button and when the time expires OK
@@ -44,10 +44,8 @@ export class ShowAlertPage implements OnInit {
     });
   }
   ngOnInit() {
-    this.route.queryParams.subscribe((params) => {
-      this.details_emergency.deviceID = this.router.getCurrentNavigation().extras.state.deviceID
-      console.log(this.details_emergency.deviceID)
-    }, err => console.log(err))
+    this.details_emergency.deviceID = this.router.getCurrentNavigation().extras?.state?.deviceID;
+    console.log(this.details_emergency)
   }
   immediateEmergency() {
     this.countdown.left = 1;
@@ -80,7 +78,7 @@ export class ShowAlertPage implements OnInit {
         ok = false
     }
     if (!ok) {
-      await this.presentAlert('PIN wrong', 70).then(() => {
+      await this.presentAlert('PIN wrong', 50).then(() => {
         for (var i = this.pin.length - 1; i >= 0; i--) {
           (<HTMLInputElement>document.getElementById(i.toString())).value = '';
           if (i == 0)
@@ -89,7 +87,7 @@ export class ShowAlertPage implements OnInit {
       })
     }
     else {
-      this.presentAlert('PIN correct', 1200);
+      //this.presentAlert('PIN correct', 1200);
       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }
   }
@@ -108,9 +106,24 @@ export class ShowAlertPage implements OnInit {
   }
   send_Emergency(event) {//when time is expired
     console.log(event)
-    if (event.action == 'done') {
+    if (event.action === 'done') {
+      this.shared_data.presentLoading('Sending emergency...')
+      console.log('activateSensors')
       this.activateSensors().then(() => {
-        this.sendEmergency();
+        console.log('sendEmergency')
+        this.sendEmergency().then(() => {
+          console.log('emergencySended')
+          this.shared_data.dismissLoading();
+          this.shared_data.createToast('Emergency sent successfully')
+        }, err => {
+          this.shared_data.dismissLoading();
+          alert(err);
+          this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+        });
+      }, err => {
+        this.shared_data.dismissLoading();
+        alert(err);
+        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
       })
     }
   }
@@ -119,7 +132,10 @@ export class ShowAlertPage implements OnInit {
   interval
   getPosition() {
     return new Promise((resolve, reject) => {
-      this.position = this.geolocation.watchPosition({ enableHighAccuracy: true }).subscribe((response: Geoposition) => {
+      this.shared_data.startBackgroundGeolocation();
+      console.log('startwatchPosition')
+      this.position = this.geolocation.getCurrentPosition({ enableHighAccuracy: true }).then((response: Geoposition) => {
+        console.log('checkintervall')
         if (this.interval === null)
           this.interval = setTimeout(() => {
             var distance = this.distance(this.details_emergency.latitude, this.details_emergency.longitude, response.coords.latitude, response.coords.longitude)
@@ -136,6 +152,7 @@ export class ShowAlertPage implements OnInit {
               this.sendEmergency();
             }
           }, 5000)
+        console.log('setDetailsEmergency')
         if (this.details_emergency.latitude == -1 && this.details_emergency.longitude == -1) {
           this.details_emergency.latitude = response.coords.latitude;
           this.details_emergency.longitude = response.coords.longitude;
@@ -165,12 +182,15 @@ export class ShowAlertPage implements OnInit {
   }
   private activateSensors() {
     return new Promise((resolve) => {
+      console.log('GETPOSITION')
       this.getPosition().then(() => {
-        this.getAcceleration().catch((err) => {console.log(err)})
+        console.log('GETACCELERATION')
+        this.getAcceleration().catch((err) => { console.log(err) })
         setTimeout(() => {
           this.acceleration.unsubscribe();
           this.position.unsubscribe();
         }, 60000)
+        console.log('resolve')
         resolve(true)
       }, err => { console.log(err) })
     })
@@ -198,17 +218,19 @@ export class ShowAlertPage implements OnInit {
     })
   }
   private sendEmergency() {
-    var id = new Date(this.details_emergency.dateObserved);
-    console.log('EMERGENCYDETAIL')
-    console.log(this.details_emergency.latitude)
-    console.log(this.details_emergency.latitude)
-    this.s4c.createDevice(DeviceType.ALERT_EVENT, Math.floor(id.getTime() / 1000).toString(), this.details_emergency.latitude, this.details_emergency.longitude).then(() => {
-      console.log('CREATE DEVICE')
-      this.sendEvent();
-      this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-    }, err => {
-      console.log(err.msg);
-      //this.sendEmergency();
+    return new Promise((resolve, reject) => {
+      var id = new Date(this.details_emergency.dateObserved);
+      console.log('CREATION_DEVICE')
+      this.s4c.createDevice(DeviceType.ALERT_EVENT, id.getTime().toString(), this.details_emergency.latitude, this.details_emergency.longitude).then(() => {
+        console.log('CREATE DEVICE')
+        this.sendEvent();
+        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+        resolve(true)
+      }, err => {
+        console.log(err.msg);
+        reject(err.msg)
+        //this.sendEmergency();
+      })
     })
     // var intervalSendEmergency = setInterval(() => {
     //   this.details_emergency.dateObserved = new Date().toISOString();
