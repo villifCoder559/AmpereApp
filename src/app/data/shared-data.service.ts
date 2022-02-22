@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, LoadingController, Platform, ToastController } from '@ionic/angular';
 // import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 // import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 
@@ -14,7 +14,6 @@ import { NativeAudio } from '@ionic-native/native-audio/ngx';
 // import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
 import { CountdownConfig, CountdownModule } from 'ngx-countdown';
 import { Storage } from '@ionic/storage-angular'
-import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationEvents, BackgroundGeolocationResponse } from '@awesome-cordova-plugins/background-geolocation/ngx';
 /**fix logout */
 @NgModule({
   imports: [
@@ -24,7 +23,7 @@ import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocati
     CountdownModule
   ],
   providers: [
-    NativeAudio,BackgroundGeolocation]
+    NativeAudio]
 })
 export class NFCCode {
   id: number = -1;
@@ -124,29 +123,13 @@ export class QRNFCEvent {
   providedIn: 'root'
 })
 export class SharedDataService {
-  config: BackgroundGeolocationConfig = {
-    desiredAccuracy: 0,
-    stationaryRadius: 10,
-    distanceFilter: 30,
-    debug: true, //  enable this hear sounds for background-geolocation life-cycle.
-    stopOnTerminate: false, // enable this to clear background location settings when the app terminates
-    interval: 1000,
-    fastestInterval: 500,
-    activitiesInterval: 1000
-  };
   nameDevices = [];
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   gps_enable = false;
-  constructor(private backgroundGeolocation: BackgroundGeolocation,private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.storage.create();
     this.platform.ready().then(() => {
-      this.backgroundGeolocation.configure(this.config).then(() => {
-        this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe((location: BackgroundGeolocationResponse) => {
-          console.log('Locations', location);
-          console.log('Speed', location.speed);
-        });
-      });
       //this.enableAllBackgroundMode();
       this.nativeAudio.preloadSimple('alert', 'assets/sounds/alert.mp3').then(() => { }, (err) => console.log(err));
       this.nativeAudio.preloadSimple('sendData', 'assets/sounds/send_data.mp3').then(() => { }, (err) => console.log(err));
@@ -158,16 +141,6 @@ export class SharedDataService {
       duration: 3500
     })
     toast.present();
-  }
-  startBackgroundGeolocation() {
-    // start recording location
-    console.log('ACTIVATED_BACKGROUND')
-    //this.backgroundGeolocation.start();
-  }
-
-  stopBackgroundGeolocation() {
-    // If you wish to turn OFF background-tracking, call the #stop method.
-    //this.backgroundGeolocation.stop();
   }
   loading;
   async presentLoading(msg) {
@@ -188,12 +161,7 @@ export class SharedDataService {
     this.storage.set('user_data', this.user_data);
     console.log('storage')
   }
-  startBackgroundLocation() {
-    //this.backgroundGeolocation.start();
-  }
-  stop() {
-    this.backgroundGeolocation.stop();
-  }
+
   loadDataUser(auth) {
     //console.log('data from service')
     //console.log(this.user_data)
@@ -265,6 +233,7 @@ export class SharedDataService {
   moveToForeground(){
     this.backgroundMode.moveToForeground()
   }
+  
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
     this.backgroundMode.enable();
