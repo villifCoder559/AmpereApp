@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-//import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
 import { AlertEvent, DeviceType, QRNFCEvent, SharedDataService } from '../../data/shared-data.service'
 import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
 import { HttpClient } from '@angular/common/http';
+import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 
 @Component({
   selector: 'app-homepage',
@@ -24,7 +24,7 @@ import { HttpClient } from '@angular/common/http';
   3.1)Improve html of Contacts tab OK
   3.2)Password & confirm_psw, add hide/not-hide_psw button OK
   4)Start page about connection device OK
-  5)Save data untill 4 phase OK
+  5)Save data until 4 phase OK
   6)Restyle ion list OK
   7)Start to make the page after sign-in OK
   8)password min length 8 and special char OK, load user_data when profile is loaded OK
@@ -41,7 +41,7 @@ import { HttpClient } from '@angular/common/http';
   */
 export class HomepagePage implements OnInit {
   gps_enable = true;
-  constructor(private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private background: BackgroundMode, private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
       this.localNotifications.hasPermission().then(result => {
         if (!result.valueOf())
@@ -179,8 +179,22 @@ export class HomepagePage implements OnInit {
       }, 3500)
     }, 2000)
   }
+  async askPermission() {
+    const data = await this.androidPermissions.requestPermissions([
+      "android.permission.ACCESS_BACKGROUND_LOCATION",
+      "android.permission.ACCESS_COARSE_LOCATION",
+      this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
+    ]).then(()=>console.log('PERMISSION_REQUESTED'))
+  }
+  checkAndroidPermission() {
+    this.androidPermissions.checkPermission('ACCESS_BACKGROUND_LOCATION').then((value) => {
+      if (!value.hasPermission)
+        this.androidPermissions.requestPermission('ACCESS_BACKGROUND_LOCATION');
+      console.log(value)
+    })
+  }
   enableWatchPosition() {
-    this.sharedData.enableAllBackgroundMode();
+    this.sharedData.enableAllBackgroundMode()
     this.geolocation.watchPosition().subscribe((data) => {
       console.log(data)
     })

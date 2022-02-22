@@ -9,11 +9,10 @@ import { HomepagePageRoutingModule } from './homepage-routing.module';
 import { HomepagePage } from './homepage.page';
 import { MaterialModule } from '../../material-module'
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-//import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
-import { BackgroundGeolocation } from '@ionic-native/background-geolocation/ngx';
+import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 
 @NgModule({
   imports: [
@@ -29,8 +28,7 @@ import { BackgroundGeolocation } from '@ionic-native/background-geolocation/ngx'
     Geolocation,
     AndroidPermissions,
     LocalNotifications,
-    BackgroundGeolocation
-    /*BackgroundMode*/
+    BackgroundMode
   ]
 })
 export class HomepagePageModule { }
