@@ -1,27 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { SharedDataService, UserData } from '../../data/shared-data.service'
-import { Router } from '@angular/router'
+import { NavigationExtras, Router } from '@angular/router'
+import { BluetoothService } from 'src/app/data/bluetooth.service';
 @Component({
   selector: 'app-test-device',
   templateUrl: './test-device.page.html',
   styleUrls: ['./test-device.page.scss'],
 })
 export class TestDevicePage implements OnInit {
-  paired_devices: any;
-  constructor(private shared_data: SharedDataService, private router: Router) {
-    var user_data: UserData = this.shared_data.getUserData();
-    this.paired_devices = user_data.paired_devices;
-    console.log(this.paired_devices)
-  }
-  delete(device, index) {
-    console.log('delete pos ' + index + " -> " + device.id)
-  }
-  simulate() {
-    this.router.navigateByUrl('/show-alert', { replaceUrl: false })
+
+  constructor(public shared_data: SharedDataService, private router: Router, private bluetoothService: BluetoothService) {
   }
   ngOnInit() {
   }
   go_to_deviceSettings() {
-    this.router.navigateByUrl('/profile/menu/profile', { replaceUrl: true, state: { page: 6 } })
+
+    var param: NavigationExtras = {
+      state: {
+        page: 4
+      }
+    }
+    this.router.navigate(['/profile/menu/profile'], param)
+  }
+  isBeaconInRegion(index) {
+    this.bluetoothService.checkRangeBeaconsInRegion(index);
   }
 }

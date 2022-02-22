@@ -13,6 +13,7 @@ import { SMS } from '@ionic-native/sms/ngx';
 import { DeviceMotion } from '@ionic-native/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
+
 @NgModule({
   imports: [
     CommonModule,
@@ -30,8 +31,7 @@ import { NativeAudio } from '@ionic-native/native-audio/ngx'
     SMS,
     DeviceMotion,
     LocalNotifications,
-    NativeAudio,
-    
+    NativeAudio
   ]
 })
 export class ShowAlertPageModule { }

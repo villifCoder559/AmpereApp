@@ -1,144 +1,120 @@
 <ion-header>
   <mat-toolbar class="toolbar">
-    <button mat-icon-button (click)="go_back()" *ngIf="!logged" style="display: flex;justify-content: center;align-items: center;">
-      <mat-icon style="display: inline;">arrow_back</mat-icon>
-    </button>
-    <ion-buttons slot="start" *ngIf="logged">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <span *ngIf="!logged">Registration Form</span>
-    <span *ngIf="logged">Profile</span>
-    <ion-buttons class="slot-end" *ngIf="logged">
-      <ion-button (click)="save_data()">Save</ion-button>
-    </ion-buttons>
-    <div *ngIf="!logged" style="width: 50px;height: 50px;"> </div>
+    <div class="toolbar_content">
+      <div *ngIf="!this.authService.isAuthenticated.getValue();then thenBlock else elseBlock"></div>
+      <ng-template #thenBlock>
+        <button mat-icon-button routerLink="/" class="go_back_button">
+          <mat-icon style="display: inline;">arrow_back</mat-icon>
+        </button>
+      </ng-template>
+      <ng-template #elseBlock>
+        <button mat-icon-button class="go_back_button" (click)="askSave()">
+          <mat-icon style="display: inline;">arrow_back</mat-icon>
+        </button>
+      </ng-template>
+      <span *ngIf="!this.authService.isAuthenticated.getValue()">Registration Form</span>
+      <span *ngIf="this.authService.isAuthenticated.getValue()">Profile</span>
+      <ion-buttons class="slot-end" *ngIf="this.authService.isAuthenticated.getValue()">
+        <ion-button (click)="save_data()"><ion-icon name="save-outline"></ion-icon></ion-button>
+      </ion-buttons>
+      <div *ngIf="!this.authService.isAuthenticated.getValue()" class="fake-icon"> </div>
+    </div>
   </mat-toolbar>
 </ion-header>
 <ion-content #content>
-  <!-- <ion-button (click)="sendPostRequest()">Send POST</ion-button> -->
-  <mat-stepper #stepper [linear]="false" [orientation]="(stepperOrientation | async)!">
-    <mat-step [stepControl]="zeroFormGroup">
-      <ng-template matStepLabel>Login credentials</ng-template>
-      <ng-template matStepContent>
-        <form id="login_credential" [formGroup]="zeroFormGroup">
-          <mat-form-field appearance="fill">
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" placeholder="" required>
-          </mat-form-field>
-          <mat-form-field *ngIf="logged && editable" appearance="fill" id="matcardResize">
-            <mat-label>Old Password</mat-label>
-            <input matInput [type]="hideold?'text':'password'" formControlName="old_psw" placeholder="" required>
-            <button mat-icon-button matSuffix (click)="hideold = !hideold">
-              <mat-icon>{{hideold ? 'visibility' : 'visibility_off'}}</mat-icon>
-            </button>
-            <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match</mat-error>
-          </mat-form-field>
-          <mat-form-field appearance="fill" id="matcardResize" *ngIf="editable || !logged">
-            <mat-label *ngIf="logged">New Password</mat-label>
-            <mat-label *ngIf="!logged">Password</mat-label>
-            <input matInput [type]="hidepsw?'text':'password'" formControlName="psw" placeholder="" required>
-            <button mat-icon-button matSuffix (click)="hidepsw = !hidepsw">
-              <mat-icon>{{hidepsw ? 'visibility' : 'visibility_off'}}</mat-icon>
-            </button>
-            <mat-error *ngIf="zeroFormGroup.get('psw').hasError('required')">Field Required</mat-error>
-            <mat-error *ngIf="zeroFormGroup.get('psw').hasError('minlength')">Password length more than 7</mat-error>
-            <mat-error *ngIf="zeroFormGroup.get('psw').hasError('pattern')">At leat one special char</mat-error>
-          </mat-form-field>
-          <mat-form-field appearance="fill" id="matcardResize" *ngIf="editable || !logged">
-            <mat-label>Confirm Password</mat-label>
-            <input matInput [type]="hide?'text':'password'" formControlName="confirm_psw" placeholder="" required>
-            <button mat-icon-button matSuffix (click)="hide = !hide">
-              <mat-icon>{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
-            </button>
-            <mat-error *ngIf="zeroFormGroup.get('confirm_psw').errors?.matching">Both Password must be match</mat-error>
-          </mat-form-field>
-          <div>
-            <button mat-button matStepperNext (click)="click_next()">Next</button>
-            <button mat-button (click)="change_EmailPassword()" *ngIf="logged">{{editable? 'Close edit ':'Edit '}}psw</button>
-
-          </div>
-        </form>
-      </ng-template>
-    </mat-step>
+  <mat-stepper #stepper [linear]="false" orientation="vertical">
     <mat-step [stepControl]="firstFormGroup">
       <ng-template matStepLabel>Personal Information</ng-template>
       <ng-template matStepContent>
         <form id="personal_information" [formGroup]="firstFormGroup">
-          <mat-form-field appearance="fill">
-            <mat-label>Name</mat-label>
-            <input matInput required formControlName="name" placeholder="Name">
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Surname</mat-label>
-            <input matInput required formControlName="surname" placeholder="Surname">
-          </mat-form-field>
-
-          <mat-form-field appearance="fill">
-            <mat-label>Phone number</mat-label>
-            <input matInput type="tel" maxlength="15" minlength="8" required formControlName="phoneNumber"
-              placeholder="">
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Birthdate</mat-label>
-            <input (input)="checkData($event)" maxlength="10" matInput type="tel" required formControlName="birthdate"
-              placeholder="mm/dd/yyyy">
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Gender</mat-label>
-            <mat-select formControlName="gender" required>
-              <mat-option value="male">Male</mat-option>
-              <mat-option value="female">Female</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Address</mat-label>
-            <input matInput formControlName="address" placeholder="" required>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Locality</mat-label>
-            <input matInput formControlName="locality" placeholder="" required>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>City</mat-label>
-            <input matInput formControlName="city" placeholder="" required>
-          </mat-form-field>
-          <mat-form-field appearance="fill" id="matcardResize">
-            <mat-label>Height</mat-label>
-            <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'height')"
-              formControlName="height" placeholder="">
-            <span matSuffix>cm</span>
-          </mat-form-field>
-          <mat-form-field appearance="fill" id="matcardResize">
-            <mat-label>Weight</mat-label>
-            <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'weight')"
-              formControlName="weight" placeholder="">
-            <span matSuffix>Kg</span>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Ethnicity</mat-label>
-            <input matInput formControlName="ethnicity" placeholder="">
-          </mat-form-field>
-          <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-            <mat-label>Description</mat-label>
-            <textarea #description matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-              cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="brown hair,blue eyes..."
-              formControlName="description"></textarea>
-            <mat-hint align="end">{{description.value?.length || 0}}/200</mat-hint>
-          </mat-form-field>
-          <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-            <mat-label>Purpose</mat-label>
-            <textarea #purpose matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-              cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="Medical Emergency, Personal safety,..."
-              formControlName="purpose"></textarea>
-            <mat-hint align="end">{{purpose.value?.length || 0}}/200</mat-hint>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>PIN</mat-label>
-            <input type="tel" required (input)="onlyNumbersAllowed($event,'pin')" matInput formControlName="pin"
-              placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()" #tooltip="matTooltip"
-              matTooltip="Use to cancel emergency call">
-          </mat-form-field>
-          <div>
+          <div class="tablet_view">
+            <mat-form-field appearance="fill">
+              <mat-label>Name</mat-label>
+              <input matInput required formControlName="name" placeholder="Name">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Surname</mat-label>
+              <input matInput required formControlName="surname" placeholder="Surname">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>NickName</mat-label>
+              <input matInput required formControlName="nickname" placeholder="Nickname">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Phone number</mat-label>
+              <input matInput type="tel" maxlength="15" minlength="8" required formControlName="phoneNumber"
+                placeholder="">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Date of Birth</mat-label>
+              <input (input)="checkDate($event)" maxlength="10" matInput type="tel" formControlName="dateofborn"
+                placeholder="yyyy/mm/dd">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Gender</mat-label>
+              <mat-select formControlName="gender">
+                <mat-option value="0">Male</mat-option>
+                <mat-option value="1">Female</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill" id="matcardResize">
+              <mat-label>Height</mat-label>
+              <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'height')"
+                formControlName="height" placeholder="">
+              <span matSuffix>cm</span>
+            </mat-form-field>
+            <mat-form-field appearance="fill" id="matcardResize">
+              <mat-label>Weight</mat-label>
+              <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'weight')"
+                formControlName="weight" placeholder="">
+              <span matSuffix>Kg</span>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Ethnicity</mat-label>
+              <input matInput formControlName="ethnicity" placeholder="">
+            </mat-form-field>
+            <mat-form-field appearance="fill" hintLabel="Max 200 characters">
+              <mat-label>Description</mat-label>
+              <textarea #description matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="brown hair,blue eyes..."
+                formControlName="description"></textarea>
+              <mat-hint align="end">{{description.value?.length || 0}}/200</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="fill" hintLabel="Max 200 characters">
+              <mat-label>Purpose</mat-label>
+              <textarea #purpose matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="Medical Emergency, Personal safety,..."
+                formControlName="purpose"></textarea>
+              <mat-hint align="end">{{purpose.value?.length || 0}}/200</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>PIN</mat-label>
+              <input type="tel" required (input)="onlyNumbersAllowed($event,'pin')" matInput formControlName="pin"
+                placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()" #tooltip="matTooltip"
+                matTooltip="Use to cancel emergency call">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Native language</mat-label>
+              <input matInput formControlName="language" placeholder="english" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Address</mat-label>
+              <input matInput formControlName="address" placeholder="" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Locality</mat-label>
+              <input matInput formControlName="locality" placeholder="" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>City</mat-label>
+              <input matInput formControlName="city" placeholder="" required>
+            </mat-form-field>
+          </div>
+          <div class="tablet_view" style="justify-content: center;">
             <button mat-button matStepperPrevious>Back</button>
             <button mat-button matStepperNext (click)="click_next()">Next</button>
           </div>
@@ -146,64 +122,78 @@
       </ng-template>
     </mat-step>
     <mat-step [stepControl]="secondFormGroup">
-      <ng-template matStepLabel>Medical Information</ng-template>
+      <ng-template matStepLabel style="display:flex;justify-content: center;">Medical Information</ng-template>
       <ng-template matStepContent>
         <form id="medical_information" [formGroup]="secondFormGroup">
-          <mat-card appearance="fill" id="matcardResize">
-            <mat-card-title>Disabilities</mat-card-title>
-            <mat-checkbox [checked]="user_data.disabilities[0]">Vision impaired
-            </mat-checkbox><br>
-            <mat-checkbox [checked]="user_data.disabilities[1]">Wheelchair user
-            </mat-checkbox>
-          </mat-card>
-          <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-            <mat-label>Allergies</mat-label>
-            <textarea #allergies matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-              cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="pollen,Insect stings..."
-              formControlName="allergies"></textarea>
-            <mat-hint align="end">{{allergies.value?.length || 0}}/200</mat-hint>
-          </mat-form-field>
-          <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-            <mat-label>Medications</mat-label>
-            <textarea #medications matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-              cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="" formControlName="medications"></textarea>
-            <mat-hint align="end">{{medications.value?.length || 0}}/200</mat-hint>
-          </mat-form-field>
-          <div>
+          <div class="tablet_view">
+            <mat-form-field appearance="fill" hintLabel="Max 200 characters">
+              <mat-label>Allergies</mat-label>
+              <textarea required #allergies matInput cdkTextareaAutosize hint="Max 200 words"
+                #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4"
+                placeholder="pollen,Insect stings..." formControlName="allergies"></textarea>
+              <mat-hint align="end">{{allergies.value?.length || 0}}/200</mat-hint>
+            </mat-form-field>
+            <mat-card appearance="fill" id="matcardResize">
+              <mat-card-title>Disabilities</mat-card-title>
+              <mat-checkbox formControlName="visionImpaired">Vision impaired
+              </mat-checkbox><br>
+              <mat-checkbox formControlName="wheelchairUser">Wheelchair user
+              </mat-checkbox>
+            </mat-card>
+            <mat-form-field appearance="fill" hintLabel="Max 200 characters">
+              <mat-label>Medications</mat-label>
+              <textarea #medications matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="" formControlName="medications"></textarea>
+              <mat-hint align="end">{{medications.value?.length || 0}}/200</mat-hint>
+            </mat-form-field>
+          </div>
+          <div class="tablet_view" style="justify-content: center;">
             <button mat-button matStepperPrevious>Back</button>
             <button mat-button matStepperNext (click)="click_next()">Next</button>
           </div>
         </form>
       </ng-template>
     </mat-step>
-    <mat-step [stepControl]="thirdFormGroup">
+    <mat-step>
       <ng-template matStepLabel>Emergency Contacts</ng-template>
       <ng-template matStepContent>
-        <form id="emergency_contacts" [formGroup]="thirdFormGroup">
-          <mat-card *ngFor="let contact of emergency_contacts;let i=index">
-            <mat-card-header>
-              <mat-card-title>Emergency Contact</mat-card-title>
-            </mat-card-header>
-            <mat-form-field appearance="fill">
-              <mat-label>Name</mat-label>
-              <input matInput maxlength="20" formControlName="contact{{i}}name" placeholder="">
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-              <mat-label>Phone number</mat-label>
-              <input type="tel" matInput maxlength="15" formControlName="contact{{i}}number" placeholder="">
-            </mat-form-field>
-            <div class="container-button">
-              <button style="display: flex;" mat-raised-button (click)="openDialogContacts(i)">Import</button>
-              <button style="display: flex;" mat-raised-button color="warn" (click)="remove_contact(i)">Remove</button>
-            </div>
-          </mat-card>
-          <button *ngIf="countNumberContactsDone < 5" style="margin: 10px 0 10px;" mat-raised-button
-            (click)="add_Contact()">Add Contact</button>
-          <div>
+        <div id="emergency_contacts">
+          <div class="tablet_view">
+            <mat-card *ngFor="let contact of this.shared_data.user_data.emergency_contacts;let i=index">
+              <div class="matCardEmergencyContact">
+                <mat-card-header>
+                  <mat-card-title>Emergency Contact</mat-card-title>
+                </mat-card-header>
+                <mat-form-field appearance="fill">
+                  <mat-label>Name</mat-label>
+                  <input matInput value="{{contact.name}}" readonly=true>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>Surname</mat-label>
+                  <input matInput value='{{contact.surname}}' readonly=true>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>Number</mat-label>
+                  <input matInput value='{{contact.number}}' readonly=true>
+                </mat-form-field>
+                <div class="container-button">
+                  <button style="display: flex;" mat-raised-button
+                    (click)="openDialogEmergencyContact(contact,i)">Modify</button>
+                  <button style="display: flex;" mat-raised-button color="warn"
+                    (click)="remove_contact(i)">Remove</button>
+                </div>
+              </div>
+            </mat-card>
+          </div>
+          <div style="justify-content: center; display:flex">
+            <button *ngIf="this.shared_data.user_data.emergency_contacts.length < 5" style="margin: 10px 0 10px;"
+              mat-raised-button (click)="openDialogEmergencyContact(0,-1)">Add Contact</button>
+          </div>
+          <div class="tablet_view" style="justify-content: center;">
             <button mat-button matStepperPrevious>Back</button>
             <button mat-button matStepperNext (click)="click_next()">Next</button>
           </div>
-        </form>
+        </div>
       </ng-template>
     </mat-step>
 
@@ -211,13 +201,36 @@
       <ng-template matStepLabel>Public Emergency Contacts</ng-template>
       <ng-template matStepContent>
         <form id="public_contacts" [formGroup]="fourthFormGroup">
-          <mat-card appearance="fill">
-            <mat-label>Would you like to contact the following numbers?(without direct responsibility)</mat-label><br>
-            <mat-checkbox [checked]="user_data.public_emergency_contacts[113]">113</mat-checkbox><br>
-            <mat-checkbox [checked]="user_data.public_emergency_contacts[115]">115</mat-checkbox><br>
-            <mat-checkbox [checked]="user_data.public_emergency_contacts[118]">118</mat-checkbox>
-          </mat-card>
-          <div>
+          <div class="tablet_view">
+            <mat-card appearance="fill" style="width: fit-content;">
+              <mat-card-content style="display: flex; flex-direction: column; width: fit-content; align-items: center;">
+                <mat-label>Would you like to contact the following numbers?</mat-label>
+                <mat-label>(without direct responsibility)</mat-label>
+                <mat-form-field appearance="fill">
+                  <mat-label>Call 112</mat-label>
+                  <mat-select formControlName="112" required>
+                    <mat-option [value]=true>Yes</mat-option>
+                    <mat-option [value]=false>No</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>Call 115</mat-label>
+                  <mat-select formControlName="115" required>
+                    <mat-option [value]=true>Yes</mat-option>
+                    <mat-option [value]=false>No</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                  <mat-label>Call 118</mat-label>
+                  <mat-select formControlName="118" required>
+                    <mat-option [value]=true>Yes</mat-option>
+                    <mat-option [value]=false>No</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <div class="tablet_view" style="justify-content: center;">
             <button mat-button matStepperPrevious>Back</button>
             <button mat-button matStepperNext>Next</button>
           </div>
@@ -234,23 +247,26 @@
           delete device)
         </mat-card-subtitle>
         <mat-card-content>
-          <button mat-fab color="primary" (click)="openDialogBLE()">
+          <button mat-fab color="primary" (click)="openBeaconDialog()">
             <mat-icon>bluetooth</mat-icon>
           </button>
-          <ion-list *ngFor="let device of paired_devices;let i=index; trackBy:trackItem">
-            <ion-item-sliding>
-              <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff;" id="device{{i}}">
-                <ion-label style="background-color: white; margin: 0px;">
-                  <h2>{{device.name || 'Unnamed'}}</h2>
-                  <h3>{{device.id}}</h3>
-                  <h3>{{device.battery}}%</h3>
-                  <p> RSSI: {{device.rssi}}</p>
+          <ion-list *ngFor="let device of this.shared_data.user_data.paired_devices;let i=index;">
+            <ion-item-sliding *ngIf="device?.id != '-1'" id="slidingItem{{i}}">
+              <ion-item class="ion-no-padding" class="bluetooth_item" id="device{{i}}">
+                <ion-label class="label_bluetooth_item">
+                  <h2>{{this.shared_data?.nameDevices[i]?.name || this.shared_data.user_data?.paired_devices[i]}}</h2>
                 </ion-label>
               </ion-item>
-              <ion-item-options side="end" (ionSwipe)="delete(device,i)" style="background-color: white;">
-                <ion-item-option color="danger" (click)="delete(device,i)" expandable style="display: flex; flex-direction: row;">
-                  <div >
-                    <ion-icon name="trash-outline" style="width: 30px; height: 30px;"></ion-icon>
+              <ion-item-options side="end" (ionSwipe)="delete(device,i)" class="bluetooth_item_options">
+                <ion-item-option color="primary" (click)="modifyNameDevice(i)" expandable class="bluetooth_item_option">
+                  <div>
+                    <ion-icon name="cog" class="trash_icon"></ion-icon>
+                    <p>Modify</p>
+                  </div>
+                </ion-item-option>
+                <ion-item-option color="danger" (click)="delete(device,i)" expandable class="bluetooth_item_option">
+                  <div>
+                    <ion-icon name="trash-outline" class="trash_icon"></ion-icon>
                     <p>Delete</p>
                   </div>
                 </ion-item-option>
@@ -259,9 +275,12 @@
           </ion-list>
         </mat-card-content>
       </mat-card>
-      <div>
+      <div class="tablet_view" style="justify-content: center;">
         <button mat-button matStepperPrevious>Back</button>
-        <button mat-button (click)="register_user()">Done</button>
+        <button *ngIf="!this.authService.isAuthenticated.getValue()" mat-button
+          (click)="register_user()">Register</button>
+        <button *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">Done</button>
+
       </div>
       <!-- </ng-template> -->
     </mat-step>

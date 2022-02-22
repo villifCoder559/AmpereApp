@@ -10,6 +10,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { Contacts } from '@ionic-native/contacts/ngx'
 import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
 import { BLE } from '@ionic-native/ble/ngx'
+import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
+import {DialogSaveComponent} from './dialog-save/dialog-save.component'
+import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component';
+import { NgxPullToRefreshModule } from 'ngx-pull-to-refresh';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -18,10 +23,11 @@ import { BLE } from '@ionic-native/ble/ngx'
     IonicModule,
     SignupPageRoutingModule,
     MaterialModule,
-    HttpClientModule
+    HttpClientModule,
+    NgxPullToRefreshModule
   ],
-  declarations: [SignupPage, DialogExampleComponent, DialogScanBluetoothComponent],
-  providers: [Contacts,BLE],
-  entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent]
+  declarations: [SignupPage,DialogModifyNameComponent, DialogExampleComponent, DialogScanBluetoothComponent,DialogAddEmergencyContactComponent,DialogSaveComponent],
+  providers: [Contacts, BLE],
+  //entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent,DialogSaveComponent]
 })
 export class SignupPageModule { }

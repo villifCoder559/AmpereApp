@@ -14,18 +14,30 @@ import {MaterialModule} from '../app/material-module';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
 import { CountdownModule } from 'ngx-countdown';
 import {LoginPageModule} from '../app/pages/login/login.module'
 import {LoginPage} from '../app/pages/login/login.page'
+import {SharedDataService} from '../app/data/shared-data.service'
+import {NGSIv2QUERYService} from '../app/data/ngsiv2-query.service'
+import {BluetoothService} from '../app/data/bluetooth.service'
+import { IBeacon } from '@ionic-native/ibeacon/ngx'
+import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
+import { Snap4CityService } from '../app/data/snap4-city.service'
+import { AutoLoginGuard } from '../app/guards/auto-login.guard'
+import { AuthenticationService } from '../app/services/authentication.service'
+import { ReadingCodeService } from '../app/data/reading-code.service'
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { FormsModule } from '@angular/forms';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,
-            IonicModule.forRoot(), AppRoutingModule,HttpClientModule,MaterialModule
+  imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,FormsModule,
+            IonicModule.forRoot(), AppRoutingModule,HttpClientModule,MaterialModule,IonicStorageModule.forRoot()
             ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     Contacts,
@@ -36,7 +48,16 @@ import {LoginPage} from '../app/pages/login/login.page'
     BackgroundMode,
     DeviceMotion,
     NativeAudio,
-    LoginPage
+    LoginPage,
+    SharedDataService,
+    NGSIv2QUERYService,
+    BluetoothService,
+    IBeacon,
+    BluetoothLE,
+    Snap4CityService,
+    AutoLoginGuard,
+    AuthenticationService,
+    ReadingCodeService
   ],
   bootstrap: [AppComponent],
 })

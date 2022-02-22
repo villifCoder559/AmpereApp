@@ -1,3 +1,8 @@
-ngx-qrcode{
-    text-align: center;
+.scan-button{
+    display: flex;
+    width: max-content;
+}
+.custom_mat_card{
+    display: flex;
+    flex-direction: column;
 }

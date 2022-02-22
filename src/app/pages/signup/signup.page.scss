@@ -1,3 +1,8 @@
+.go_back_button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .example-stepper {
     margin-top: 8px;
   }
@@ -22,7 +27,7 @@ mat-stepper{
   background-color: #FAFAFA;
 }
 #emergency_contacts mat-card{
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 mat-card-title{
@@ -39,10 +44,15 @@ ion-button{
     color: white;
     justify-content: space-between;
 }
-@media(min-width: 1024px){
-  mat-form-field{
-    padding: 5px 10px;
-  }
+// @media(min-width: 1024px){
+//   mat-form-field{
+//     padding: 5px 10px;
+//   }
+// }
+.matCardEmergencyContact{
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
 }
 mat-form-field{
   width: 100%;
@@ -63,28 +73,28 @@ mat-form-field{
   //width: 40px;
   text-align: center;
 }
-#bluetooth mat-card-content{
-  text-align: center;
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-}
-#bluetooth button{
-  margin: 13px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-#bluetooth mat-icon{
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
-#bluetooth ion-list{
-  padding: 0px;
-  width: 100%;
-}
 .container_form{
   display: flex;
   justify-content: space-around;
+}
+// ::ng-deep .mat-step-header{
+//   justify-content: center;
+// }
+.align_checkbox{
+  align-items: center;
+}
+.field{
+  display: flex;
+  
+}
+@media screen and(min-width: 800px) { 
+  .tablet_view{
+    justify-content: space-around;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  ::ng-deep .mat-step-header{
+    justify-content: center;
+  }
 }

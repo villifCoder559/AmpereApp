@@ -1,0 +1,41 @@
+<ion-header>
+  <mat-toolbar class="toolbar">
+    <div class="toolbar_content">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <span>Contacts</span>
+      <button mat-icon-button style="font-size: 23px;" (click)="go_to_deviceSettings()">
+        <ion-icon name="settings"></ion-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+</ion-header>
+
+<ion-content>
+  <div id="emergency_contacts">
+    <mat-card *ngFor="let contact of this.shared_data.user_data.emergency_contacts;let i=index">
+      <div class="matCardEmergencyContact">
+        <!-- <mat-card-header>
+          <mat-card-title>Emergency Contact</mat-card-title>
+        </mat-card-header> -->
+        <mat-form-field appearance="fill">
+          <mat-label>Name</mat-label>
+          <input matInput value="{{contact.name}}" [readonly]="true">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Surname</mat-label>
+          <input matInput [readonly]="true" value="{{contact.surname}}">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Phone number</mat-label>
+          <input matInput [readonly]="true" value="{{contact.number}}">
+        </mat-form-field>
+      </div>
+      <div style="justify-content: center; display:flex">
+        <button style="margin: 10px 0 10px;background-color: green;color: #fff;" mat-raised-button
+          (click)="call(contact)">Call</button>
+      </div>
+    </mat-card>
+  </div>
+</ion-content>

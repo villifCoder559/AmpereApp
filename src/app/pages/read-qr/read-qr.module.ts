@@ -9,7 +9,6 @@ import { ReadQRPage } from './read-qr.page';
 import { MaterialModule } from '../../material-module'
 import { QRScanner } from '@ionic-native/qr-scanner/ngx';
 import { NgxQRCodeModule } from '@techiediaries/ngx-qrcode';
-import { Base64ToGallery } from '@ionic-native/base64-to-gallery/ngx';
 
 @NgModule({
   imports: [
@@ -21,6 +20,6 @@ import { Base64ToGallery } from '@ionic-native/base64-to-gallery/ngx';
     NgxQRCodeModule
   ],
   declarations: [ReadQRPage],
-  providers:[QRScanner,Base64ToGallery]
+  providers:[QRScanner]
 })
 export class ReadQRPageModule {}

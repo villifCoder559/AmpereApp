@@ -10,7 +10,7 @@ const routes: Routes = [
     children: [
       {
         path: 'homepage',
-        loadChildren: () => import('../homepage/homepage.module').then(m => m.HomepagePageModule)
+        loadChildren: () => import('../homepage/homepage.module').then(m => m.HomepagePageModule),
       },
       {
         path: 'read-nfc',
@@ -39,6 +39,14 @@ const routes: Routes = [
       {
         path: 'faq',
         loadChildren: () => import('../faq/faq.module').then(m => m.FaqPageModule)
+      },
+      {
+        path: 'webpage',
+        loadChildren: () => import('../webpage/webpage.module').then(m => m.WebpagePageModule)
+      },
+      {
+        path: 'callemergencycontacts',
+        loadChildren: () => import('../callemergencycontacts/callemergencycontacts.module').then(m => m.CallemergencycontactsPageModule)
       }
     ]
   },

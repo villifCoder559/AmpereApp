@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent } from '@angular/router';
+import { MenuController } from '@ionic/angular';
+import { SharedDataService } from 'src/app/data/shared-data.service';
 import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
@@ -8,57 +10,61 @@ import { AuthenticationService } from '../../services/authentication.service';
   styleUrls: ['./menu.page.scss'],
 })
 export class MenuPage implements OnInit {
-  pages=[
+  pages = [
     {
-      title:'Homepage',
-      url:'/profile/menu/homepage'
+      title: 'Homepage',
+      url: '/profile/menu/homepage',
+      icon:'home'
     },
     {
-      title:'Profile',
-      url:'/profile/menu/profile'
+      title: 'Emergency contacts',
+      url: '/profile/menu/callemergencycontacts',
+      icon:'people'
     },
     {
-      title:'Devices Status',
-      url:'/profile/menu/testAlert'
+      title: 'Webpage',
+      url: '/profile/menu/webpage',
+      icon:'earth'
     },
     {
-      title:'NFC Reader',
-      url:'/profile/menu/read-nfc'
+      title: 'Devices Status',
+      url: '/profile/menu/testAlert',
+      icon:'phone-portrait'
     },
     {
-      title:'QR Reader',
-      url:'/profile/menu/read-qr'
+      title: 'Term of Use',
+      url: '/profile/menu/termOfUse',
+      icon:'document'
     },
     {
-      title:'FAQ',
-      url:'/profile/menu/faq'
+      title: 'Privacy Policy',
+      url: '/profile/menu/privacyPolicy',
+      icon:'document'
     },
     {
-      title:'Term of Use',
-      url:'/profile/menu/termOfUse'
-    },
-    {
-      title:'Privacy Policy',
-      url:'/profile/menu/privacyPolicy'
-    },
-
+      title: 'Logout',
+      url: '',
+      icon:"log-out"
+    }
   ]
-  selectedPath=''
-  constructor(private router:Router,private authService: AuthenticationService) { 
+  selectedPath = ''
+  constructor(private ctrlMenu: MenuController, private router: Router, private authService: AuthenticationService, public shared_data: SharedDataService) {
     console.log('costruttore')
-    this.router.events.subscribe((event:RouterEvent)=>{
-      this.selectedPath=event.url
+    this.router.events.subscribe((event: RouterEvent) => {
+      this.selectedPath = event.url;
     })
   }
-  go_back(){
-    this.router.navigateByUrl('/',{replaceUrl:true})
+  go_back() {
+    this.router.navigateByUrl('/', { replaceUrl: true })
   }
   ngOnInit() {
 
   }
-  async logout() {
-    await this.authService.logout();
-    this.router.navigateByUrl('/login', { replaceUrl: true });
+  logout() {
+    this.ctrlMenu.close().then(() => {
+      console.log('logout');
+      console.log('autentcated.next is false')
+      this.authService.logout();
+    })
   }
-
 }

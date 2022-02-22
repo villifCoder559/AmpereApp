@@ -11,7 +11,7 @@
 
 /* Core CSS required for Ionic components to work properly */
 @import "~@ionic/angular/css/core.css";
-
+@import '~material-icons/iconfont/material-icons.css';
 /* Basic CSS for apps built with Ionic */
 @import "~@ionic/angular/css/normalize.css";
 @import "~@ionic/angular/css/structure.css";
@@ -26,6 +26,7 @@
 @import "~@ionic/angular/css/flex-utils.css";
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
+
 .alert-msg{
     text-align: center;
     padding: 8px 0px;
@@ -37,6 +38,7 @@
 ion-item{
     --ion-background-color:#fff;
 }
+
 h2,h3,p{
     margin: 0px !important
 }
@@ -44,9 +46,32 @@ h2,h3,p{
     background-color: #3F51B5;
     color: white;
     justify-content: space-between;
+    display: flex;
+    align-items: center;
+}
+.toolbar .mat-icon{
+    align-items: center;
+    text-align: center;
+}
+.toolbar .toolbar_content{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 25px;
+    //font-size: 10vw;
+}
+
+.toolbar button{
+    display: flex;
+   // height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
 }
 .fake-icon{ // for style of toolbar
-    width: 40px;height: 32px;display: flex;
+    width: 48px;height: 48px;display: flex;
 }
 .containerDialog .mat-form-field-infix{
     display: flex;
@@ -60,3 +85,102 @@ h2,h3,p{
     flex: 1;
     overflow: auto;
   }
+.bluetooth_item{
+    padding-left: 15px;
+    background-color: #fff;
+}
+.label_bluetooth_item{
+    background-color: #fff;
+    margin: 0px;
+}
+.bluetooth_item_options{
+    background-color: #fff;
+}
+.bluetooth_item_option{
+    display: flex;
+    flex-direction: row;
+}
+.trash_icon{
+    width: 20px;
+    height: 20px;
+}
+#bluetooth mat-card-content{
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+  #bluetooth button{
+    margin: 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #bluetooth mat-icon{
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+  #bluetooth ion-list{
+    padding: 0px;
+    width: 100%;
+  }
+ngx-qrcode{
+    text-align: center;
+}
+.ion_item{
+    padding-left: 15px;
+    background-color: #fff;
+}
+.ion_item_sliding{
+    background-color: white;
+    margin: 0px;
+}
+.reader{
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    width: 85vw;
+    height: 100%;
+}
+.title_list_Code{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.container_icon{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.scannerCode{
+    margin-top: 30px;
+}
+.content{
+    display: flex;
+    justify-content: center;
+}
+.label_code{//rq and nfc
+    background-color: white;
+     margin: 15px 0px;
+}
+.icon_code{
+    width: 30px; 
+    height: 30px;
+}
+@media(min-width:800px){ //mediaQueries also in signup.scss,signup.ts constructor, homepage.scss
+    .reader{
+        width:60%;
+        display: flex;
+        justify-content: center;
+    }
+    .homepage_button{
+       
+        height: 20vw;
+        width: 20vw;
+        font-size: 16vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

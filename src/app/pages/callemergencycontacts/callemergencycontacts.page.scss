@@ -1,0 +1,15 @@
+#emergency_contacts mat-card{
+    margin-top: 20px;
+}
+#emergency_contacts{
+    margin: 10vw;
+}
+mat-card-header{
+    display: flex;
+    justify-content: center;
+}
+.matCardEmergencyContact{
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}

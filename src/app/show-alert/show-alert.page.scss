@@ -3,12 +3,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 .box{
     width: 40px;
     height: 40px;
     margin: 10px;
     text-align: center;
+    border-style: solid;
+    border-width: 3px;
 }
 .content{
     display: flex;
@@ -36,4 +39,7 @@
     font-weight: bold;
     padding: 20px;
 }
-
+.immediate_emergency{
+    display: flex;
+    justify-content: center;
+}

@@ -1,16 +1,155 @@
 <ion-header>
   <mat-toolbar class="toolbar">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <span>Homepage</span>
-    <div class="fake-icon"></div>
+    <div class="toolbar_content">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <span>Homepage</span>
+      <div class="fake-icon"></div>
+    </div>
   </mat-toolbar>
 </ion-header>
 
 <ion-content>
-  <div *ngIf="!gps_enable" class="alert-msg">
+  <!-- <div class="content">
+      <div class="row">
+        <button mat-raised-button class="homepage_button" routerLink="/profile/menu/read-qr">
+          <div class="homepage_button_content">
+            <ion-icon name="qr-code-outline"></ion-icon>
+            <h3>QR</h3>
+          </div>
+        </button>
+        <button mat-raised-button class="homepage_button" routerLink="/profile/menu/read-nfc">
+          <div class="homepage_button_content">
+            <mat-icon>nfc</mat-icon>
+            <h3>NFC</h3>
+          </div>
+        </button>
+      </div>
+      <div class="row" style="display: flex;">
+        <button mat-raised-button class="homepage_button" routerLink="/profile/menu/profile">
+          <div class="homepage_button_content">
+            <ion-icon name="person-outline"></ion-icon>
+            <h3>Profile</h3>
+          </div>
+        </button>
+        <button mat-raised-button class="homepage_button " routerLink="/profile/menu/faq">
+          <div class="homepage_button_content">
+            <ion-icon name="help-outline"></ion-icon>
+            <h3>FAQ</h3>
+          </div>
+        </button>
+      </div>
+    <div class="bottom" style="display: flex;">
+      <button mat-raised-button class="homepage_bottom" (click)="openAlertPage()">
+        <div class="homepage_button_content">
+          <ion-icon name="notifications-outline"></ion-icon>
+          <h3>Emergency</h3>
+        </div>
+      </button>
+    </div>
+  </div> -->
+
+  <mat-grid-list cols="2" rowHeight='33%'>
+    <div class="homepage_content">
+      <mat-grid-tile  [colspan]="1" [rowspan]="1">
+        <button id="QR" mat-raised-button class="buttons" routerLink="/profile/menu/read-qr">
+          <div class="homepage_button_content">
+            <mat-icon>qr_code_2</mat-icon>
+            <h3>QR</h3>
+          </div>
+        </button>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <button mat-raised-button class="buttons" routerLink="/profile/menu/read-nfc">
+          <div class="homepage_button_content">
+            <mat-icon>nfc</mat-icon>
+            <h3>NFC</h3>
+          </div>
+        </button>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="1">
+        <button id="emergency" mat-raised-button class="buttons" (click)="openAlertPage()">
+          <div class="homepage_button_content">
+            <mat-icon>notifications</mat-icon>
+            <h3>Emergency</h3>
+          </div>
+        </button>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <button mat-raised-button class="buttons" routerLink="/profile/menu/profile">
+          <div class="homepage_button_content">
+            <mat-icon>person</mat-icon>
+            <h3>Profile</h3>
+          </div>
+        </button>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" >
+        <button mat-raised-button class="buttons " routerLink="/profile/menu/faq">
+          <div class="homepage_button_content">
+            <mat-icon>help</mat-icon>
+            <h3>FAQ</h3>
+          </div>
+        </button>
+      </mat-grid-tile>
+      
+    </div>
+  </mat-grid-list>
+  <button mat-raised-button (click)="createDeviceFromModel()">createDeviceFromModel</button>
+  <button mat-raised-button (click)="getInsertDataS4C()">GetPayload</button>
+  <button mat-raised-button (click)="testDeviceID()">testDeviceID</button> 
+  <button mat-raised-button (click)="getAlertEventPayload()">GetAlertEventPayload</button>
+  <button mat-raised-button (click)="enableWatchPosition()">enableWatchPosition</button>
+  <button mat-raised-button (click)="checkAndroidPermission()">checkAndroidPermission</button>
+  <button mat-raised-button (click)="askPermission()">askPermission</button>
+  <!-- <div *ngIf="!gps_enable" class="alert-msg">
     Localization is not enable!
   </div>
-  <ion-button (click)="showAlert()">ShowAlert</ion-button>
+  <div class="homepage_content">
+    <div class="row_content">
+      <button mat-raised-button class="homepage_button" routerLink="/profile/menu/read-qr">
+        <div class="homepage_button_content">
+          <ion-icon name="qr-code-outline"></ion-icon>
+          <h3>QR</h3>
+        </div>
+      </button>
+      <button mat-raised-button class="homepage_button" routerLink="/profile/menu/read-nfc">
+        <div class="homepage_button_content">
+          <mat-icon>nfc</mat-icon>
+          <h3>NFC</h3>
+        </div>
+      </button>
+    </div>
+    <div class="row_content">
+      <button mat-raised-button class="homepage_button" id="emergency" (click)="openAlertPage()">
+        <div class="homepage_button_content">
+          <ion-icon name="notifications-outline"></ion-icon>
+          <h3>Emergency</h3>
+        </div>
+      </button>
+    </div>
+    <div class="row_content">
+      <button mat-raised-button class="homepage_button" routerLink="/profile/menu/profile">
+        <div class="homepage_button_content">
+          <ion-icon name="person-outline"></ion-icon>
+          <h3>Profile</h3>
+        </div>
+      </button>
+      <button mat-raised-button class="homepage_button " routerLink="/profile/menu/faq">
+        <div class="homepage_button_content">
+          <ion-icon name="help-outline"></ion-icon>
+          <h3>FAQ</h3>
+        </div>
+      </button>
+    </div>
+    
+  </div> -->
+  <!-- <button mat-raised-button (click)="testQuery()">Test GetFunzionante</button>
+  <button mat-raised-button (click)="testAPIEntry()">Test GetUserProfile</button>
+  <button mat-raised-button (click)="testWriteQuery()">Test Write</button> -->
+  <!-- <button mat-raised-button (click)="openAlertPage()">AlertPage</button> -->
+  <!-- <button mat-raised-button (click)="openWebPage()">OpenWebPage</button>
+  <button mat-raised-button (click)="getInsertDataS4C()">GetAllPayload</button>
+  <button mat-raised-button (click)="createDevice()">CreateProfile</button>
+  <button mat-raised-button (click)="getProfile()">TestGetNumError</button> -->
 </ion-content>

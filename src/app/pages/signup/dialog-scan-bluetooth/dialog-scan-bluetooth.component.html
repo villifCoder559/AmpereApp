@@ -1,24 +1,31 @@
-<div class="containerDialog">
-  <h1 mat-dialog-title style="position: relative;">Devices List</h1>
-  <div mat-dialog-content id="mat-dialog-content">
-    <mat-spinner id="matSpinner"></mat-spinner>
-    <mat-selection-list id="selectionList" [(ngModel)]="selectedOptions" #devicesList [multiple]="false">
-      <mat-list-option *ngFor="let device of devices;let i=index" [value]="device" (click)="connect(i)"
-       >
-        <div class="container-option">
-          <div class="container-name">
-            <div mat-line><h2>{{device?.name || 'Unnamed'}}</h2></div>
-            <div mat-line>{{device?.id}}</div>
+
+  <div class="containerDialog">
+    <div class="title">
+      <h1 mat-dialog-title style="position: relative; margin: 0;">Devices List</h1>
+    
+      <mat-spinner id="matSpinner" [diameter]="30" style="margin-left: 20px;"></mat-spinner>
+    </div>
+    <div mat-dialog-content id="mat-dialog-content">
+      <ngx-pull-to-refresh spinnerColor="#ff0000" [isEnable]="true" (refresh)="scan()">
+    </ngx-pull-to-refresh>
+      <mat-selection-list id="selectionList" [(ngModel)]="selectedOptions" #devicesList [multiple]="false">
+        <mat-list-option *ngFor="let device of devices;let i=index" [value]="device" (click)="connect(i)">
+          <div class="container-option">
+            <div class="container-name">
+              <div mat-line>
+                <h2>{{device?.name || 'Unnamed'}}</h2>
+              </div>
+              <div mat-line>{{device?.id}}</div>
+            </div>
+            <div class="matSpinner-i">
+              <mat-spinner id="matSpinner{{i}}" [diameter]="25" style="display: none;"></mat-spinner>
+            </div>
           </div>
-          <div class="matSpinner-i">
-            <mat-spinner id="matSpinner{{i}}" [diameter]="25" style="display: none;"></mat-spinner>
-          </div>
-        </div>
-      </mat-list-option>
-    </mat-selection-list>
+        </mat-list-option>
+      </mat-selection-list>
+    </div>
+    <div mat-dialog-actions>
+      <button mat-button [mat-dialog-close]="">Close</button>
+      <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+    </div>
   </div>
-  <div mat-dialog-actions>
-    <button mat-button [mat-dialog-close]="">Close</button>
-    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
-  </div>
-</div>

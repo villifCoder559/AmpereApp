@@ -9,19 +9,21 @@ import { SharedDataService } from '../data/shared-data.service';
   providedIn: 'root'
 })
 export class AutoLoginGuard implements CanLoad {
-  constructor(private authService: AuthenticationService, private router: Router, private shared_data:SharedDataService) { }
+  constructor(private authService: AuthenticationService, private shared_data:SharedDataService) { }
  
   canLoad(): Observable<boolean> {    
     return this.authService.isAuthenticated.pipe(
       filter(val => val !== null), // Filter out initial Behaviour subject value
       take(1), // Otherwise the Observable doesn't complete!
       map(isAuthenticated => {
-        console.log('Found previous token, automatic login');
+        console.log(isAuthenticated)
         if (isAuthenticated) {
+          console.log('autologin auth')
           // Directly open inside area
-          this.shared_data.goHomepage()
+          //this.shared_data.goHomepage()
         } else {          
           // Simply allow access to the login
+          console.log('access to login')
           return true;
         }
       })

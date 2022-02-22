@@ -7,21 +7,23 @@
       <div class="icon">
         <ion-icon name="alert-circle"></ion-icon>
       </div>
+      <div class="immediate_emergency">
+        <button mat-raised-button (click)="immediateEmergency()">Send immediatly Emergency</button>
+      </div>
       <div class="section">
         Accidentally triggered?
         No problem,enter your PIN to cancel.<br><br>
-        To send a message to your contact, please let the time expire
+        To send a message to your contact, please let the time expire or click the button above
       </div>
       <div class="section number">
-        <countdown [config]="config" (event)="send_Emergency($event)"></countdown>
+        <countdown #countdown [config]="config" (event)="send_Emergency($event)"></countdown>
       </div>
       <div class="container-box section">
-        <input (keyup)="onDigitInput($event)" name="0" id="0" matInput class="box" type='number' [(ngModel)]="pin[0]">
-        <input (keyup)="onDigitInput($event)" name="1" id="1" matInput class="box" type='number' [(ngModel)]="pin[1]">
-        <input (keyup)="onDigitInput($event)" name="2" id="2" matInput class="box" type='number' [(ngModel)]="pin[2]">
-        <input (keyup)="onDigitInput($event)" name="3" id="3" matInput class="box" type='number' [(ngModel)]="pin[3]">
+        <input class="box" (keyup)="onDigitInput($event)" name="0" id="0" matInput type='number' [(ngModel)]="pin[0]">
+        <input class="box" (keyup)="onDigitInput($event)" name="1" id="1" matInput type='number' [(ngModel)]="pin[1]">
+        <input class="box" (keyup)="onDigitInput($event)" name="2" id="2" matInput type='number' [(ngModel)]="pin[2]">
+        <input class="box" (keyup)="onDigitInput($event)" name="3" id="3" matInput type='number' [(ngModel)]="pin[3]">
       </div>
     </div>
   </div>
-  <!-- <ion-button (click)="currentLocPosition()">Controlla permesso</ion-button> -->
 </ion-content>

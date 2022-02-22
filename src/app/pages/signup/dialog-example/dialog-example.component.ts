@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { Emergency_Contact } from '../../../data/shared-data.service'
 import { Contacts, ContactName, ContactField } from '@ionic-native/contacts';
 import { LoadingController } from '@ionic/angular';
 
@@ -59,7 +58,7 @@ export class DialogExampleComponent implements OnInit {
   myContacts = [];
   selectedOptions;
   enableMatSpinner = true;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: Contact, private contacts: Contacts, private changeDetection: ChangeDetectorRef, private loadingController: LoadingController) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data, private contacts: Contacts, private changeDetection: ChangeDetectorRef, private loadingController: LoadingController) {
     this.import_from_addressBook();
     // this.loadedContacts.forEach(element => {
     //   this.myContacts.push(element)

@@ -3,21 +3,41 @@
 </button> -->
 <ion-header #content>
   <mat-toolbar class="toolbar">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <span>QR Reader</span>
-    <div class="fake-icon"></div>
+    <div class="toolbar_content">
+      <button mat-icon-button routerLink="/profile/menu/homepage" class="go_back_button">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span>QR Reader</span>
+      <div class="fake-icon"></div>
+    </div>
   </mat-toolbar>
 </ion-header>
 
 <ion-content #content>
-  <ion-card>
-    <ion-card-content>
-      Result from scan: {{scannedCode}}
-    </ion-card-content>
-  </ion-card>
-  <ion-button expand="full" (click)="scanCode()">
-    Scan Code
-  </ion-button>
+  <div class="content">
+    <div class="reader">
+      <mat-card appearance="fill" id="bluetooth" class="custom_mat_card">
+        <div class="title_list_Code">
+          <mat-card-title>List of yours QRs</mat-card-title>
+        </div>
+        <div>
+          <ion-list *ngFor="let item of this.sharedData.user_data.qr_code;let i=index;">
+            <ion-item-sliding>
+              <ion-item *ngIf="item.id !=-1 " class="ion-no-padding" id="item{{i}}">
+                <ion-label class="label_code">
+                  <h3>{{item}}</h3>
+                </ion-label>
+              </ion-item>
+            </ion-item-sliding>
+          </ion-list>
+        </div>
+      </mat-card>
+      <img src="assets/images/qr-reader.gif" alt="qr-reader" />
+      <div class="scannerCode">
+        <ion-button expand="full" (click)="scanCode()">
+          Scan Code
+        </ion-button>
+      </div>
+    </div>
+  </div>
 </ion-content>

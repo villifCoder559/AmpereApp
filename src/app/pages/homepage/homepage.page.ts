@@ -1,25 +1,30 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
-import {SharedDataService} from '../../data/shared-data.service'
+import { AlertEvent, DeviceType, QRNFCEvent, SharedDataService } from '../../data/shared-data.service'
+import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
+import { Snap4CityService } from '../../data/snap4-city.service'
+import { HttpClient } from '@angular/common/http';
+import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
+
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.page.html',
   styleUrls: ['./homepage.page.scss'],
 })
 /*TODO List:
+  0)Add alertButton
   1)Enable scroll page OK
   2)Fix validator foreach textarea OK
   3)Import contact from contacts of device TEST OK
   3.1)Improve html of Contacts tab OK
   3.2)Password & confirm_psw, add hide/not-hide_psw button OK
   4)Start page about connection device OK
-  5)Save data untill 4 phase OK
+  5)Save data until 4 phase OK
   6)Restyle ion list OK
   7)Start to make the page after sign-in OK
   8)password min length 8 and special char OK, load user_data when profile is loaded OK
@@ -35,24 +40,21 @@ import {SharedDataService} from '../../data/shared-data.service'
         _bad performance OK
   */
 export class HomepagePage implements OnInit {
-  gps_enable = false;
-  constructor(private sharedData:SharedDataService,private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private backgroundMode: BackgroundMode, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  gps_enable = true;
+  constructor(private background: BackgroundMode, private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
-      this.backgroundMode.enable();
-      this.backgroundMode.overrideBackButton();
-      this.backgroundMode.disableWebViewOptimizations();
       this.localNotifications.hasPermission().then(result => {
         if (!result.valueOf())
           this.localNotifications.requestPermission()
-      })
-      this.checkPermission()
-    })
+      }, (err) => console.log(err))
+      this.checkPermission();
+    }, (err) => console.log(err))
   }
-
   ngOnInit() {
-
   }
-
+  ngAfterViewInit() {
+    this.sharedData.dismissLoading();
+  }
   enableGPS() {
     this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
       () => {
@@ -97,6 +99,104 @@ export class HomepagePage implements OnInit {
   }
   showAlert() {
     //take bluetooth singal
-    this.sharedData.showAlertandSendEmergency();
+    this.sharedData.showAlert(0);
+  }
+  testQuery() {
+    this.ngsi.getDeviceData().then((result) => {
+      console.log(result)
+    }, (err) => console.log(err))
+  }
+  testAPIEntry() {
+    return new Promise((resolve, reject) => {
+      this.http.get("https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/ampereuser1Profile" + "?elementid=" + 'ampereuser1Profile' + "&type=" + 'Profile', { observe: "response" })
+        .subscribe((result) => {
+          console.log(result)
+          resolve(result)
+        }, (err) => {
+          console.log(err.status)
+          reject(err)
+        })
+    })
+    // this.ngsi.getEntity(DeviceType.PROFILE, DeviceType.PROFILE).then((result: any) => {
+    //   console.log(result)
+    //   console.log(result.address.value)
+    // }, (err) => console.log(err))
+  }
+  testWriteQuery() {
+    this.ngsi.testWriteAPI('QR-NFC-Event').then((result) => {
+      console.log(result)
+    }, (err) => console.log(err))
+  }
+  openAlertPage() {
+    let navigationExtras: NavigationExtras = {
+      state: { deviceID: 'APP' },
+      replaceUrl: true
+    };
+    this.router.navigate(['/show-alert'], navigationExtras)
+  }
+  openWebPage() {
+    window.open('www.google.com')
+  }
+  createDeviceFromModel() {
+    //this.s4c.createDeviceFromModel();
+  }
+  getProfile() {
+    this.ngsi.getEntityHTTP(DeviceType.PROFILE, DeviceType.PROFILE).then((result) => {
+      console.log(result)
+    }, err => { })
+  }
+  getInsertDataS4C() {
+    console.log(this.s4c.getUserIDPayload(false));
+    console.log(this.s4c.getAlertEventPayload())
+    console.log(this.s4c.getQRNFCEventPayload())
+  }
+  sendUserProfile() {
+    this.ngsi.sendUserProfile().then(() => {
+      console.log('OK')
+    }, err => console.log(err))
+  }
+  SendEventQRNFC() {
+    var attr = this.ngsi.sendQRNFCEvent(new QRNFCEvent('', '', ''))
+  }
+  testDeviceID() {
+    this.sharedData.showAlert('25a')
+  }
+  getAlertEventPayload() {
+    var event = new AlertEvent();
+    event.accelX = 18;
+    event.quote = 157;
+    event.status = 'test'
+    var test = this.s4c.getAlertEventPayload(false, event);
+    console.log(test)
+  }
+  testLoading() {
+    this.sharedData.presentLoading('TEST 1');
+    setTimeout(() => {
+      this.sharedData.dismissLoading();
+      this.sharedData.presentLoading('TEST 2')
+      setTimeout(() => {
+        this.sharedData.dismissLoading();
+      }, 3500)
+    }, 2000)
+  }
+  async askPermission() {
+    const data = await this.androidPermissions.requestPermissions([
+      "android.permission.ACCESS_BACKGROUND_LOCATION",
+      "android.permission.ACCESS_COARSE_LOCATION",
+      this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
+    ]).then(()=>console.log('PERMISSION_REQUESTED'))
+  }
+  checkAndroidPermission() {
+    this.androidPermissions.checkPermission('ACCESS_BACKGROUND_LOCATION').then((value) => {
+      if (!value.hasPermission)
+        this.androidPermissions.requestPermission('ACCESS_BACKGROUND_LOCATION');
+      console.log(value)
+    })
+  }
+  enableWatchPosition() {
+    this.sharedData.enableAllBackgroundMode()
+    this.geolocation.watchPosition().subscribe((data) => {
+      console.log(data)
+    })
   }
 }

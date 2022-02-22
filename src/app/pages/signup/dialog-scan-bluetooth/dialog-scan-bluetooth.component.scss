@@ -13,6 +13,12 @@
 .matSpinner-i{
     display: flex
 }
+.title{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
 mat-selection-list{
     max-height: inherit;
     max-width: inherit;

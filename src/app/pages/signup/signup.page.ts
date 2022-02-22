@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, Input, ElementRef } from '@angular/core';
-import { FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors, ValidatorFn, FormControl } from '@angular/forms';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatStep, MatStepper, StepperOrientation } from '@angular/material/stepper';
 import { interval, Observable, timer } from 'rxjs';
@@ -13,126 +13,74 @@ import { DialogExampleComponent } from './dialog-example/dialog-example.componen
 import { MatTooltip } from '@angular/material/tooltip';
 import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
-import { AlertController, IonContent, ToastController } from '@ionic/angular';
+import { AlertController, AngularDelegate, IonContent, Platform, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SharedDataService, UserData, Device, Emergency_Contact } from '../../data/shared-data.service'
+import { SharedDataService, UserData, Emergency_Contact, typeChecking, DeviceType } from '../../data/shared-data.service'
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 import * as moment from 'moment';
 import { Contacts, ContactName, ContactField } from '@ionic-native/contacts/ngx';
 import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
-
+import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
+import { BluetoothService } from '../../data/bluetooth.service'
+import { Snap4CityService } from '../../data/snap4-city.service'
+import { AuthenticationService } from '../../services/authentication.service'
+import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
+import { LoadingController } from '@ionic/angular';
+import { DialogSaveComponent } from './dialog-save/dialog-save.component';
+import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component';
+import { Geolocation } from '@ionic-native/geolocation/ngx'
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
   styleUrls: ['./signup.page.scss'],
 })
 export class SignupPage implements OnInit {
-  logged = false;
   hide;
-
   hideold;
   hidepsw;
-  posNumberContacts = [false, false, false, false, false];
   countNumberContactsDone = 0;
-  name;
-  number;
-  editable = false;
-  data = {
-    name: '',
-    number: ''
-  }
-  user_data: UserData;
-  public_emergency_contacts
-  paired_devices = [];
+  psw_editable = false;
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
-  required = Validators.required;
+  //required = Validators.required;
   @ViewChild('tooltip') tooltip: MatTooltip;
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
-  pswValidator: Validators = [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*[|!"£/()?@#$%^&+=]).*$')];
-  zeroFormGroup = this._formBuilder.group({
-    email: ['', Validators.email],
-    psw: [''],
-    confirm_psw: [''],
-    old_psw: ['']
-  }, {
-    validators: [ValidatePassword.ConfirmValidator('psw', 'confirm_psw')]
-  })
+  //add native-langauage field
+  //fix dimension when resize the screen
   firstFormGroup = this._formBuilder.group({
-    name: ['', Validators.required],
-    surname: ['', Validators.required],
-    phoneNumber: ['', Validators.required],
-    birthdate: ['', Validators.compose([Validators.required, DateValidator.dateVaidator])],
-    gender: ['', Validators.required],
-    address: ['', Validators.required],
-    locality: ['', Validators.required],
-    city: ['', Validators.required],
-    height: ['', [Validators.maxLength(3), Validators.pattern("^[0-9]*$")]],
-    weight: ['', [Validators.maxLength(3), Validators.pattern("^[0-9]*$")]],
-    ethnicity: ['', Validators.maxLength(15)],
-    description: ['', Validators.maxLength(200)],
-    purpose: ['', Validators.maxLength(200)],
-    pin: ['', Validators.minLength(4)]
+    name: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
+    surname: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
+    nickname: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
+    email: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator, Validators.email])],
+    phoneNumber: ['', Validators.compose([SpecialCharValidator.specialCharValidator, Validators.required, Validators.pattern('[- +()0-9]+')])],
+    dateofborn: ['', Validators.compose([SpecialCharValidator.specialCharValidator, DateValidator.dateVaidator])],
+    gender: [''],
+    language: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
+    address: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
+    locality: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
+    city: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
+    height: ['', Validators.compose([Validators.maxLength(3), Validators.pattern("^[0-9]*$")])],
+    weight: ['', Validators.compose([Validators.maxLength(3), Validators.pattern("^[0-9]*$")])],
+    ethnicity: ['', Validators.compose([Validators.maxLength(15), SpecialCharValidator.specialCharValidator])],
+    description: ['', Validators.compose([Validators.maxLength(200), SpecialCharValidator.specialCharValidator])],
+    purpose: ['', Validators.compose([Validators.maxLength(200), SpecialCharValidator.specialCharValidator])],
+    pin: ['', Validators.compose([Validators.minLength(4), Validators.maxLength(4), Validators.pattern("^[0-9]*$")])]
   });
   secondFormGroup = this._formBuilder.group({
-    allergies: ['', Validators.maxLength(200)],
-    medications: ['', Validators.maxLength(200)]
-  });
-  thirdFormGroup = this._formBuilder.group({
-    contact0name: [''],
-    contact0number: [''],
-    contact1name: [''],
-    contact1number: [''],
-    contact2name: [''],
-    contact2number: [''],
-    contact3name: [''],
-    contact3number: [''],
-    contact4name: [''],
-    contact4number: [''],
+    allergies: ['', Validators.compose([Validators.required, Validators.maxLength(200), SpecialCharValidator.specialCharValidator])],
+    medications: ['', Validators.compose([Validators.maxLength(200), SpecialCharValidator.specialCharValidator])],
+    visionImpaired: [false],
+    wheelchairUser: [false]
   });
   fourthFormGroup = this._formBuilder.group({
-    fourthCtrl: ['']
+    112: ['', Validators.required],
+    115: ['', Validators.required],
+    118: ['', Validators.required]
   });
-  readonly arrayFormGroup = [this.zeroFormGroup, this.firstFormGroup, this.secondFormGroup, this.thirdFormGroup, this.fourthFormGroup]
-  stepperOrientation: Observable<StepperOrientation>;
-  myContacts = [
-    {
-      name: 'pol',
-      number: '12345555'
-    }, {
-      name: 'Aliss',
-      number: '1249855'
-    }, {
-      name: 'sdgf',
-      number: '7654123'
-    }, {
-      name: 'Pasq',
-      number: '129852185'
-    }
-  ];
-  constructor(public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, private shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
-    this.user_data = this.shared_data.getUserData();
-    if (this.user_data == undefined) {
-      this.user_data = new UserData();
-    }
-    this.stepperOrientation = breakpointObserver.observe('(min-width: 800px)')
-      .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
-    this.logged = this.shared_data.getIs_logged();
-  }
-  sendPostRequest() {
-    var headers = new HttpHeaders();
-    headers.append("Accept", 'application/json');
-    headers.append('Content-Type', 'application/json');
-    let postData = {
-      "name": "Customer004",
-      "email": "customer004@email.com",
-      "tel": "0000252525"
-    }
-    this.http.post("http://127.0.0.1:1880/home", postData, { headers: headers })
-      .subscribe(data => {
-      }, error => {
-        console.log(error);
-      });
+  readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.fourthFormGroup]
+  constructor(private geo: Geolocation, private route: ActivatedRoute, private platform: Platform, public authService: AuthenticationService, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+    console.log('From signup')
+    console.log(this.shared_data.user_data)
   }
   findErrorsAllFormsGroup() {
     console.log(this.arrayFormGroup.length)
@@ -140,109 +88,124 @@ export class SignupPage implements OnInit {
     for (var i = 0; i < this.arrayFormGroup.length && !error; i++) {
       var result = this.getFormValidationErrors(this.arrayFormGroup[i]);
       if (result.length != 0) {
-        return i+1;
+        return i + 1;
       }
     }
     return error;
   }
-  /*Create generalised check foreach formGroup field. this specific implementation working fine*/
-  change_EmailPassword() {
-    this.editable = !this.editable;
-    if (!this.editable) {
-      this.zeroFormGroup.controls['psw'].setErrors(null);
-      this.zeroFormGroup.controls['confirm_psw'].setErrors(null);
-      this.zeroFormGroup.controls['old_psw'].setErrors(null);
-      console.log('clear')
-    }
-    else {
-      this.zeroFormGroup.controls['psw'].setErrors(this.pswValidator)
-      this.zeroFormGroup.controls['confirm_psw'].setErrors([Validators.required])
-      this.zeroFormGroup.controls['old_psw'].setErrors([Validators.required])
-      this.createToast('If you don\'t want to modify your password, click close Edit psw')
-    }
-    this.zeroFormGroup.updateValueAndValidity();
-
-  }
-
   ngOnInit() {
-    if (this.logged) {
-      // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
-      const user_data: UserData = this.shared_data.getUserData();
-      this.zeroFormGroup.get('email').setValue(user_data.email)
-      console.log(user_data);
-      this.firstFormGroup.setValue({
-        name: user_data.name,
-        surname: user_data.surname,
-        phoneNumber: user_data.phoneNumber,
-        birthdate: user_data.birthdate,
-        gender: user_data.gender,
-        address: user_data.address,
-        locality: user_data.locality,
-        city: user_data.city,
-        height: user_data.height,
-        weight: user_data.weight,
-        ethnicity: user_data.ethnicity,
-        description: user_data.description,
-        purpose: user_data.purpose,
-        pin: user_data.pin
-      });
-      // this.user_data.disabilities saved thanks toogle_checkbox(i)
-      this.user_data.disabilities = user_data.disabilities;
-      this.secondFormGroup.setValue({
-        allergies: user_data.allergies,
-        medications: user_data.medications
-      })
-      for (var i = 0; i < 5; i++) {
-        var mat_card_number = "contact" + (i) + "number";
-        var mat_card_name = "contact" + (i) + "name";
-        if (user_data.emergency_contacts[i] != undefined && user_data.emergency_contacts[i].number != '') {
-          this.emergency_contacts.push(user_data.emergency_contacts[i])
-          this.thirdFormGroup.get(mat_card_name).setValue(user_data.emergency_contacts[i].name);
-          this.thirdFormGroup.get(mat_card_number).setValue(user_data.emergency_contacts[i].number);
-        }
-      }
-      this.user_data.public_emergency_contacts = user_data.public_emergency_contacts;
-      this.paired_devices = user_data.paired_devices;
-      this.changeDetection.detectChanges();
-      if (this.router.getCurrentNavigation().extras.state?.page == 6) {
+    if (this.authService.isAuthenticated.getValue()) {
+      var index = this.router.getCurrentNavigation().extras?.state?.page;
+      if (index !== undefined) {
         setTimeout(() => {
-          this.stepper.selectedIndex = 5;
+          this.stepper.selectedIndex = index;
           this.stepper.animationDone.subscribe(() => {
             this.content.scrollToBottom(500)
           })
-        }, 250);
+        }, 350);
       }
+      this.shared_data.presentLoading('Retrieving information...').then(() => {
+        this.NGSIv2QUERY.getEntity(this.shared_data.user_data.id + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
+          this.authService.isAuthenticated.next(true);
+          this.shared_data.user_data.paired_devices = [];
+          this.shared_data.user_data.qr_code = [];
+          this.shared_data.user_data.nfc_code = [];
+          this.shared_data.user_data.emergency_contacts = [];
+          Object.keys(this.shared_data.user_data).forEach((field_name) => {
+            switch (field_name) {
+              case 'id': case 'nfc_code': case 'qr_code': case 'paired_devices': case 'emergency_contacts': case 'public_emergency_contacts': {
+                break
+              }
+              case 'disabilities': {
+                this.shared_data.user_data.disabilities.visionImpaired = data.visionImpaired.value
+                this.shared_data.user_data.disabilities.wheelchairUser = data.wheelchairUser.value
+                break;
+              }
+              default: {
+                this.shared_data.user_data[field_name] = data[field_name].value;
+                break;
+              }
+            }
+          })
+          this.shared_data.user_data.public_emergency_contacts = { 112: data.call_112.value, 115: data.call_115.value, 118: data.call_118.value }
+          if (data.jewel1ID.value != '')
+            this.shared_data.user_data.paired_devices.push(data.jewel1ID.value)
+          if (data.jewel2ID.value != '')
+            this.shared_data.user_data.paired_devices.push(data.jewel2ID.value)
+          for (var i = 0; i < 5; i++) {
+            var name = data['emergencyContact' + (i + 1) + 'Name'].value;
+            var surname = data['emergencyContact' + (i + 1) + 'Surname'].value;
+            var number = data['emergencyContact' + (i + 1) + 'Number'].value;
+            console.log('contact ' + i);
+            console.log(name + surname + number)
+            if (name != '' && surname != '' && number != '')
+              this.shared_data.user_data.emergency_contacts.push(new Emergency_Contact(name, surname, number))
+          }
+          for (var i = 0; i < 4; i++) {
+            var qrcode = data['QR' + (i + 1)].value;
+            if (qrcode != '')
+              this.shared_data.user_data.qr_code.push(qrcode)
+          }
+          for (var i = 0; i < 4; i++) {
+            var nfccode = data['NFC' + (i + 1)].value;
+            if (nfccode != '')
+              this.shared_data.user_data.nfc_code.push(nfccode)
+          }
+          this.setAllFromData();
+          this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
+          this.shared_data.getNameDevices();
+          //this.bluetoothService.enableAllUserBeaconFromSnap4City();
+          this.changeDetection.detectChanges();
+          this.shared_data.dismissLoading();
+          // this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
+        }, err => {
+          console.log(err)
+          this.shared_data.dismissLoading();
+          if (err.status == '401' || err.status == '404') {
+            this.router.navigateByUrl('/signup', { replaceUrl: true })
+          }
+        })
+      })
+
     }
   }
-  checkData(ev) {
+  checkDate(ev) {
     console.log(ev)
     //if(backspace) delete 2 chars
     if (ev.inputType != 'deleteContentBackward') {
       var value: string = ev.target.value;
-      var split = value.split('/');
-      console.log(split)
-      if (split.length < 3) {
-        if (split.length == 2 || split.length == 5) {
-          this.firstFormGroup.controls['birthdate'].setValue(ev.target.value + '/');
-        }
-        else {
-          for (var i = 0; i < split.length; i++) {
-            if (i == 0) {
-              if (parseInt(split[i]) > 1) {//month
-                this.firstFormGroup.controls['birthdate'].setValue(ev.target.value + '/');
-              }
-            }
+      var split = value.split('-');
+      var year = parseInt(split[0]);
+      var month = parseInt(split[1]);
+      var day = parseInt(split[2]);
+      var date: string = '';
+      if (value.length > 3) {
+        date = year + '-'
+        if (!isNaN(month)) {
+          if (month.toString().length < 2)
+            if (month > 1)
+              date += '0' + month.toString() + '-';
             else {
-              if (i == 1 && parseInt(split[i]) > 3) {//day
-                this.firstFormGroup.controls['birthdate'].setValue(ev.target.value + '/');
-              }
+              date += month.toString()
+              console.log(date)
             }
-          }
+          else
+            date += month + '-'
+        }
+        if (!isNaN(day)) {
+          if (day.toString().length < 2)
+            if (day > 3)
+              date += '0' + day.toString()
+            else
+              date += day.toString()
+          else
+            date += day
         }
       }
-    }
-    else if (ev.inputType == 'deleteContentBackward') {
-
+      if (date != '') {
+        this.firstFormGroup.controls['dateofborn'].setValue(date);
+        console.log(date)
+      }
     }
   }
   triggerResize() {
@@ -257,119 +220,248 @@ export class SignupPage implements OnInit {
       this.firstFormGroup.controls[id].setValue(txt.substring(0, txt.length - 1))
     }
   }
-
-  add_Contact() {
-    this.getFormValidationErrors(this.thirdFormGroup)
-    if (this.countNumberContactsDone < 5 && !this.thirdFormGroup.hasError('required')) {
-      this.countNumberContactsDone++;
-      const app = new Emergency_Contact()
-      this.emergency_contacts.push(app)
+  remove_contact(index) {
+    //var index = this.shared_data.user_data.emergency_contacts.findIndex((element) => element = contact);
+    this.shared_data.user_data.emergency_contacts.splice(index, 1);
+    if (this.authService.isAuthenticated.getValue())
+      this.NGSIv2QUERY.sendUserProfile().catch(err => {
+        this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
+        alert('Error ' + err + '. Retrived old data');
+      });
+  }
+  openDialogEmergencyContact(value, index): void {
+    var ok = true;
+    console.log('pass');
+    var oldList = this.shared_data.user_data.paired_devices;
+    if (value == 0) {
+      value = { name: '', surnamne: '', number: '' }
+      if (this.shared_data.user_data.emergency_contacts.length > 4)
+        ok = false
     }
+    if (ok) {
+      const dialogRef = this.dialog.open(DialogAddEmergencyContactComponent, {
+        maxWidth: '90vw',
+        minWidth: '40vw',
+        data: {
+          contact: value,
+          index: index
+        }
+      });
+      dialogRef.afterClosed().subscribe(result => {
+        //console.log(result);
+        console.log(result.index == -1)
+        if (result.index == -1) //new element
+          this.shared_data.user_data.emergency_contacts.push(new Emergency_Contact(result.data.name, result.data.surname, result.data.number))
+        else //old element modified
+          this.shared_data.user_data.emergency_contacts[result.index] = new Emergency_Contact(result.data.name, result.data.surname, result.data.number);
+        this.saveUserProfile().then(() => {
+          this.shared_data.createToast('Data saved succesfully')
+        }, err => {
+          alert(err)
+          this.shared_data.createToast('Recovery old data')
+        })
+      });
+    }
+    else
+      this.shared_data.createToast('You can register max 5 people!')
   }
-  remove_contact(id) {
-    this.emergency_contacts.splice(id, 1)
-    this.countNumberContactsDone--;
-    var mat_card_number = "contact" + (id) + "number";
-    var mat_card_name = "contact" + (id) + "name";
-    this.thirdFormGroup.get(mat_card_name).setValue("");
-    this.thirdFormGroup.get(mat_card_number).setValue(undefined);
-  }
-
-  openDialogContacts(id): void {
-    const dialogRef = this.dialog.open(DialogExampleComponent, {
-      maxWidth: '90vw',
-      minWidth: '40vw',
-      data: {
-        contact: { name: '', number: '' }
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      var app = 'contact' + id + 'name';
-      if (result?.name != undefined && result?.number != undefined) {
-        this.thirdFormGroup.get(app).setValue(result.name)
-        var app = 'contact' + id + 'number';
-        this.thirdFormGroup.get(app).setValue(result.number)
-      }
-    });
-  }
-  openDialogBLE(): void {
-    const dialogRef = this.dialog.open(DialogScanBluetoothComponent, {
-      maxWidth: '90vw',
-      minWidth: '40vw'
-      //data: { id: '' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
-      if (result != null && result != '' && result != undefined)
-        this.paired_devices.push(result);
+  saveUserProfile() {
+    return new Promise((resolve, reject) => {
+      this.shared_data.presentLoading('Updating info...').then(() => {
+        this.NGSIv2QUERY.sendUserProfile().then(() => {
+          this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
+          this.shared_data.dismissLoading();
+          resolve(true)
+        }, err => {
+          this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
+          this.shared_data.dismissLoading();
+          reject(err)
+        })
+      })
     })
+
+  }
+  openBeaconDialog() {
+    //this.shared_data.user_data.paired_devices[0] == null || this.shared_data.user_data.paired_devices[1] == null
+    console.log(this.shared_data.user_data.paired_devices)
+    if (this.shared_data.user_data.paired_devices.length < 2) {
+      const dialogRef = this.dialog.open(DialogScanBluetoothComponent, {
+        maxWidth: '90vw',
+        minWidth: '40vw',
+        data: { result: '' }
+      })
+      dialogRef.afterClosed().subscribe((result) => {
+        console.log('RESULT')
+        console.log(result)
+        if (result != '' && result !== undefined)
+          this.addPairedDeviceANDregister(result);
+      }, err => (console.log(err)));
+    }
+    else
+      this.shared_data.createToast('You have already paired 2 devices!');
   };
+  addPairedDeviceANDregister(device) {
+    var indexOf = this.shared_data.user_data.paired_devices.indexOf(device);
+    this.shared_data.user_data.paired_devices.push(device);
+    console.log(this.shared_data.user_data.paired_devices.length)
+    if (indexOf == -1) {
+      var attr = {}
+      attr['jewel' + this.shared_data.user_data.paired_devices.length + 'ID'] = { value: device }
+      this.saveUserProfile().then(() => {
+        this.shared_data.setNameDevice(device, device);
+        this.shared_data.createToast('Data saved succesfully')
+      }, err => {
+        alert(err)
+        this.shared_data.createToast('Recovery old data')
+      })
+    }
+    else
+      alert('Device already registred')
+  }
   click_next() {
     for (var i = 0; i < this.countNumberContactsDone; i++) {
-      if (this.emergency_contacts[i].name === '')
-        this.emergency_contacts.splice(1, i)
+      if (this.shared_data.user_data.emergency_contacts[i].name === '')
+        this.shared_data.user_data.emergency_contacts.splice(1, i)
     }
   }
   show_tooltip() {
     this.tooltip.show();
     interval(4000).subscribe(() => { this.tooltip.hide(); })
   }
-  emergency_contacts: Emergency_Contact[] = []
-
-  scanInterval = null;
-  //add loading while searching devices, try to paire the devices
-
-
-  async pair_device(device) {
-    var free_index = this.pair_device == null ? 0 : 1;
-    if (this.paired_devices[free_index] != null) {
-      var msg = 'You have already pair 2 smart jewelries, delete once if you want to add a new';
-      for (var i = 0; i < this.pair_device.length; i++) {
-        if (device.id == this.pair_device[i])
-          msg = "This device has already been registred!"
-      }
-      const alert = await this.alertController.create({
-        cssClass: '',
-        header: 'Alert',
-        subHeader: 'Subtitle',
-        message: msg,
-        buttons: ['OK']
-      });
-
-      await alert.present();
-      const { role } = await alert.onDidDismiss();
-      console.log('onDidDismiss resolved with role', role);
-    }
-    else
-      this.paired_devices[free_index] = device
-  }
   delete(device, index) {
-    console.log('delete pos ' + index + " -> " + device.id)
-    var a = $('#device' + index).hide(800, () => {
-      this.paired_devices.splice(index, 1);
-      console.log(this.paired_devices)
+    console.log('delete pos ' + index + " -> " + device.uuid)
+    var a = $('#device' + index).hide(400, () => {
+      //var data_to_send = this.NGSIv2QUERY.getEmergencyContactsToSend(newContacts);
+      var el_deleted = this.shared_data.user_data.paired_devices.splice(index, 1);
+      console.log(this.shared_data.user_data.paired_devices)
+      //this.bluetoothservice.disableRegion(deviceDeleted)
+      if (this.authService.isAuthenticated.value)
+        this.saveUserProfile().then(() => {
+          this.shared_data.deleteDeviceFromNameDevice(el_deleted);
+          this.shared_data.createToast('Data saved succesfully')
+        }, err => {
+          //alert(err)
+          console.log(this.shared_data.user_data)
+          this.shared_data.createToast('Error ' + 'Recovery old data')
+        })
+      //.then(()=>{ alert('Successfully updated)},err=>aler('Update error' + err))
+      //this.shared_data.user_data.paired_devices[index] = null;
+      //this.shared_data.saveData();
+      console.log(this.shared_data.user_data.paired_devices)
     })
-
+  }
+  getAllDataFromForm() {
+    Object.keys(this.shared_data.user_data).forEach((element) => {
+      console.log(element)
+      switch (element) {
+        case 'id': case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
+          break;
+        case 'dateObserved': {
+          this.shared_data.user_data[element] = new Date().toISOString();
+          break;
+        }
+        case 'allergies': case 'medications': {
+          this.shared_data.user_data[element] = this.secondFormGroup.get(element)?.value;
+          break
+        }
+        case 'public_emergency_contacts': {
+          Object.keys(this.shared_data.user_data[element]).forEach((number) => {
+            console.log(number)
+            console.log(this.shared_data.user_data[element][number])
+            this.shared_data.user_data[element][number] = this.fourthFormGroup.get(number)?.value;
+          })
+          break;
+        }
+        case 'disabilities': {
+          console.log('DISABILITIES')
+          //console.log(this.shared_data.user_data[element])
+          Object.keys(this.shared_data.user_data[element]).forEach((dis) => {
+            this.shared_data.user_data[element][dis] = this.secondFormGroup.get(dis)?.value
+          })
+          break;
+        }
+        default:
+          this.shared_data.user_data[element] = this.firstFormGroup.get(element)?.value
+      }
+    })
+    // this.shared_data.user_data.email = this.firstFormGroup.get('email')?.value;
+    // this.shared_data.user_data.name = this.firstFormGroup.get('name')?.value;
+    // this.shared_data.user_data.surname = this.firstFormGroup.get('surname')?.value;
+    // this.shared_data.user_data.nickname = this.firstFormGroup.get('nickname')?.value;
+    // this.shared_data.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
+    // this.shared_data.user_data.dateofborn = this.firstFormGroup.get('dateofborn')?.value;
+    // this.shared_data.user_data.gender = this.firstFormGroup.get('gender')?.value;
+    // this.shared_data.user_data.address = this.firstFormGroup.get('address')?.value;
+    // this.shared_data.user_data.locality = this.firstFormGroup.get('locality')?.value;
+    // this.shared_data.user_data.city = this.firstFormGroup.get('city')?.value;
+    // this.shared_data.user_data.height = this.firstFormGroup.get('height')?.value;
+    // this.shared_data.user_data.weight = this.firstFormGroup.get('weight')?.value;
+    // this.shared_data.user_data.ethnicity = this.firstFormGroup.get('ethnicity')?.value;
+    // this.shared_data.user_data.description = this.firstFormGroup.get('description')?.value;
+    // this.shared_data.user_data.purpose = this.firstFormGroup.get('purpose')?.value;
+    // this.shared_data.user_data.pin = this.firstFormGroup.get('pin')?.value;
+    // this.shared_data.user_data.allergies = this.secondFormGroup.get('allergies')?.value;
+    // this.shared_data.user_data.medications = this.secondFormGroup.get('medications')?.value;
+  }
+  setAllFromData() {
+    Object.keys(this.shared_data.user_data).forEach((element) => {
+      console.log(element)
+      switch (element) {
+        case 'id': case 'dateObserved': case 'emergency_contacts': case 'paired_devices': case 'qr_code': case 'nfc_code': case 'status':
+          break;
+        case 'allergies': case 'medications': {
+          this.secondFormGroup.get(element).setValue(this.shared_data.user_data[element])
+          break
+        }
+        case 'public_emergency_contacts': {
+          Object.keys(this.shared_data.user_data[element]).forEach((number) => {
+            this.fourthFormGroup.get(number).setValue(this.shared_data.user_data[element][number] === 'true' ? true : false);
+          })
+          break;
+        }
+        case 'disabilities': {
+          Object.keys(this.shared_data.user_data[element]).forEach((dis) => {
+            this.secondFormGroup.get(dis).setValue(this.shared_data.user_data[element][dis])
+          })
+          break;
+        }
+        default:
+          this.firstFormGroup.get(element).setValue(this.shared_data.user_data[element])
+      }
+    })
   }
   save_data() {
     //conyrollo
-    console.log(this.zeroFormGroup.errors);
-    console.log(this.getFormValidationErrors(this.zeroFormGroup))
-    this.register_user();
-    var error=this.findErrorsAllFormsGroup();
-    if (!error)      //check if change is registred in db
-      this.createToast('Data updated!');
+    // console.log(this.zeroFormGroup.errors);
+    // console.log(this.getFormValidationErrors(this.zeroFormGroup))
+    this.shared_data.user_data.dateObserved = new Date().toISOString();
+    var error = this.findErrorsAllFormsGroup();
+    console.log('OLD DATA')
+    console.log(this.shared_data.old_user_data)
+    console.log('STANDARD DATA')
+    console.log(this.shared_data.user_data)
+    if (!error) {      //check if changes it is registred in db
+      this.getAllDataFromForm();
+      console.log(this.shared_data.user_data)
+      this.shared_data.presentLoading('Updating server').then(() => {
+        this.NGSIv2QUERY.sendUserProfile().then((value) => {
+          this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
+          this.shared_data.dismissLoading();
+          this.shared_data.createToast('Data updated!');
+        }, (err) => {
+          console.log(this.shared_data.old_user_data)
+          this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
+          console.log('AFTER OBJECT')
+          console.log(this.shared_data.user_data)
+          this.setAllFromData();
+          this.changeDetection.detectChanges();
+          this.shared_data.dismissLoading();
+          this.shared_data.createToast('Error ' + err + '. Recovered old data available')
+        })
+      })
+    }
     else
-      this.createToast('Error in step number '+(error));
-  }
-  async createToast(header) {
-    let toast = await this.toastCtrl.create({
-      header: header,
-      duration:3500
-    })
-    toast.present();
+      this.shared_data.createToast('Error in step number ' + (error));
   }
   getFormValidationErrors(form: FormGroup) {
     const result = [];
@@ -385,82 +477,96 @@ export class SignupPage implements OnInit {
         });
       }
     });
-
     return result;
   }
   register_user() {
-    // this.user_data.password = bcrypt.hashSync(this.zeroFormGroup.get('password')?.value, 10);
-    this.user_data.email = this.zeroFormGroup.get('email')?.value;
-    this.user_data.name = this.firstFormGroup.get('name')?.value;
-    this.user_data.surname = this.firstFormGroup.get('surname')?.value;
-    this.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
-    this.user_data.birthdate = this.firstFormGroup.get('birthdate')?.value;
-    this.user_data.gender = this.firstFormGroup.get('gender')?.value;
-    this.user_data.address = this.firstFormGroup.get('address')?.value;
-    this.user_data.locality = this.firstFormGroup.get('locality')?.value;
-    this.user_data.city = this.firstFormGroup.get('city')?.value;
-    this.user_data.height = this.firstFormGroup.get('height')?.value;
-    this.user_data.weight = this.firstFormGroup.get('weight')?.value;
-    this.user_data.ethnicity = this.firstFormGroup.get('ethnicity')?.value;
-    this.user_data.description = this.firstFormGroup.get('description')?.value;
-    this.user_data.purpose = this.firstFormGroup.get('purpose')?.value;
-    this.user_data.pin = this.firstFormGroup.get('pin')?.value;
-    // this.user_data.disabilities saved thanks toogle_checkbox(i)
-    this.user_data.allergies = this.secondFormGroup.get('allergies')?.value;
-    this.user_data.medications = this.secondFormGroup.get('medications')?.value;
-    for (var i = 0; i < this.user_data.emergency_contacts.length; i++) {
-      var index = i + '';
-      var mat_card_name = "contact" + (index) + "name";
-      var mat_card_number = "contact" + (index) + "number";
-      var contact: Emergency_Contact = { name: '', number: '' };
-      contact.name = this.thirdFormGroup.get(mat_card_name)?.value;
-      contact.number = this.thirdFormGroup.get(mat_card_number)?.value
-      if (contact.name != '' && contact.number != '') {
-        this.user_data.emergency_contacts[i] = contact;
-      }
+    // var error = this.findErrorsAllFormsGroup();
+    // if (!error)
+    if (this.shared_data.user_data.paired_devices.length > -1) {//FIX >0
+      this.getAllDataFromForm();
+      console.log(this.shared_data.user_data)
+      this.shared_data.presentLoading('Creating user').then(() => {
+        this.snap4CityService.createDevice(DeviceType.PROFILE).then(() => {
+          console.log('DEVICE CRATED')
+          this.shared_data.user_data.dateObserved = new Date().toISOString();
+          this.NGSIv2QUERY.sendUserProfile().then(() => {
+            this.shared_data.dismissLoading();
+            this.shared_data.createToast('Successfully registered')
+            this.authService.isAuthenticated.next(true);
+            this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
+            this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true })
+          }, (err) => {
+            console.log('DELETING_DEVICE')
+            this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
+              console.log('Device deleted')
+            }, err => console.log(err))
+            this.shared_data.dismissLoading();
+            alert(err.msg)
+          })
+        }, err => {
+          console.log('DELETING_DEVICE')
+          this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
+            console.log('Device deleted')
+          }, err => console.log(err))
+          this.shared_data.dismissLoading();
+          alert(err.msg)
+        })
+      })
     }
-    this.user_data.paired_devices = this.paired_devices;
-    this.shared_data.setUserData(this.user_data)
-  }
-  toggle_checkbox_disabilities(index) {
-    this.user_data.disabilities[index] = !this.user_data.disabilities[index];
-  }
-  toggle_checkbox_public_emergency_contacts(id) {
-    this.user_data.public_emergency_contacts[id] = !this.user_data.public_emergency_contacts[id];
+    else
+      this.shared_data.createToast('You must pair at least one device!')
   }
   go_back() {
     this.router.navigateByUrl('/', { replaceUrl: true });
   }
-  public trackItem(index: number, item) {
-    return item.trackId;
+  askSave() {
+    const dialog = this.dialog.open(DialogSaveComponent, {
+      maxWidth: '90vw',
+      minWidth: '40vw'
+    })
+    dialog.afterClosed().subscribe(result => {
+      console.log(result)
+      if (result !== undefined) {
+        if (result.value == 'yes')
+          this.save_data();
+        else
+          this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
+        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+      }
+    })
+  }
+  modifyNameDevice(i) {
+    const dialogRef = this.dialog.open(DialogModifyNameComponent, {
+      maxWidth: '90vw',
+      minWidth: '40vw',
+      data: {
+        id: this.shared_data.user_data.paired_devices[i],
+        name: '',
+      }
+    })
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result)
+      this.shared_data.setNameDevice(result.value.id, result.value.name);
+      console.log(this.shared_data.nameDevices)
+      const slidingItem = document.getElementById('slidingItem' + i) as any;
+      slidingItem.close();
+      this.changeDetection.detectChanges();
+    });
   }
 }
-
+export class SpecialCharValidator {
+  static specialCharValidator(control: FormControl): { [key: string]: boolean } {
+    const nameRegexp: RegExp = /[<>"'=;()]/;
+    if (control.value && nameRegexp.test(control.value)) {
+      return { invalidName: true };
+    }
+  }
+}
 class DateValidator {
   static dateVaidator(AC: AbstractControl) {
-    if (AC && AC.value && (!moment(AC.value, 'MM/DD/YYYY', true).isValid() && !moment(AC.value, 'M/D/YYYY', true).isValid())) {
+    if (AC && AC.value && (!moment(AC.value, 'YYYY-MM-DD', true).isValid() || (moment().diff(AC.value) < 0 || moment().diff(AC.value, 'day') > 365 * 150))) {
       return { dateValidator: true };
     }
     return null;
-  }
-}
-
-class ValidatePassword {
-  static ConfirmValidator(name: string, checkName: string): ValidatorFn {
-    return (controls: AbstractControl) => {
-      const control = controls.get(name);
-      const checkControl = controls.get(checkName);
-      if (checkControl.errors && !checkControl.errors.matching) { //avoid errors when confirm_password is not yet insert
-        return null;
-      }
-      if (control.value !== checkControl.value) {
-        controls.get(checkName).setErrors({ matching: true });
-        return { matching: true }
-      }
-      else {
-        controls.get(checkName).setErrors(null)
-        return null
-      }
-    }
   }
 }

@@ -1,18 +1,20 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
+import { Injectable, OnInit } from '@angular/core';
+import { NavigationExtras, Router } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, Platform } from '@ionic/angular';
-import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { BackgroundMode } from '@ionic-native/background-mode/ngx';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
-import { NativeAudio } from '@ionic-native/native-audio/ngx';
-import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
-import { CountdownConfig, CountdownModule } from 'ngx-countdown';
+import { IonicModule, LoadingController, Platform, ToastController } from '@ionic/angular';
+// import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
+import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
+// import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 
+// import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { NativeAudio } from '@ionic-native/native-audio/ngx';
+// import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
+import { CountdownConfig, CountdownModule } from 'ngx-countdown';
+import { Storage } from '@ionic/storage-angular'
+/**fix logout */
 @NgModule({
   imports: [
     CommonModule,
@@ -21,32 +23,56 @@ import { CountdownConfig, CountdownModule } from 'ngx-countdown';
     CountdownModule
   ],
   providers: [
-    LocationAccuracy,
-    Geolocation,
-    AndroidPermissions,
-    LocalNotifications,
-    BackgroundMode,
-    DeviceMotion,
-    NativeAudio,]
+    NativeAudio]
 })
+export class NFCCode {
+  id: number = -1;
+}
+export class QRCode {
+  id: number = -1;
+}
 export class Emergency_Contact {
   number: string = '';
   name: string = '';
+  surname: string = '';
+  constructor(name, surname, number) {
+    this.name = name;
+    this.surname = surname;
+    this.number = number;
+  }
 }
-export class Device {
-  name: string = '';
-  id: string = '';
-  rssi: string = '';
-  battery: number = 100;
-  connected: boolean = false;
+/**accuray:'15',major:125,mior:758,proximity:'Near',rssi:'-69',tx:'10db',uuid:'51446-54564w-fwfffw4-56d4we5d1e5113d2e1' */
+
+/* check iBeacon library OK
+  save data */
+export enum FakeKeycloak {
+  token = '',
+  refresh_token = ''
+}
+export enum typeChecking {
+  NFC_CODE = 'nfc_code',
+  QR_CODE = 'qr_code',
+  EMERGENCY_CONTACTS = 'emergency_contacts',
+  DISABILITIES = 'disabilities',
+  PUB_EMERGENCY_CONTACTS = 'public_emergency_contacts',
+  PAIRED_DEVICES = 'paired_devices'
+}
+export enum DeviceType {
+  ALERT_EVENT = 'AmpereEvent',
+  QR_NFC_EVENT = 'QR-NFC-Event',
+  DICTIONARY = 'QRNFCDictionary',
+  PROFILE = 'Profile'
 }
 
 export class UserData {
+  id: string = ''
   name: string = '';
   surname: string = ''
+  nickname: string = ''
+  language: string = ''
   email: string = ''
   phoneNumber: string = ''
-  birthdate: string = ''
+  dateofborn: string = ''
   gender: string = ''
   address: string = ''
   locality: string = ''
@@ -59,147 +85,216 @@ export class UserData {
   pin: string = ''
   allergies: string = ''
   medications: string = ''
-  password: string = ''
-  disabilities = [false, false]
-  emergency_contacts = [new Emergency_Contact, new Emergency_Contact, new Emergency_Contact, new Emergency_Contact, new Emergency_Contact]
-  public_emergency_contacts = { 113: false, 115: false, 118: false }
-  paired_devices = [new Device, new Device]
+  dateObserved = new Date().toISOString();
+  disabilities = { visionImpaired: false, wheelchairUser: false } /**[visionImapired,wheelchairUser] */
+  emergency_contacts = []
+  public_emergency_contacts = { 112: false, 115: false, 118: false }
+  paired_devices = []
+  qr_code = []
+  nfc_code = []
+  status = 'active'
   constructor() { }
+}
+export class AlertEvent {
+  latitude = -1.0
+  longitude = -1.0
+  dateObserved = new Date().toISOString();
+  quote = 0.0
+  velocity = 0.0
+  evolution = 'notHandled'
+  deviceID: string = ''
+  accelX = 0.0
+  accelY = 0.0
+  accelZ = 0.0
+  status = 'alert'
+}
+export class QRNFCEvent {
+  QRIDorNFC: string = ''
+  identifier: string = ''
+  action: string = ''
+  dateObserved = new Date().toISOString();
+  constructor(qridNfc, id, action) {
+    this.QRIDorNFC = qridNfc;
+    this.identifier = id;
+    this.action = action;
+  }
 }
 @Injectable({
   providedIn: 'root'
 })
 export class SharedDataService {
-  user_data: UserData;
-  gps_enable=false;
-  private _is_logged = false;
-  currentPosition = {
-    latitude: 0.0,
-    longitude: 0.0,
-    time: '',
-    date: '',
-    accuracy: 0
-  };
-  
-  count_click_emergency = 0;
-  constructor(private backgroundMode: BackgroundMode,private router: Router, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private locationAccuracy: LocationAccuracy,
-    private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  nameDevices = [];
+  old_user_data: UserData = new UserData();
+  public user_data: UserData = new UserData();
+  gps_enable = false;
+  constructor(private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+    this.storage.create();
     this.platform.ready().then(() => {
+      //this.enableAllBackgroundMode();
       this.nativeAudio.preloadSimple('alert', 'assets/sounds/alert.mp3').then(() => { }, (err) => console.log(err));
       this.nativeAudio.preloadSimple('sendData', 'assets/sounds/send_data.mp3').then(() => { }, (err) => console.log(err));
-      
     })
-    // this.user_data.emergency_contacts[0] = { number: '123456789', name: 'paul'};
-    // this.user_data.emergency_contacts[2] = { number: '058745632', name: 'Leo' }
   }
-
-  public getIs_logged() {
-    return this._is_logged;
+  async createToast(header) {
+    let toast = await this.toastCtrl.create({
+      header: header,
+      duration: 3500
+    })
+    toast.present();
   }
-  public setIs_logged(value) {
-    this._is_logged = value;
+  loading;
+  async presentLoading(msg) {
+    this.loading = await this.loadingController.create({
+      cssClass: 'my-custom-class',
+      message: msg,
+      spinner: 'bubbles'
+    });
+    await this.loading.present();
+  }
+  async dismissLoading() {
+    this.loading.dismiss()
   }
   setUserData(data) {
     this.user_data = data
-    //save data on database
   }
-  getUserData() {
-    return this.user_data
+  saveData() {
+    this.storage.set('user_data', this.user_data);
+    console.log('storage')
   }
-  loadDataUser() {
-    const data: UserData = {
-      address: 'Viale Morgagni 87',
-      allergies: 'gluten',
-      birthdate: '10/25/1947',
-      city: 'Florence',
-      description: 'brown hair, blue eyes',
-      disabilities: [false, true],
-      email: 'email@mail.com',
-      emergency_contacts: [{ number: '8541254732', name: 'Paul Rid' }],
-      ethnicity: 'white',
-      gender: 'male',
-      height: '185',
-      locality: 'Careggi',
-      medications: '',
-      name: 'Wayne',
-      weight: '85',
-      surname: 'Richards',
-      phoneNumber: '2587436910',
-      public_emergency_contacts: { 113: false, "115": false, "118": true },
-      paired_devices: [{ name: 'necklace', battery: 50, connected: true, id: '78542', rssi: '-73' }],
-      password: '',
-      pin: '0258',
-      purpose: 'Personal safety'
-    }
-    this.setUserData(data)
-    this.setIs_logged(true);
 
+  loadDataUser(auth) {
+    //console.log('data from service')
+    //console.log(this.user_data)
+    return new Promise((resolve, reject) => {
+      if (auth) {
+        this.storage.get('user_data').then((storageData) => {
+          if (storageData != null) {
+            console.log('TRUE_BLOCK')
+            console.log('LOADINGDATA')
+            this.user_data = storageData;
+            this.user_data.name = 'TEST'
+            resolve(true);
+          }
+          else {
+            console.log('ELSE_BLOCK')
+            var qr_code = new QRCode();
+            qr_code.id = 40;
+            var nfc_code = new NFCCode();
+            nfc_code.id = 42;
+            this.user_data.id = 'ampereuser1'
+            this.user_data.nickname = 'KL15'
+            this.user_data.address = 'VialeMorgagni87'
+            this.user_data.allergies = 'gluten'
+            this.user_data.dateofborn = '1950-08-09'
+            this.user_data.city = 'Florence'
+            this.user_data.description = 'brownHairBlueEyes'
+            this.user_data.disabilities.visionImpaired = false
+            this.user_data.disabilities.wheelchairUser = true
+            this.user_data.email = 'email@mail.com'
+            this.user_data.emergency_contacts = [new Emergency_Contact('Paul', 'Rid', '785232145202')]
+            this.user_data.ethnicity = 'white'
+            this.user_data.gender = 'male'
+            this.user_data.height = '185'
+            this.user_data.locality = 'Careggi'
+            this.user_data.medications = ''
+            this.user_data.name = 'Wayne'
+            this.user_data.weight = '85'
+            this.user_data.surname = 'Richards'
+            this.user_data.phoneNumber = '2587436910'
+            this.user_data.public_emergency_contacts = { 112: true, "115": false, "118": true }
+            this.user_data.paired_devices = []
+            this.user_data.pin = '0258'
+            this.user_data.purpose = 'PersonalSafety'
+            this.user_data.qr_code = [qr_code]
+            this.user_data.nfc_code = [nfc_code];
+            this.old_user_data = JSON.parse(JSON.stringify(this.user_data))
+            resolve(false)
+          }
+        }, err => console.log(err));
+      }
+    })
   }
-  goHomepage() {
-    //load user data from database
-    this.loadDataUser();
-    this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
-  }
-  showAlertandSendEmergency() {
+  // goHomepage() {
+  //   //load user data from database
+  //   this.loadDataUser()
+  //   this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
+  // }
+  showAlert(id) {
     //take bluetooth signal, create handler that takes the signal
-    console.log(this.count_click_emergency)
-    if (this.count_click_emergency == 0) {
-      this.count_click_emergency++;
-      this.nativeAudio.play('alert')
-      this.router.navigateByUrl('/show-alert', { replaceUrl: true })
-    } else {
-      this.sendEmergency();
-      this.count_click_emergency = 0;
+    console.log(id)
+    let navigationExtras: NavigationExtras = {
+      state: { deviceID: id },
+      replaceUrl: true
+    };
+    this.nativeAudio.play('alert');
+    this.router.navigate(['/show-alert'], navigationExtras)
+    //this.sendEmergency();
+  }
+  moveToForeground(){
+    this.backgroundMode.moveToForeground()
+  }
+  
+  enableAllBackgroundMode() {
+    console.log('enableBackgroundMode')
+    this.backgroundMode.enable();
+    //this.backgroundMode.overrideBackButton();
+    this.backgroundMode.disableWebViewOptimizations();
+    this.backgroundMode.disableBatteryOptimizations();
+    this.backgroundMode.wakeUp();
+    // this.backgroundMode.unlock();
+  }
+  setNameDevice(device, name) {
+    var app = { id: '', name: '' };
+    app.id = device;
+    app.name = name === '' ? device : name;
+    var check = true;
+    if (this.nameDevices === null)
+      this.nameDevices = []
+    this.nameDevices.forEach(element => {
+      if (element.id === device) {
+        element.name = name;
+        check = false;
+      }
+    })
+    if (check)
+      this.nameDevices.push(app)
+    this.storage.set('nameDevices', this.nameDevices)
+  }
+  deleteDeviceFromNameDevice(device) {
+    var index = this.nameDevices.indexOf(device);
+    this.nameDevices.splice(index, 1)
+    this.storage.set('nameDevices', this.nameDevices)
+  }
+  getNameDevices() {
+    this.storage.get('nameDevices').then((result) => {
+      this.nameDevices = result;
+      console.log(this.nameDevices === null)
+      if (this.nameDevices === null) {
+        this.user_data.paired_devices.forEach(element => {
+          console.log('SETNAME')
+          this.setNameDevice(element, element)
+        })
+      }
+    })
+    if (this.nameDevices === null) {
+      this.user_data.paired_devices.forEach(element => {
+        this.setNameDevice(element, element)
+      })
     }
   }
-  reset_EmergencyClick() {
-    this.count_click_emergency = 0;
-  }
-  currentLocPosition() {
-    this.geolocation.getCurrentPosition().then((response) => {
-      this.currentPosition.latitude = response.coords.latitude;
-      this.currentPosition.longitude = response.coords.longitude;
-      this.currentPosition.accuracy = response.coords.accuracy;
-      var today = new Date();
-      this.currentPosition.date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-      this.currentPosition.time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      //  this.currentPosition.date = today.getUTCFullYear() + "-" + (today.getUTCMonth() + 1) + '-' + (today.getUTCDate()+1);
-      //  this.currentPosition.timestamp = ((today.getUTCHours() < 10 ? '0' + today.getUTCHours() : today.getUTCHours())) + ':' + ((today.getUTCMinutes() < 10 ? '0' + today.getUTCMinutes() : today.getUTCMinutes()))
-      console.log(this.currentPosition)
-    }).catch((error) => {
-      alert('Error: ' + error);
-    });
-  }
-  private async sendEmergency() {
-    await this.currentLocPosition();
-    this.reset_EmergencyClick();
-    this.nativeAudio.play('sendData').catch(
-      (err) => console.log(err))
-    var user_data = this.getUserData();
-    console.log(user_data)
-    console.log(this.currentPosition)
-    // for (var i = 0; i < user_data.emergency_contacts.length; i++) {
-    //if (user_data.emergency_contacts[i].number != '')
-    // this.sms.send(user_data.emergency_contacts[i].number, 'I need a help! My current position is: \n latitude: ' + this.locationCordinates.latitude + ' longitude: ' + this.locationCordinates.longitude)
-    // }
-    //send emergency data
-    this.data_device_motion();
-    this.localNotifications.schedule({
-      id: 2,
-      text: 'Emergency sent',
-      data: ""
-    });
-    console.log('Emergenza inviata');
-    this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-    //this.router.navigateByUrl('/');
-  }
-  data_device_motion() {
-    var sub = this.deviceMotion.watchAcceleration({ frequency: 1500 }).subscribe((acceleration: DeviceMotionAccelerationData) => {
-      //send acceleration data
-      console.log(acceleration)
-    })
-    setTimeout(() => {
-      sub.unsubscribe()
-    }, 60000)
-  }
+  
+  // saveNameDevice() {
+  //   var newData = []
+  //   this.user_data.paired_devices.forEach(paired_element => {
+  //     this.nameDevices.forEach(name_device => {
+  //       if (name_device.id === paired_element) {
+  //         var el;
+  //         el.id = paired_element;
+  //         el.name = 
+  //       }
+  //     })
+  //   })
+  //   this.storage.set('nameDevices', this.nameDevices)
+  // }
+
 }

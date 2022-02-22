@@ -2,70 +2,90 @@ import { Component, Inject, NgZone, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BLE } from '@ionic-native/ble/ngx';
 import { Platform } from '@ionic/angular';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BluetoothService } from '../../../data/bluetooth.service'
+import { ChangeDetectorRef } from '@angular/core';
+import { SharedDataService } from 'src/app/data/shared-data.service';
+
+/* first pair device and then use Ibeacon Library  */
 @Component({
   selector: 'app-dialog-scan-bluetooth',
   templateUrl: './dialog-scan-bluetooth.component.html',
   styleUrls: ['./dialog-scan-bluetooth.component.scss'],
 })
 export class DialogScanBluetoothComponent implements OnInit {
+  //bs: any;
   devices = [];
-  selectedOptions
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
+  selectedOptions;
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any = '', private sharedData: SharedDataService, private detectChange: ChangeDetectorRef, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
     this.platform.ready().then(() => {
+      //this.bluetoothService.startRegisterBeacon();
       this.scan();
-      this.dialogRef.afterClosed().subscribe(()=>{
-        this.ble.stopScan();
-        console.log('stopScanning')
+      console.log('scanning...')
+      this.dialogRef.afterClosed().subscribe(() => {
+        this.bluetoothService.stopScan();
       })
     })
-
   }
-  // scan(){
-  //   this.devices.push({id:'sddfwfsfsfsffgrg',name:'Pippo'})
-  //   this.devices.push({id:'sggfgsddsvv',name:'Pluto'})
-  //   this.devices.push({id:'fdgdfvd',name:'Pape'})
-  //   this.devices.push({id:'ngmgmgmmghm ',name:'Rino'})
-  //   this.devices.push({id:'3456ruj2',name:'TOpo'})
-  //   $('#matSpinner').hide();
-  // }
-  scan() {// ble.enale() only supported for android
-    this.ble.isEnabled().then(() => { }, (err) => this.ble.enable())
-      .then(() => {
-        var array = []
-        this.ble.startScanWithOptions([], { reportDuplicates: false }).subscribe(device => {
-          array.push(device)
-          console.log(JSON.stringify(device));
-        }, (err) => console.log(err));
-        setTimeout(() => {
-          this.devices = array;
-          this.ble.stopScan();
-          $('#matSpinner').hide();
-          console.log('stopScan')
-        }, 15000);
-      });
+  connectDevice(id) {
+    return new Promise((resolve, reject) => {
+      this.ble.connect(id).subscribe((peripheralData) => {
+        console.log('enable connection')
+        console.log(id)
+        resolve(peripheralData)
+      }, (err) => { reject(err) })
+    })
+  }
+  scan() {
+    this.devices = [];
+    $('#matSpinner').show()
+    this.detectChange.detectChanges();
+    console.log(this.devices)
+    this.bluetoothService.detectedValue.subscribe((value) => {
+      //console.log(value);
+      if (value !== null) {
+        this.devices.push(value);
+        this.detectChange.detectChanges();
+      }
+    }, (err) => console.log(err))
+
+    this.bluetoothService.scanBLE(15000).then((scanList: []) => {
+      $('#matSpinner').hide()
+      //this.devices = scanList;
+      console.log('LISTA')
+      console.log(this.devices)
+    });
   }
   connect(i) {
     console.log(i);
     // $('#matSpinner').hide();
     $('#matSpinner' + i).css('display', 'flex')
-    this.data = this.devices[i];
-    this.ble.connect(this.data.id).subscribe((peripheralData) => {
+    //console.log(this.devices[i])
+    this.bluetoothService.connectDevice(this.devices[i]).then((peripheralData) => {
       $('#matSpinner' + i).hide();
-      console.log(peripheralData)
       this.data = peripheralData;
+      console.log(peripheralData)
+      alert('Correctly connected');
       this.closeDialog();
     }, (err) => {
-      console.log(err)
       $('#matSpinner' + i).hide();
-    })
+      this.data = '';
+      console.log(err);
+      alert('Error' + err)
+    });
   }
+
   closeDialog() {
     this.ngZone.run(() => {
+      this.bluetoothService.stopScan();
       this.dialogRef.close(this.data);
       console.log('closeDIalog')
     })
-
   }
+  // connect(device) {
+  //   this.bluetoothService.addPairedDeviceANDregister(device);
+  //   this.closeDialog();
+  // }
   ngOnInit() { }
 
 }
