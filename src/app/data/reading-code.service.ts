@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { type } from 'os';
 import { NGSIv2QUERYService } from './ngsiv2-query.service';
 import { DeviceType, QRNFCEvent, SharedDataService, typeChecking } from './shared-data.service';
 import { Snap4CityService } from './snap4-city.service';

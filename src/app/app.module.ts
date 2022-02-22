@@ -32,7 +32,6 @@ import { AuthenticationService } from '../app/services/authentication.service'
 import { ReadingCodeService } from '../app/data/reading-code.service'
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { FormsModule } from '@angular/forms';
-import { BackgroundGeolocation } from '@awesome-cordova-plugins/background-geolocation/ngx'
 
 @NgModule({
   declarations: [AppComponent],
@@ -58,7 +57,6 @@ import { BackgroundGeolocation } from '@awesome-cordova-plugins/background-geolo
     Snap4CityService,
     AutoLoginGuard,
     AuthenticationService,
-    BackgroundGeolocation,
     ReadingCodeService
   ],
   bootstrap: [AppComponent],

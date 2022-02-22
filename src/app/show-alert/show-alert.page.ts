@@ -12,15 +12,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
 import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
 import { Snap4CityService } from '../data/snap4-city.service'
-//import * as backgroundGeolocation from '@mauron85/cordova-plugin-background-geolocation'
-/*
-  OK Fix view page OK
-  OK Add sound when I click button and when the time expires OK
-  Check cordova elements( localization,accelerometer,if I send emergency check the coords,notification, etc ) OK
-    _fix errors when i click notification OK
-  Add possibility when I click two times the emergency button app sends immediately notification OK
-  
-*/
+
 @Component({
   selector: 'app-show-alert',
   templateUrl: './show-alert.page.html',
@@ -132,7 +124,6 @@ export class ShowAlertPage implements OnInit {
   interval
   getPosition() {
     return new Promise((resolve, reject) => {
-      this.shared_data.startBackgroundGeolocation();
       console.log('startwatchPosition')
       this.position = this.geolocation.getCurrentPosition({ enableHighAccuracy: true }).then((response: Geoposition) => {
         console.log('checkintervall')
