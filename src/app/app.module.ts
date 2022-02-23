@@ -17,7 +17,6 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
-import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
 import { CountdownModule } from 'ngx-countdown';
 import {LoginPageModule} from '../app/pages/login/login.module'
 import {LoginPage} from '../app/pages/login/login.page'
@@ -46,7 +45,6 @@ import { FormsModule } from '@angular/forms';
     AndroidPermissions,
     LocalNotifications,
     BackgroundMode,
-    DeviceMotion,
     NativeAudio,
     LoginPage,
     SharedDataService,
