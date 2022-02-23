@@ -13,6 +13,7 @@ import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
+import { BackgroundGeolocation} from '@awesome-cordova-plugins/background-geolocation/ngx'
 
 @NgModule({
   imports: [
@@ -28,7 +29,8 @@ import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions
     Geolocation,
     AndroidPermissions,
     LocalNotifications,
-    BackgroundMode
+    BackgroundMode,
+    BackgroundGeolocation
   ]
 })
 export class HomepagePageModule { }
