@@ -13,7 +13,6 @@ import { BLE } from '@ionic-native/ble/ngx'
 import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
 import {DialogSaveComponent} from './dialog-save/dialog-save.component'
 import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component';
-import { NgxPullToRefreshModule } from 'ngx-pull-to-refresh';
 
 @NgModule({
   imports: [
@@ -23,8 +22,7 @@ import { NgxPullToRefreshModule } from 'ngx-pull-to-refresh';
     IonicModule,
     SignupPageRoutingModule,
     MaterialModule,
-    HttpClientModule,
-    NgxPullToRefreshModule
+    HttpClientModule
   ],
   declarations: [SignupPage,DialogModifyNameComponent, DialogExampleComponent, DialogScanBluetoothComponent,DialogAddEmergencyContactComponent,DialogSaveComponent],
   providers: [Contacts, BLE],
