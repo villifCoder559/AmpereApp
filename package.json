@@ -27,6 +27,7 @@
     "@awesome-cordova-plugins/background-mode": "^5.37.3",
     "@awesome-cordova-plugins/call-number": "^5.37.3",
     "@awesome-cordova-plugins/core": "^5.37.3",
+    "@awesome-cordova-plugins/device-motion": "^5.39.1",
     "@awesome-cordova-plugins/geolocation": "^5.39.1",
     "@ionic-native/android-permissions": "^5.36.0",
     "@ionic-native/background-geolocation": "^5.36.0",
@@ -49,6 +50,7 @@
     "@ionic/angular": "^5.5.2",
     "@ionic/storage-angular": "^3.0.6",
     "@mauron85/cordova-plugin-background-geolocation": "^3.1.0",
+    "@piumaz/pull-to-refresh": "^2.2.0",
     "@techiediaries/ngx-qrcode": "^9.1.0",
     "@types/crypto-js": "^4.1.0",
     "angular-crypto": "0.0.3",
@@ -171,7 +173,8 @@
       "cordova-plugin-geolocation": {
         "GPS_REQUIRED": "true",
         "ACCESS_BACKGROUND_LOCATION": "true"
-      }
+      },
+      "cordova-plugin-background-geolocation": {}
     },
     "platforms": [
       "android"
