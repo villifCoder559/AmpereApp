@@ -15,7 +15,7 @@ import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
 import { AlertController, AngularDelegate, IonContent, Platform, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SharedDataService, UserData, Emergency_Contact, typeChecking, DeviceType } from '../../data/shared-data.service'
+import { SharedDataService, UserData, Emergency_Contact, typeChecking, DeviceType, StorageNameType } from '../../data/shared-data.service'
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 import * as moment from 'moment';
 import { Contacts, ContactName, ContactField } from '@ionic-native/contacts/ngx';
@@ -35,6 +35,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx'
   styleUrls: ['./signup.page.scss'],
 })
 export class SignupPage implements OnInit {
+  StorageNameType = StorageNameType
   hide;
   hideold;
   hidepsw;
@@ -153,7 +154,9 @@ export class SignupPage implements OnInit {
           }
           this.setAllFromData();
           this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
-          this.shared_data.getNameDevices();
+          Object.keys(this.shared_data.storageName).forEach((element: StorageNameType) => {
+            this.shared_data.getNameDevices(element);
+          })
           //this.bluetoothService.enableAllUserBeaconFromSnap4City();
           this.changeDetection.detectChanges();
           this.shared_data.dismissLoading();
@@ -337,7 +340,7 @@ export class SignupPage implements OnInit {
       //this.bluetoothservice.disableRegion(deviceDeleted)
       if (this.authService.isAuthenticated.value)
         this.saveUserProfile().then(() => {
-          this.shared_data.deleteDeviceFromNameDevice(el_deleted);
+          this.shared_data.deleteDeviceFromNameDevice(el_deleted, StorageNameType.DEVICES);
           this.shared_data.createToast('Data saved succesfully')
         }, err => {
           //alert(err)
@@ -546,8 +549,7 @@ export class SignupPage implements OnInit {
     })
     dialogRef.afterClosed().subscribe(result => {
       console.log(result)
-      this.shared_data.setNameDevice(result.value.id, result.value.name);
-      console.log(this.shared_data.nameDevices)
+      this.shared_data.setNameDevice(result.value.id, StorageNameType.DEVICES, result.value.name);
       const slidingItem = document.getElementById('slidingItem' + i) as any;
       slidingItem.close();
       this.changeDetection.detectChanges();
