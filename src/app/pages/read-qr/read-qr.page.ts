@@ -4,11 +4,13 @@ import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 import { ToastController } from '@ionic/angular';
 import * as $ from "jquery";
 import { ChangeDetectorRef } from '@angular/core';
-import { DeviceType, QRNFCEvent, SharedDataService, typeChecking } from 'src/app/data/shared-data.service';
+import { DeviceType, QRNFCEvent, SharedDataService, StorageNameType, typeChecking } from 'src/app/data/shared-data.service';
 import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service'
 import { LoadingController } from '@ionic/angular';
 import { Snap4CityService } from 'src/app/data/snap4-city.service';
 import { ReadingCodeService } from 'src/app/data/reading-code.service';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogModifyNameComponent } from '../signup/dialog-modify-name/dialog-modify-name.component';
 /* QR-Code has 3 fields:{"description":"","link":"","code":""} */
 
 @Component({
@@ -17,12 +19,13 @@ import { ReadingCodeService } from 'src/app/data/reading-code.service';
   styleUrls: ['./read-qr.page.scss'],
 })
 export class ReadQRPage implements OnInit {
+  StorageNameType=StorageNameType
   previewCamera = false;
   qrData = ''
   scannedCode = null;
   title = 'app';
   isOn = false;
-  constructor(private readCode: ReadingCodeService, private s4c: Snap4CityService, public sharedData: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: QRScanner, private toastCtrl: ToastController) {
+  constructor(private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: QRScanner) {
     document.addEventListener('ionBackButton', (ev) => {
       if (this.previewCamera) {
         console.log('backbutton');
@@ -50,13 +53,13 @@ export class ReadQRPage implements OnInit {
             this.closePreviewCamera();
             this.changeRef.detectChanges();
             $("ion-app").show(500);
-            this.sharedData.presentLoading('Getting info from server').then(() => {
+            this.shared_data.presentLoading('Getting info from server').then(() => {
               this.readCode.readURLFromServer(text, typeChecking.QR_CODE).then(() => {
-                this.sharedData.createToast('QR scanned succesfully')
-                this.sharedData.dismissLoading();
+                this.shared_data.createToast('QR scanned succesfully')
+                this.shared_data.dismissLoading();
               }, err => {
-                this.sharedData.createToast(err?.msg)
-                this.sharedData.dismissLoading();
+                this.shared_data.createToast(err?.msg)
+                this.shared_data.dismissLoading();
               })
             })
           });
@@ -74,57 +77,23 @@ export class ReadQRPage implements OnInit {
     //})
 
   }
-  // readURLFromServer(json_id) {
-  //   return new Promise((resolve, reject) => {
-  //     this.sharedData.presentLoading('Getting info from server');
-  //     this.getListFromServer().then(() => {
-  //       if (this.sharedData.checkIDValidityNFCorQR(typeChecking.QR_CODE, json_id['deviceID'])) {
-  //         this.NGSIv2Query.getEntity(json_id['deviceID'], DeviceType.DICTIONARY, json_id['broker']).then((response: any) => {
-  //           var event = new QRNFCEvent('QR', response.identifier.value, action);
-  //           var action: string = response.action.value;
-  //           var identifier_event = (new Date(event.dateObserved).getTime()).toString() //seconds
-  //           console.log(identifier_event)
-  //           this.s4c.createDevice(DeviceType.QR_NFC_EVENT, identifier_event).then(() => {
-  //             this.sharedData.dismissLoading();
-  //             this.NGSIv2Query.sendQRNFCEvent(event, identifier_event)
-  //             this.scannedCode = action;
-  //             console.log(action);
-  //             window.open('https://' + action, '_system', 'location=yes')
-  //             resolve(true);
-  //           }, (err) => {
-  //             console.log(err)
-  //             reject(err)
-  //           })
-  //         }, (err) => {
-  //           reject(err);
-  //         })
-  //       }
-  //       else {
-  //         //this.sharedData.createToast('Permission denied!')
-  //         reject({ msg: 'Permission denied' })
-  //       }
-  //     }, err => {
-  //       console.log(err)
-  //       reject(err)
-  //     })
-  //   })
-  // }
-  // getListFromServer() {
-  //   return new Promise((resolve, reject) => {
-  //     this.NGSIv2Query.getEntity(this.sharedData.user_data.id + DeviceType.PROFILE, DeviceType.PROFILE).then((data) => {
-  //       this.fillListQRCode(data);
-  //       resolve(true);
-  //     }, err => reject(err))
-  //   })
-  // }
-  // fillListQRCode(data) {
-  //   this.sharedData.user_data.qr_code = [];
-  //   for (var i = 0; i < 4; i++) {
-  //     var qrcode = data['QR' + (i + 1)].value;
-  //     if (qrcode != '')
-  //       this.sharedData.user_data.qr_code.push(qrcode)
-  //   }
-  // }
+  modifyNameDevice(i) {
+    const dialogRef = this.dialog.open(DialogModifyNameComponent, {
+      maxWidth: '90vw',
+      minWidth: '40vw',
+      data: {
+        id: this.shared_data.user_data.qr_code[i],
+        name: '',
+      }
+    })
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result)
+      this.shared_data.setNameDevice(result.value.id, StorageNameType.QR_CODE, result.value.name);
+      const slidingItem = document.getElementById('slidingItem' + i) as any;
+      slidingItem.close();
+      this.changeDetection.detectChanges();
+    });
+  }
   ngOnInit() {
   }
 }
