@@ -7,11 +7,12 @@ import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SMS } from '@ionic-native/sms/ngx';
 import { AlertEvent, DeviceType, SharedDataService, UserData } from '../data/shared-data.service'
-import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx'
+import { DeviceMotion, DeviceMotionAccelerationData } from '@awesome-cordova-plugins/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
 import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
 import { Snap4CityService } from '../data/snap4-city.service'
+import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@awesome-cordova-plugins/background-geolocation/ngx';
 
 @Component({
   selector: 'app-show-alert',
@@ -27,7 +28,7 @@ export class ShowAlertPage implements OnInit {
     formatDate: ({ date }) => `${date / 1000}`,
     // notify: 1
   };;
-  constructor(private changeRef: ChangeDetectorRef, private s4c: Snap4CityService, private NGSIv2Query: NGSIv2QUERYService, private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
+  constructor(private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private s4c: Snap4CityService, private NGSIv2Query: NGSIv2QUERYService, private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
     private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.localNotifications.schedule({
       id: 1,
@@ -54,23 +55,27 @@ export class ShowAlertPage implements OnInit {
       element = event.srcElement.previousElementSibling;
       element.select()
     }
-    if (element == null) {
+    if (element === null) {
       this.checkPin();
-      return;
     }
     else
       element.focus();
   }
-  async checkPin() {
+  checkPin() {
     var ok = true;
     // var pin_saved = window.localStorage.getItem('user.password');
     var pin_saved = this.shared_data.user_data.pin;
+    console.log('checkPIN')
+    console.log(this.shared_data.user_data)
+    console.log(this.pin[i])
     for (var i = 0; i < this.pin.length; i++) {
+      console.log(pin_saved[i])
+      console.log(this.pin[i])
       if (pin_saved[i] != this.pin[i])
         ok = false
     }
     if (!ok) {
-      await this.presentAlert('PIN wrong', 50).then(() => {
+      this.presentAlert('PIN wrong', 50).then(() => {
         for (var i = this.pin.length - 1; i >= 0; i--) {
           (<HTMLInputElement>document.getElementById(i.toString())).value = '';
           if (i == 0)
@@ -79,7 +84,6 @@ export class ShowAlertPage implements OnInit {
       })
     }
     else {
-      //this.presentAlert('PIN correct', 1200);
       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }
   }
@@ -99,21 +103,19 @@ export class ShowAlertPage implements OnInit {
   send_Emergency(event) {//when time is expired
     console.log(event)
     if (event.action === 'done') {
-      this.shared_data.presentLoading('Sending emergency...')
       console.log('activateSensors')
+      this.shared_data.createToast('Sending emergency...', 5500);
       this.activateSensors().then(() => {
         console.log('sendEmergency')
         this.sendEmergency().then(() => {
           console.log('emergencySended')
-          this.shared_data.dismissLoading();
+          this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
           this.shared_data.createToast('Emergency sent successfully')
         }, err => {
-          this.shared_data.dismissLoading();
           alert(err);
           this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
         });
       }, err => {
-        this.shared_data.dismissLoading();
         alert(err);
         this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
       })
@@ -121,40 +123,37 @@ export class ShowAlertPage implements OnInit {
   }
   position;
   acceleration;
-  interval
+  interval = 30000 //milliseconds
   getPosition() {
     return new Promise((resolve, reject) => {
       console.log('startwatchPosition')
-      this.position = this.geolocation.getCurrentPosition({ enableHighAccuracy: true }).then((response: Geoposition) => {
-        console.log('checkintervall')
-        if (this.interval === null)
-          this.interval = setTimeout(() => {
-            var distance = this.distance(this.details_emergency.latitude, this.details_emergency.longitude, response.coords.latitude, response.coords.longitude)
-            console.log('DISTANCE')
-            console.log(distance)
-            console.log(response)
-            if (distance > 0.05) {
-              this.details_emergency.latitude = response.coords.latitude;
-              this.details_emergency.longitude = response.coords.longitude;
-              this.details_emergency.quote = response.coords.altitude;
-              this.details_emergency.velocity = response.coords.speed !== null ? response.coords.speed : 0;
-              this.details_emergency.dateObserved = new Date().toISOString();
-              this.interval = null;
-              this.sendEmergency();
-            }
-          }, 5000)
-        console.log('setDetailsEmergency')
-        if (this.details_emergency.latitude == -1 && this.details_emergency.longitude == -1) {
-          this.details_emergency.latitude = response.coords.latitude;
-          this.details_emergency.longitude = response.coords.longitude;
-          this.details_emergency.quote = response.coords.altitude;
-          this.details_emergency.velocity = response.coords.speed !== null ? response.coords.speed : 0;
-          resolve(true);
-        }
-      }, (err) => {
-        console.log(err);
-        reject(err);
-      })
+      const config: BackgroundGeolocationConfig = {
+        desiredAccuracy: 0,
+        stationaryRadius: 20,
+        distanceFilter: 50,
+        debug: true, //  enable this hear sounds for background-geolocation life-cycle.
+        stopOnTerminate: true, // enable this to clear background location settings when the app terminates
+        interval: 3000,
+        fastestInterval: 3000,
+        activitiesInterval: 3000
+      };
+      this.backgroundGeolocation.configure(config)
+        .then(() => {
+          this.backgroundGeolocation.start();
+        }, err => reject(err));
+      // start recording location
+      this.backgroundGeolocation.getCurrentLocation().then((position) => {
+        console.log(position)
+        this.details_emergency.latitude = position.latitude;
+        this.details_emergency.longitude = position.longitude;
+        this.details_emergency.quote = position.altitude;
+        this.details_emergency.velocity = position.speed !== null ? position.speed : 0;
+        this.details_emergency.dateObserved = new Date().toISOString();
+        setTimeout(() => {
+          this.backgroundGeolocation.stop()
+        }, this.interval)
+        resolve(true)
+      }, err => reject(err))
     })
   }
   getAcceleration() {
@@ -176,13 +175,13 @@ export class ShowAlertPage implements OnInit {
       console.log('GETPOSITION')
       this.getPosition().then(() => {
         console.log('GETACCELERATION')
-        this.getAcceleration().catch((err) => { console.log(err) })
-        setTimeout(() => {
-          this.acceleration.unsubscribe();
-          this.position.unsubscribe();
-        }, 60000)
-        console.log('resolve')
-        resolve(true)
+        this.getAcceleration().then(() => {
+          setTimeout(() => {
+            this.acceleration.unsubscribe();
+          }, this.interval)
+          console.log('resolve')
+          resolve(true)
+        }, err => resolve(false))
       }, err => { console.log(err) })
     })
 
@@ -202,7 +201,6 @@ export class ShowAlertPage implements OnInit {
         text: 'Emergency sent!',
         data: ""
       })
-      this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }, err => {
       console.log(err)
       //this.sendEvent();
@@ -215,7 +213,6 @@ export class ShowAlertPage implements OnInit {
       this.s4c.createDevice(DeviceType.ALERT_EVENT, id.getTime().toString(), this.details_emergency.latitude, this.details_emergency.longitude).then(() => {
         console.log('CREATE DEVICE')
         this.sendEvent();
-        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
         resolve(true)
       }, err => {
         console.log(err.msg);

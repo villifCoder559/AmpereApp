@@ -10,9 +10,10 @@ import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { SMS } from '@ionic-native/sms/ngx';
-import { DeviceMotion } from '@ionic-native/device-motion/ngx'
+import { DeviceMotion } from '@awesome-cordova-plugins/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
+import { BackgroundGeolocation} from '@awesome-cordova-plugins/background-geolocation/ngx'
 
 @NgModule({
   imports: [
@@ -31,7 +32,8 @@ import { NativeAudio } from '@ionic-native/native-audio/ngx'
     SMS,
     DeviceMotion,
     LocalNotifications,
-    NativeAudio
+    NativeAudio,
+    BackgroundGeolocation
   ]
 })
 export class ShowAlertPageModule { }
