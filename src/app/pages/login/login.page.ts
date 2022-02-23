@@ -60,8 +60,6 @@ export class LoginPage implements OnInit {
                   }
                   case 'public_emergency_contacts': {
                     Object.keys(this.sharedData.user_data[element]).forEach((number) => {
-                      console.log(number)
-                      console.log(this.sharedData.user_data[element][number])
                       this.sharedData.user_data[element][number] = data.value;
                     })
                     break;
@@ -74,8 +72,10 @@ export class LoginPage implements OnInit {
                     })
                     break;
                   }
-                  default:
-                    this.sharedData.user_data[element] = data.value
+                  default: {
+                    this.sharedData.user_data[element] = data[element].value
+                    break
+                  }
                 }
               })
               this.sharedData.user_data.public_emergency_contacts = { 112: data.call_112.value, 115: data.call_115.value, 118: data.call_118.value }
