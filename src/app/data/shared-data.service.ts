@@ -11,9 +11,9 @@ import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 
 // import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
-// import { DeviceMotion, DeviceMotionAccelerationData } from '@ionic-native/device-motion/ngx';
 import { CountdownConfig, CountdownModule } from 'ngx-countdown';
 import { Storage } from '@ionic/storage-angular'
+//import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
 @NgModule({
   imports: [
@@ -63,7 +63,15 @@ export enum DeviceType {
   DICTIONARY = 'QRNFCDictionary',
   PROFILE = 'Profile'
 }
-
+export enum StorageNameType {
+  QR_CODE = 'qr_code',
+  NFC_CODE = 'nfc_code',
+  DEVICES = 'paired_devices'
+}
+export class StorageName {
+  id: any = ''
+  name: any = ''
+}
 export class UserData {
   id: string = ''
   name: string = '';
@@ -123,22 +131,28 @@ export class QRNFCEvent {
   providedIn: 'root'
 })
 export class SharedDataService {
-  nameDevices = [];
+  /**List of StorageNameType */
+  storageName = {}
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   gps_enable = false;
   constructor(private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.storage.create();
     this.platform.ready().then(() => {
+      console.log('StorageNameType')
+      Object.keys(StorageNameType).forEach(element=>{
+        console.log(StorageNameType[element])
+        this.storageName[StorageNameType[element]]=[]
+      })
       //this.enableAllBackgroundMode();
       this.nativeAudio.preloadSimple('alert', 'assets/sounds/alert.mp3').then(() => { }, (err) => console.log(err));
       this.nativeAudio.preloadSimple('sendData', 'assets/sounds/send_data.mp3').then(() => { }, (err) => console.log(err));
     })
   }
-  async createToast(header) {
+  async createToast(header, time = 3500) {
     let toast = await this.toastCtrl.create({
       header: header,
-      duration: 3500
+      duration: time
     })
     toast.present();
   }
@@ -152,7 +166,7 @@ export class SharedDataService {
     await this.loading.present();
   }
   async dismissLoading() {
-    this.loading.dismiss()
+    await this.loading.dismiss()
   }
   setUserData(data) {
     this.user_data = data
@@ -230,71 +244,65 @@ export class SharedDataService {
     this.router.navigate(['/show-alert'], navigationExtras)
     //this.sendEmergency();
   }
-  moveToForeground(){
-    this.backgroundMode.moveToForeground()
-  }
-  
+  // async askPermission() {//from API 28 ask about BACKGROUND LOCATION
+  //   const data = await this.androidPermissions.requestPermissions([
+  //     "android.permission.ACCESS_BACKGROUND_LOCATION",
+  //     "android.permission.ACCESS_COARSE_LOCATION",
+  //     this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
+  //   ]).then(() => console.log('PERMISSION_REQUESTED'))
+  // }
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
+    this.backgroundMode.configure({ resume: true })
     this.backgroundMode.enable();
+    console.log('enable')
     //this.backgroundMode.overrideBackButton();
     this.backgroundMode.disableWebViewOptimizations();
+    console.log('batteryOptimiz')
     this.backgroundMode.disableBatteryOptimizations();
-    this.backgroundMode.wakeUp();
+    //this.backgroundMode.wakeUp();
     // this.backgroundMode.unlock();
   }
-  setNameDevice(device, name) {
+  setNameDevice(device, type: StorageNameType, name = '') {
     var app = { id: '', name: '' };
     app.id = device;
     app.name = name === '' ? device : name;
     var check = true;
-    if (this.nameDevices === null)
-      this.nameDevices = []
-    this.nameDevices.forEach(element => {
+    if (this.storageName[type] === null)
+      this.storageName[type] = []
+    this.storageName[type].forEach(element => {
       if (element.id === device) {
         element.name = name;
         check = false;
       }
     })
     if (check)
-      this.nameDevices.push(app)
-    this.storage.set('nameDevices', this.nameDevices)
+      this.storageName[type].push(app)
+    console.log('SET_TYPE->' + type)
+    console.log(this.storageName[type])
+    this.storage.set(type, this.storageName[type])
   }
-  deleteDeviceFromNameDevice(device) {
-    var index = this.nameDevices.indexOf(device);
-    this.nameDevices.splice(index, 1)
-    this.storage.set('nameDevices', this.nameDevices)
+  deleteDeviceFromNameDevice(device, type: StorageNameType) {
+    var index = this.storageName[type].indexOf(device);
+    this.storageName[type].splice(index, 1)
+    this.storage.set(type, this.storageName[type])
   }
-  getNameDevices() {
-    this.storage.get('nameDevices').then((result) => {
-      this.nameDevices = result;
-      console.log(this.nameDevices === null)
-      if (this.nameDevices === null) {
-        this.user_data.paired_devices.forEach(element => {
-          console.log('SETNAME')
-          this.setNameDevice(element, element)
+  getNameDevices(type: StorageNameType) {
+    this.storage.get(type).then((result) => {
+      this.storageName[type] = result;
+      console.log('GET_TYPE->' + this.storageName[type])
+      console.log(this.storageName[type] === null)
+      if (this.storageName[type] === null) {
+        this.user_data[type].forEach(element => {
+          console.log('SETNAME_' + type)
+          this.setNameDevice(element, type)
         })
       }
     })
-    if (this.nameDevices === null) {
-      this.user_data.paired_devices.forEach(element => {
-        this.setNameDevice(element, element)
-      })
-    }
+    // if (this.nameDevices === null) {
+    //   this.user_data.paired_devices.forEach(element => {
+    //     this.setNameDevice(element, type)
+    //   })
+    // }
   }
-  
-  // saveNameDevice() {
-  //   var newData = []
-  //   this.user_data.paired_devices.forEach(paired_element => {
-  //     this.nameDevices.forEach(name_device => {
-  //       if (name_device.id === paired_element) {
-  //         var el;
-  //         el.id = paired_element;
-  //         el.name = 
-  //       }
-  //     })
-  //   })
-  //   this.storage.set('nameDevices', this.nameDevices)
-  // }
-
 }
