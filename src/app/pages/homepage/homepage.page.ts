@@ -10,7 +10,7 @@ import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
 import { HttpClient } from '@angular/common/http';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
-
+import { BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationEvents, BackgroundGeolocationResponse } from '@awesome-cordova-plugins/background-geolocation/ngx'
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.page.html',
@@ -41,8 +41,10 @@ import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions
   */
 export class HomepagePage implements OnInit {
   gps_enable = true;
-  constructor(private background: BackgroundMode, private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private backgroundGeolocation: BackgroundGeolocation, private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
     this.platform.ready().then(() => {
+      this.sharedData.enableAllBackgroundMode();
+      this.askPermission();
       this.localNotifications.hasPermission().then(result => {
         if (!result.valueOf())
           this.localNotifications.requestPermission()
@@ -179,12 +181,12 @@ export class HomepagePage implements OnInit {
       }, 3500)
     }, 2000)
   }
-  async askPermission() {
+  async askPermission() {//from API 28 ask about BACKGROUND LOCATION
     const data = await this.androidPermissions.requestPermissions([
       "android.permission.ACCESS_BACKGROUND_LOCATION",
       "android.permission.ACCESS_COARSE_LOCATION",
       this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
-    ]).then(()=>console.log('PERMISSION_REQUESTED'))
+    ]).then(() => console.log('PERMISSION_REQUESTED'))
   }
   checkAndroidPermission() {
     this.androidPermissions.checkPermission('ACCESS_BACKGROUND_LOCATION').then((value) => {
@@ -194,9 +196,43 @@ export class HomepagePage implements OnInit {
     })
   }
   enableWatchPosition() {
-    this.sharedData.enableAllBackgroundMode()
     this.geolocation.watchPosition().subscribe((data) => {
       console.log(data)
     })
+  }
+  testDeviceMotionEvent(){
+    window.addEventListener("devicemotion", function(event) {
+      console.log(event)
+  }, true);
+  }
+  backgroundGeolocationMauron() {
+    setTimeout(() => {
+      const config: BackgroundGeolocationConfig = {
+        desiredAccuracy: 0,
+        stationaryRadius: 20,
+        distanceFilter: 50,
+        debug: true, //  enable this hear sounds for background-geolocation life-cycle.
+        stopOnTerminate: false, // enable this to clear background location settings when the app terminates
+        interval: 3000,
+        fastestInterval: 3000,
+        activitiesInterval: 3000,
+      };
+      this.backgroundGeolocation.configure(config)
+        .then(() => {
+          this.backgroundGeolocation.start();
+        });
+      // start recording location
+      setInterval(() => {
+        this.backgroundGeolocation.getCurrentLocation().then((position) => {
+          console.log(position)
+        })
+      }, 2000)
+      setTimeout(() => {
+        this.backgroundGeolocation.stop()
+      }, 20000)
+    }, 5000)
+
+    // If you wish to turn OFF background-tracking, call the #stop method.
+    //this.backgroundGeolocation.stop();
   }
 }
