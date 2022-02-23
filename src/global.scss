@@ -86,12 +86,24 @@ h2,h3,p{
     overflow: auto;
   }
 .bluetooth_item{
+    //height: 65px;
     padding-left: 15px;
     background-color: #fff;
 }
-.label_bluetooth_item{
+.icon-reader{
+    text-align: center;
+}
+.sliding-item{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+#bluetooth .label_bluetooth_item{
     background-color: #fff;
     margin: 0px;
+    height: 55px;
+    align-items: center;
+    display: flex;
 }
 .bluetooth_item_options{
     background-color: #fff;
