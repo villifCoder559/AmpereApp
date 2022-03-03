@@ -25,7 +25,7 @@
             <ion-item-sliding id="slidingItem{{i}}">
               <ion-item *ngIf="item.id !=-1 " class="ion-no-padding" id="item{{i}}">
                 <ion-label class="label_code">
-                  <h2>{{this.shared_data?.storageName[StorageNameType.QR_CODE][i]?.name || this.shared_data.user_data?.qr_code[i]}}</h2>
+                  <h2>{{this.shared_data?.localStorage[StorageNameType.QR_CODE][i]?.name || this.shared_data.user_data?.qr_code[i]}}</h2>
                 </ion-label>
               </ion-item>
               <ion-item-options side="end" class="bluetooth_item_options">
@@ -40,12 +40,12 @@
           </ion-list>
         </div>
       </mat-card>
-      <img src="assets/images/qr-reader.gif" alt="qr-reader" />
       <div class="scannerCode">
         <ion-button expand="full" (click)="scanCode()">
           Scan Code
         </ion-button>
       </div>
+      <img src="assets/images/qr-reader.gif" alt="qr-reader" />
     </div>
   </div>
 </ion-content>
