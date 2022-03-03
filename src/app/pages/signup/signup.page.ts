@@ -9,7 +9,6 @@ import { NgZone, ViewChild } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DialogExampleComponent } from './dialog-example/dialog-example.component';
 import { MatTooltip } from '@angular/material/tooltip';
 import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
@@ -46,6 +45,7 @@ export class SignupPage implements OnInit {
   @ViewChild('tooltip') tooltip: MatTooltip;
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
+
   //add native-langauage field
   //fix dimension when resize the screen
   firstFormGroup = this._formBuilder.group({
@@ -70,13 +70,13 @@ export class SignupPage implements OnInit {
   secondFormGroup = this._formBuilder.group({
     allergies: ['', Validators.compose([Validators.required, Validators.maxLength(200), SpecialCharValidator.specialCharValidator])],
     medications: ['', Validators.compose([Validators.maxLength(200), SpecialCharValidator.specialCharValidator])],
-    visionImpaired: [false],
-    wheelchairUser: [false]
+    visionImpaired: false,
+    wheelchairUser: false
   });
   fourthFormGroup = this._formBuilder.group({
-    112: ['', Validators.required],
-    115: ['', Validators.required],
-    118: ['', Validators.required]
+    call_112: ['', Validators.required],
+    call_115: ['', Validators.required],
+    call_118: ['', Validators.required]
   });
   readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.fourthFormGroup]
   constructor(private geo: Geolocation, private route: ActivatedRoute, private platform: Platform, public authService: AuthenticationService, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
@@ -112,49 +112,9 @@ export class SignupPage implements OnInit {
           this.shared_data.user_data.qr_code = [];
           this.shared_data.user_data.nfc_code = [];
           this.shared_data.user_data.emergency_contacts = [];
-          Object.keys(this.shared_data.user_data).forEach((field_name) => {
-            switch (field_name) {
-              case 'id': case 'nfc_code': case 'qr_code': case 'paired_devices': case 'emergency_contacts': case 'public_emergency_contacts': {
-                break
-              }
-              case 'disabilities': {
-                this.shared_data.user_data.disabilities.visionImpaired = data.visionImpaired.value
-                this.shared_data.user_data.disabilities.wheelchairUser = data.wheelchairUser.value
-                break;
-              }
-              default: {
-                this.shared_data.user_data[field_name] = data[field_name].value;
-                break;
-              }
-            }
-          })
-          this.shared_data.user_data.public_emergency_contacts = { 112: data.call_112.value, 115: data.call_115.value, 118: data.call_118.value }
-          if (data.jewel1ID.value != '')
-            this.shared_data.user_data.paired_devices.push(data.jewel1ID.value)
-          if (data.jewel2ID.value != '')
-            this.shared_data.user_data.paired_devices.push(data.jewel2ID.value)
-          for (var i = 0; i < 5; i++) {
-            var name = data['emergencyContact' + (i + 1) + 'Name'].value;
-            var surname = data['emergencyContact' + (i + 1) + 'Surname'].value;
-            var number = data['emergencyContact' + (i + 1) + 'Number'].value;
-            console.log('contact ' + i);
-            console.log(name + surname + number)
-            if (name != '' && surname != '' && number != '')
-              this.shared_data.user_data.emergency_contacts.push(new Emergency_Contact(name, surname, number))
-          }
-          for (var i = 0; i < 4; i++) {
-            var qrcode = data['QR' + (i + 1)].value;
-            if (qrcode != '')
-              this.shared_data.user_data.qr_code.push(qrcode)
-          }
-          for (var i = 0; i < 4; i++) {
-            var nfccode = data['NFC' + (i + 1)].value;
-            if (nfccode != '')
-              this.shared_data.user_data.nfc_code.push(nfccode)
-          }
-          this.setAllFromData();
-          this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
-          Object.keys(this.shared_data.storageName).forEach((element: StorageNameType) => {
+          this.shared_data.setUserValueFromData(data)
+          this.setFormGroupFromUser();
+          Object.keys(this.shared_data.localStorage).forEach((element: StorageNameType) => {
             this.shared_data.getNameDevices(element);
           })
           //this.bluetoothService.enableAllUserBeaconFromSnap4City();
@@ -178,29 +138,29 @@ export class SignupPage implements OnInit {
     if (ev.inputType != 'deleteContentBackward') {
       var value: string = ev.target.value;
       var split = value.split('-');
-      var year = parseInt(split[0]);
-      var month = parseInt(split[1]);
-      var day = parseInt(split[2]);
+      var year = (split[0]);
+      var month = (split[1]);
+      var day = (split[2]);
       var date: string = '';
       if (value.length > 3) {
         date = year + '-'
-        if (!isNaN(month)) {
-          if (month.toString().length < 2)
-            if (month > 1)
-              date += '0' + month.toString() + '-';
+        if (!isNaN(parseInt(month))) {
+          if (month.length < 2)
+            if (parseInt(month) > 1)
+              date += '0' + month + '-';
             else {
-              date += month.toString()
+              date += month
               console.log(date)
             }
           else
             date += month + '-'
         }
-        if (!isNaN(day)) {
+        if (!isNaN(parseInt(day))) {
           if (day.toString().length < 2)
-            if (day > 3)
-              date += '0' + day.toString()
+            if (parseInt(day) > 3)
+              date += '0' + day
             else
-              date += day.toString()
+              date += day
           else
             date += day
         }
@@ -226,11 +186,18 @@ export class SignupPage implements OnInit {
   remove_contact(index) {
     //var index = this.shared_data.user_data.emergency_contacts.findIndex((element) => element = contact);
     this.shared_data.user_data.emergency_contacts.splice(index, 1);
-    if (this.authService.isAuthenticated.getValue())
-      this.NGSIv2QUERY.sendUserProfile().catch(err => {
-        this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
-        alert('Error ' + err + '. Retrived old data');
-      });
+    this.changeDetection.detectChanges();
+    if (this.authService.isAuthenticated.getValue()) {
+      this.shared_data.presentLoading('Sending data...').then(() => {
+        this.NGSIv2QUERY.sendUserProfile().then(() => {
+          this.shared_data.dismissLoading();
+        }, err => {
+          this.shared_data.dismissLoading();
+          this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
+          alert('Error ' + err + '. Retrived old data');
+        });
+      })
+    }
   }
   openDialogEmergencyContact(value, index): void {
     var ok = true;
@@ -251,18 +218,24 @@ export class SignupPage implements OnInit {
         }
       });
       dialogRef.afterClosed().subscribe(result => {
-        //console.log(result);
-        console.log(result.index == -1)
-        if (result.index == -1) //new element
-          this.shared_data.user_data.emergency_contacts.push(new Emergency_Contact(result.data.name, result.data.surname, result.data.number))
-        else //old element modified
-          this.shared_data.user_data.emergency_contacts[result.index] = new Emergency_Contact(result.data.name, result.data.surname, result.data.number);
-        this.saveUserProfile().then(() => {
-          this.shared_data.createToast('Data saved succesfully')
-        }, err => {
-          alert(err)
-          this.shared_data.createToast('Recovery old data')
-        })
+        console.log(result)
+        if (result != undefined) {
+          //console.log(result);
+          console.log(result.index == -1)
+          if (result.index == -1) //new element
+            this.shared_data.user_data.emergency_contacts.push(new Emergency_Contact(result.data.name, result.data.surname, result.data.number))
+          else //old element modified
+            this.shared_data.user_data.emergency_contacts[result.index] = new Emergency_Contact(result.data.name, result.data.surname, result.data.number);
+          this.changeDetection.detectChanges()
+          console.log(this.shared_data.user_data.emergency_contacts)
+          if (this.authService.isAuthenticated.getValue())
+            this.saveUserProfile().then(() => {
+              this.shared_data.createToast('Data saved succesfully')
+            }, err => {
+              alert(err)
+              this.shared_data.createToast('Recovery old data')
+            })
+        }
       });
     }
     else
@@ -308,24 +281,25 @@ export class SignupPage implements OnInit {
     this.shared_data.user_data.paired_devices.push(device);
     console.log(this.shared_data.user_data.paired_devices.length)
     if (indexOf == -1) {
-      var attr = {}
-      attr['jewel' + this.shared_data.user_data.paired_devices.length + 'ID'] = { value: device }
-      this.saveUserProfile().then(() => {
-        this.shared_data.setNameDevice(device, device);
-        this.shared_data.createToast('Data saved succesfully')
-      }, err => {
-        alert(err)
-        this.shared_data.createToast('Recovery old data')
-      })
+      // var attr = {}
+      // attr['jewel' + this.shared_data.user_data.paired_devices.length + 'ID'] = { value: device }
+      if (this.authService.isAuthenticated.getValue())
+        this.saveUserProfile().then(() => {
+          this.shared_data.setNameDevice(device, device);
+          this.shared_data.createToast('Data saved succesfully')
+        }, err => {
+          alert(err)
+          this.shared_data.createToast('Recovery old data')
+        })
     }
     else
       alert('Device already registred')
   }
   click_next() {
-    for (var i = 0; i < this.countNumberContactsDone; i++) {
-      if (this.shared_data.user_data.emergency_contacts[i].name === '')
-        this.shared_data.user_data.emergency_contacts.splice(1, i)
-    }
+    if (this.shared_data.user_data.emergency_contacts.length > 0)
+      this.stepper.next()
+    else
+      this.shared_data.createToast('Add at least one contact');
   }
   show_tooltip() {
     this.tooltip.show();
@@ -336,16 +310,19 @@ export class SignupPage implements OnInit {
     var a = $('#device' + index).hide(400, () => {
       //var data_to_send = this.NGSIv2QUERY.getEmergencyContactsToSend(newContacts);
       var el_deleted = this.shared_data.user_data.paired_devices.splice(index, 1);
+      this.changeDetection.detectChanges()
       console.log(this.shared_data.user_data.paired_devices)
       //this.bluetoothservice.disableRegion(deviceDeleted)
-      if (this.authService.isAuthenticated.value)
+      if (this.authService.isAuthenticated.getValue())
         this.saveUserProfile().then(() => {
-          this.shared_data.deleteDeviceFromNameDevice(el_deleted, StorageNameType.DEVICES);
+          this.shared_data.deleteDeviceFromLocalStorage(el_deleted, StorageNameType.DEVICES);
           this.shared_data.createToast('Data saved succesfully')
         }, err => {
           //alert(err)
           console.log(this.shared_data.user_data)
           this.shared_data.createToast('Error ' + 'Recovery old data')
+          this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
+          this.changeDetection.detectChanges()
         })
       //.then(()=>{ alert('Successfully updated)},err=>aler('Update error' + err))
       //this.shared_data.user_data.paired_devices[index] = null;
@@ -353,7 +330,7 @@ export class SignupPage implements OnInit {
       console.log(this.shared_data.user_data.paired_devices)
     })
   }
-  getAllDataFromForm() {
+  getUserFromFormGroup() {
     Object.keys(this.shared_data.user_data).forEach((element) => {
       console.log(element)
       switch (element) {
@@ -377,7 +354,6 @@ export class SignupPage implements OnInit {
         }
         case 'disabilities': {
           console.log('DISABILITIES')
-          //console.log(this.shared_data.user_data[element])
           Object.keys(this.shared_data.user_data[element]).forEach((dis) => {
             this.shared_data.user_data[element][dis] = this.secondFormGroup.get(dis)?.value
           })
@@ -387,26 +363,9 @@ export class SignupPage implements OnInit {
           this.shared_data.user_data[element] = this.firstFormGroup.get(element)?.value
       }
     })
-    // this.shared_data.user_data.email = this.firstFormGroup.get('email')?.value;
-    // this.shared_data.user_data.name = this.firstFormGroup.get('name')?.value;
-    // this.shared_data.user_data.surname = this.firstFormGroup.get('surname')?.value;
-    // this.shared_data.user_data.nickname = this.firstFormGroup.get('nickname')?.value;
-    // this.shared_data.user_data.phoneNumber = this.firstFormGroup.get('phoneNumber')?.value;
-    // this.shared_data.user_data.dateofborn = this.firstFormGroup.get('dateofborn')?.value;
-    // this.shared_data.user_data.gender = this.firstFormGroup.get('gender')?.value;
-    // this.shared_data.user_data.address = this.firstFormGroup.get('address')?.value;
-    // this.shared_data.user_data.locality = this.firstFormGroup.get('locality')?.value;
-    // this.shared_data.user_data.city = this.firstFormGroup.get('city')?.value;
-    // this.shared_data.user_data.height = this.firstFormGroup.get('height')?.value;
-    // this.shared_data.user_data.weight = this.firstFormGroup.get('weight')?.value;
-    // this.shared_data.user_data.ethnicity = this.firstFormGroup.get('ethnicity')?.value;
-    // this.shared_data.user_data.description = this.firstFormGroup.get('description')?.value;
-    // this.shared_data.user_data.purpose = this.firstFormGroup.get('purpose')?.value;
-    // this.shared_data.user_data.pin = this.firstFormGroup.get('pin')?.value;
-    // this.shared_data.user_data.allergies = this.secondFormGroup.get('allergies')?.value;
-    // this.shared_data.user_data.medications = this.secondFormGroup.get('medications')?.value;
   }
-  setAllFromData() {
+  setFormGroupFromUser() {
+    console.log('FormGroupFromUser')
     Object.keys(this.shared_data.user_data).forEach((element) => {
       console.log(element)
       switch (element) {
@@ -418,12 +377,13 @@ export class SignupPage implements OnInit {
         }
         case 'public_emergency_contacts': {
           Object.keys(this.shared_data.user_data[element]).forEach((number) => {
-            this.fourthFormGroup.get(number).setValue(this.shared_data.user_data[element][number] === 'true' ? true : false);
+            this.fourthFormGroup.get(number).setValue(this.shared_data.user_data[element][number]);
           })
           break;
         }
         case 'disabilities': {
           Object.keys(this.shared_data.user_data[element]).forEach((dis) => {
+            console.log(dis)
             this.secondFormGroup.get(dis).setValue(this.shared_data.user_data[element][dis])
           })
           break;
@@ -434,34 +394,35 @@ export class SignupPage implements OnInit {
     })
   }
   save_data() {
-    //conyrollo
-    // console.log(this.zeroFormGroup.errors);
-    // console.log(this.getFormValidationErrors(this.zeroFormGroup))
     this.shared_data.user_data.dateObserved = new Date().toISOString();
     var error = this.findErrorsAllFormsGroup();
     console.log('OLD DATA')
     console.log(this.shared_data.old_user_data)
     console.log('STANDARD DATA')
     console.log(this.shared_data.user_data)
-    if (!error) {      //check if changes it is registred in db
-      this.getAllDataFromForm();
-      console.log(this.shared_data.user_data)
-      this.shared_data.presentLoading('Updating server').then(() => {
-        this.NGSIv2QUERY.sendUserProfile().then((value) => {
-          this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
-          this.shared_data.dismissLoading();
-          this.shared_data.createToast('Data updated!');
-        }, (err) => {
-          console.log(this.shared_data.old_user_data)
-          this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
-          console.log('AFTER OBJECT')
-          console.log(this.shared_data.user_data)
-          this.setAllFromData();
-          this.changeDetection.detectChanges();
-          this.shared_data.dismissLoading();
-          this.shared_data.createToast('Error ' + err + '. Recovered old data available')
+    if (!error) {
+      if (this.shared_data.user_data.emergency_contacts.length > 0) {
+        this.getUserFromFormGroup();
+        console.log(this.shared_data.user_data)
+        this.shared_data.presentLoading('Updating server').then(() => {
+          this.NGSIv2QUERY.sendUserProfile().then((value) => {
+            this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
+            this.shared_data.dismissLoading();
+            this.shared_data.createToast('Data updated!');
+          }, (err) => {
+            console.log(this.shared_data.old_user_data)
+            this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
+            console.log('AFTER OBJECT')
+            console.log(this.shared_data.user_data)
+            this.setFormGroupFromUser();
+            this.changeDetection.detectChanges();
+            this.shared_data.dismissLoading();
+            this.shared_data.createToast('Error ' + err + '. Recovered old data available')
+          })
         })
-      })
+      }
+      else
+        this.shared_data.createToast('Add at least one contact')
     }
     else
       this.shared_data.createToast('Error in step number ' + (error));
@@ -483,65 +444,68 @@ export class SignupPage implements OnInit {
     return result;
   }
   register_user() {
-    // var error = this.findErrorsAllFormsGroup();
-    // if (!error)
-    if (this.shared_data.user_data.paired_devices.length > -1) {//FIX >0
-      this.getAllDataFromForm();
+    //if (this.shared_data.user_data.paired_devices.length > -1) {//FIX >0
+    if (this.shared_data.user_data.emergency_contacts.length > 0) {
+      this.getUserFromFormGroup();
       console.log(this.shared_data.user_data)
       this.shared_data.presentLoading('Creating user').then(() => {
         this.snap4CityService.createDevice(DeviceType.PROFILE).then(() => {
-          console.log('DEVICE CRATED')
+          console.log('DEVICE_PROFILE_CREATE')
+          this.snap4CityService.createDevice(DeviceType.ALERT_EVENT).catch((err) => alert('ALERT_EVENT. ' + err))
+          this.snap4CityService.createDevice(DeviceType.QR_NFC_EVENT).catch((err) => alert('QRNFC_EVENT. ' + err))
+          console.log()
           this.shared_data.user_data.dateObserved = new Date().toISOString();
           this.NGSIv2QUERY.sendUserProfile().then(() => {
             this.shared_data.dismissLoading();
             this.shared_data.createToast('Successfully registered')
             this.authService.isAuthenticated.next(true);
+            this.bluetoothService.enableAllBeaconFromSnap4City();
             this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
             this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true })
           }, (err) => {
-            console.log('DELETING_DEVICE')
-            this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
-              console.log('Device deleted')
-            }, err => console.log(err))
+            console.log('SendUserProfile')
+            console.log(err)
             this.shared_data.dismissLoading();
             alert(err.msg)
           })
         }, err => {
-          console.log('DELETING_DEVICE')
-          this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
-            console.log('Device deleted')
-          }, err => console.log(err))
+          console.log('createDevice')
+          console.log(err)
           this.shared_data.dismissLoading();
           alert(err.msg)
         })
       })
     }
     else
-      this.shared_data.createToast('You must pair at least one device!')
+      this.shared_data.createToast('You must add at least one emergency contact!')
+    // }
+    // else
+    //   this.shared_data.createToast('You must pair at least one device!')
   }
   go_back() {
     this.router.navigateByUrl('/', { replaceUrl: true });
   }
   askSave() {
-    const dialog = this.dialog.open(DialogSaveComponent, {
-      maxWidth: '90vw',
-      minWidth: '40vw'
-    })
-    dialog.afterClosed().subscribe(result => {
-      console.log(result)
-      if (result !== undefined) {
-        if (result.value == 'yes')
-          this.save_data();
-        else
-          this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
-        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-      }
-    })
+    // const dialog = this.dialog.open(DialogSaveComponent, {
+    //   maxWidth: '90vw',
+    //   minWidth: '40vw'
+    // })
+    // dialog.afterClosed().subscribe(result => {
+    //   console.log(result)
+    //   if (result !== undefined) {
+    //     if (result.value == 'yes')
+    //       this.save_data();
+    //     else
+    //       this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
+    this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+    //   }
+    // })
   }
   modifyNameDevice(i) {
     const dialogRef = this.dialog.open(DialogModifyNameComponent, {
       maxWidth: '90vw',
       minWidth: '40vw',
+      panelClass: 'custom-dialog-container',
       data: {
         id: this.shared_data.user_data.paired_devices[i],
         name: '',

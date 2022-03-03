@@ -2,9 +2,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Emergency_Contact, SharedDataService } from '../../../data/shared-data.service';
-import { DialogExampleComponent } from '../dialog-example/dialog-example.component'
 import { SpecialCharValidator } from '../signup.page';
-
+import { DialogImportContactsComponent } from '../dialog-import-contacts/dialog-import-contacts.component'
 @Component({
   selector: 'app-dialog-add-emergency-contact',
   templateUrl: './dialog-add-emergency-contact.component.html',
@@ -38,17 +37,18 @@ export class DialogAddEmergencyContactComponent implements OnInit {
 
   }
   openDialogFromContacts(): void {
-    const dialogRef = this.dialog.open(DialogExampleComponent, {
+    const dialogRef = this.dialog.open(DialogImportContactsComponent, {
       maxWidth: '90vw',
       minWidth: '40vw',
       data: {
         contact: { name: '', surname: '', number: '' }
       }
     });
-    dialogRef.afterClosed().subscribe(result => {
-      this.data = result;
-      if ((result?.name != undefined || result?.surname != undefined) && result?.number != undefined)
-        this.setContact(result)
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('RESULT_FROM_CONTACTS')
+      console.log(result)
+      if (result.contact?.name != undefined && result.contact?.surname != undefined && result.contact?.number != undefined)
+        this.setContact(result.contact)
     });
   }
   save() {
@@ -59,15 +59,17 @@ export class DialogAddEmergencyContactComponent implements OnInit {
         ok = false;
     })
     if (ok) {
+      console.log('VALUE_CONFIRM')
+      console.log(this.data)
       this.setContactFromForm()
       this.dialogRef.close({ data: this.contact, index: this.data.index });
     }
   }
   ngOnInit() {
+    console.log('DATA_FROM_SIGNUP')
     console.log(this.data)
     if (this.data.index != -1) {
       this.setContact(this.data.contact)
     }
   }
-
 }
