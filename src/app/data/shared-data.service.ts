@@ -4,14 +4,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, LoadingController, Platform, ToastController } from '@ionic/angular';
-// import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
-// import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
-
 // import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
-import { CountdownConfig, CountdownModule } from 'ngx-countdown';
+import { CountdownModule } from 'ngx-countdown';
 import { Storage } from '@ionic/storage-angular'
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
@@ -23,7 +19,7 @@ import { Storage } from '@ionic/storage-angular'
     CountdownModule
   ],
   providers: [
-    NativeAudio]
+    NativeAudio, BackgroundMode]
 })
 export class NFCCode {
   id: number = -1;
@@ -45,10 +41,7 @@ export class Emergency_Contact {
 
 /* check iBeacon library OK
   save data */
-export enum FakeKeycloak {
-  token = '',
-  refresh_token = ''
-}
+
 export enum typeChecking {
   NFC_CODE = 'nfc_code',
   QR_CODE = 'qr_code',
@@ -96,7 +89,7 @@ export class UserData {
   dateObserved = new Date().toISOString();
   disabilities = { visionImpaired: false, wheelchairUser: false } /**[visionImapired,wheelchairUser] */
   emergency_contacts = []
-  public_emergency_contacts = { 112: false, 115: false, 118: false }
+  public_emergency_contacts = { call_112: false, call_115: false, call_118: false }
   paired_devices = []
   qr_code = []
   nfc_code = []
@@ -132,17 +125,24 @@ export class QRNFCEvent {
 })
 export class SharedDataService {
   /**List of StorageNameType */
-  storageName = {}
+  readonly MAX_NFCs = 4;
+  readonly MAX_QRs = 4;
+  readonly MAX_EMERGENCY_CONTACTs = 4;
+  readonly MAX_DEVICEs = 2;
+
+  public accessToken;
+  localStorage = {}
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
-  gps_enable = false;
   constructor(private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.storage.create();
+    console.log('UserData')
+    console.log(this.user_data)
     this.platform.ready().then(() => {
       console.log('StorageNameType')
-      Object.keys(StorageNameType).forEach(element=>{
+      Object.keys(StorageNameType).forEach(element => {
         console.log(StorageNameType[element])
-        this.storageName[StorageNameType[element]]=[]
+        this.localStorage[StorageNameType[element]] = []
       })
       //this.enableAllBackgroundMode();
       this.nativeAudio.preloadSimple('alert', 'assets/sounds/alert.mp3').then(() => { }, (err) => console.log(err));
@@ -168,73 +168,7 @@ export class SharedDataService {
   async dismissLoading() {
     await this.loading.dismiss()
   }
-  setUserData(data) {
-    this.user_data = data
-  }
-  saveData() {
-    this.storage.set('user_data', this.user_data);
-    console.log('storage')
-  }
-
-  loadDataUser(auth) {
-    //console.log('data from service')
-    //console.log(this.user_data)
-    return new Promise((resolve, reject) => {
-      if (auth) {
-        this.storage.get('user_data').then((storageData) => {
-          if (storageData != null) {
-            console.log('TRUE_BLOCK')
-            console.log('LOADINGDATA')
-            this.user_data = storageData;
-            this.user_data.name = 'TEST'
-            resolve(true);
-          }
-          else {
-            console.log('ELSE_BLOCK')
-            var qr_code = new QRCode();
-            qr_code.id = 40;
-            var nfc_code = new NFCCode();
-            nfc_code.id = 42;
-            this.user_data.id = 'ampereuser1'
-            this.user_data.nickname = 'KL15'
-            this.user_data.address = 'VialeMorgagni87'
-            this.user_data.allergies = 'gluten'
-            this.user_data.dateofborn = '1950-08-09'
-            this.user_data.city = 'Florence'
-            this.user_data.description = 'brownHairBlueEyes'
-            this.user_data.disabilities.visionImpaired = false
-            this.user_data.disabilities.wheelchairUser = true
-            this.user_data.email = 'email@mail.com'
-            this.user_data.emergency_contacts = [new Emergency_Contact('Paul', 'Rid', '785232145202')]
-            this.user_data.ethnicity = 'white'
-            this.user_data.gender = 'male'
-            this.user_data.height = '185'
-            this.user_data.locality = 'Careggi'
-            this.user_data.medications = ''
-            this.user_data.name = 'Wayne'
-            this.user_data.weight = '85'
-            this.user_data.surname = 'Richards'
-            this.user_data.phoneNumber = '2587436910'
-            this.user_data.public_emergency_contacts = { 112: true, "115": false, "118": true }
-            this.user_data.paired_devices = []
-            this.user_data.pin = '0258'
-            this.user_data.purpose = 'PersonalSafety'
-            this.user_data.qr_code = [qr_code]
-            this.user_data.nfc_code = [nfc_code];
-            this.old_user_data = JSON.parse(JSON.stringify(this.user_data))
-            resolve(false)
-          }
-        }, err => console.log(err));
-      }
-    })
-  }
-  // goHomepage() {
-  //   //load user data from database
-  //   this.loadDataUser()
-  //   this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
-  // }
   showAlert(id) {
-    //take bluetooth signal, create handler that takes the signal
     console.log(id)
     let navigationExtras: NavigationExtras = {
       state: { deviceID: id },
@@ -242,67 +176,163 @@ export class SharedDataService {
     };
     this.nativeAudio.play('alert');
     this.router.navigate(['/show-alert'], navigationExtras)
-    //this.sendEmergency();
   }
-  // async askPermission() {//from API 28 ask about BACKGROUND LOCATION
-  //   const data = await this.androidPermissions.requestPermissions([
-  //     "android.permission.ACCESS_BACKGROUND_LOCATION",
-  //     "android.permission.ACCESS_COARSE_LOCATION",
-  //     this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
-  //   ]).then(() => console.log('PERMISSION_REQUESTED'))
-  // }
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
-    this.backgroundMode.configure({ resume: true })
     this.backgroundMode.enable();
-    console.log('enable')
-    //this.backgroundMode.overrideBackButton();
+    this.backgroundMode.configure({ resume: true })
     this.backgroundMode.disableWebViewOptimizations();
-    console.log('batteryOptimiz')
     this.backgroundMode.disableBatteryOptimizations();
-    //this.backgroundMode.wakeUp();
-    // this.backgroundMode.unlock();
   }
   setNameDevice(device, type: StorageNameType, name = '') {
     var app = { id: '', name: '' };
     app.id = device;
     app.name = name === '' ? device : name;
     var check = true;
-    if (this.storageName[type] === null)
-      this.storageName[type] = []
-    this.storageName[type].forEach(element => {
+    if (this.localStorage[type] === null)
+      this.localStorage[type] = []
+    console.log(this.localStorage)
+    this.localStorage[type].forEach(element => {
       if (element.id === device) {
         element.name = name;
         check = false;
       }
     })
     if (check)
-      this.storageName[type].push(app)
+      this.localStorage[type].push(app)
     console.log('SET_TYPE->' + type)
-    console.log(this.storageName[type])
-    this.storage.set(type, this.storageName[type])
+    console.log(this.localStorage[type])
+    this.storage.set(type, this.localStorage[type])
   }
-  deleteDeviceFromNameDevice(device, type: StorageNameType) {
-    var index = this.storageName[type].indexOf(device);
-    this.storageName[type].splice(index, 1)
-    this.storage.set(type, this.storageName[type])
+  deleteDeviceFromLocalStorage(device, type: StorageNameType) {
+    var index = this.localStorage[type].indexOf(device);
+    this.localStorage[type].splice(index, 1)
+    this.storage.set(type, this.localStorage[type])
   }
   getNameDevices(type: StorageNameType) {
     this.storage.get(type).then((result) => {
-      this.storageName[type] = result;
-      console.log('GET_TYPE->' + this.storageName[type])
-      console.log(this.storageName[type] === null)
-      if (this.storageName[type] === null) {
+      this.localStorage[type] = result;
+      console.log('TYPE_STORAGE')
+      console.log(this.localStorage[type])
+      console.log(this.localStorage[type] == null)
+      if (this.localStorage[type] == null) {
         this.user_data[type].forEach(element => {
           console.log('SETNAME_' + type)
           this.setNameDevice(element, type)
         })
       }
     })
-    // if (this.nameDevices === null) {
-    //   this.user_data.paired_devices.forEach(element => {
-    //     this.setNameDevice(element, type)
-    //   })
-    // }
+  }
+  setUserValueFromData(data) {
+    Object.keys(this.user_data).forEach((element) => {
+      switch (element) {
+        case 'id': case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
+          break;
+        case 'dateObserved': {
+          this.user_data[element] = new Date().toISOString();
+          break;
+        }
+        case 'allergies': case 'medications': {
+          this.user_data[element] = data[element].value;
+          break
+        }
+        case 'public_emergency_contacts': {
+          Object.keys(this.user_data[element]).forEach((number) => {
+            this.user_data[element][number] = data[number].value;
+          })
+          break;
+        }
+        case 'disabilities': {
+          Object.keys(this.user_data[element]).forEach((dis) => {
+            this.user_data[element][dis] = data[dis].value
+          })
+          break;
+        }
+        default: {
+          this.user_data[element] = data[element].value
+          break
+        }
+      }
+    })
+    for (var i = 0; i < this.MAX_DEVICEs; i++)
+      if (data['jewel' + (i + 1) + 'ID'].value != '')
+        this.user_data.paired_devices.push(data['jewel' + (i + 1) + 'ID'].value)
+    for (var i = 0; i < this.MAX_EMERGENCY_CONTACTs; i++) {
+      var name = data['emergencyContact' + (i + 1) + 'Name'].value;
+      var surname = data['emergencyContact' + (i + 1) + 'Surname'].value;
+      var number = data['emergencyContact' + (i + 1) + 'Number'].value;
+      if (name != '' && surname != '' && number != '')
+        this.user_data.emergency_contacts.push(new Emergency_Contact(name, surname, number))
+    }
+    for (var i = 0; i < this.MAX_QRs; i++) {
+      var qrcode = data['QR' + (i + 1)].value;
+      if (qrcode != '')
+        this.user_data.qr_code.push(qrcode)
+    }
+    for (var i = 0; i < this.MAX_NFCs; i++) {
+      var nfccode = data['NFC' + (i + 1)].value;
+      if (nfccode != '')
+        this.user_data.nfc_code.push(nfccode)
+    }
+    this.user_data.public_emergency_contacts = { call_112: data.call_112.value, call_115: data.call_115.value, call_118: data.call_118.value }
+    //this.old_user_data = JSON.parse(JSON.stringify(this.user_data))
+  }
+  getUserFromLocalToServer() {
+    console.log(this.user_data)
+    var newUser={}
+    Object.keys(this.user_data).forEach((field_name) => {
+      console.log(field_name)
+      switch (field_name) {
+        case 'id': { break; }
+        case 'dateObserved': {
+          newUser[field_name] = { value: new Date().toISOString() }
+          break;
+        }
+        case 'emergency_contacts': {
+          for (var i = 0; i < this.MAX_EMERGENCY_CONTACTs; i++) {
+            newUser['emergencyContact' + (i + 1) + 'Name'] = { value: this.user_data.emergency_contacts[i]?.name === undefined ? '' : this.user_data.emergency_contacts[i]?.name }
+            newUser['emergencyContact' + (i + 1) + 'Surname'] = { value: this.user_data.emergency_contacts[i]?.surname === undefined ? '' : this.user_data.emergency_contacts[i]?.surname }
+            newUser['emergencyContact' + (i + 1) + 'Number'] = { value: this.user_data.emergency_contacts[i]?.number === undefined ? '' : this.user_data.emergency_contacts[i]?.number }
+          }
+          break;
+        }
+        case 'disabilities': {
+          console.log('disabilities')
+          Object.keys(this.user_data.disabilities).forEach((dis) => {
+            newUser[dis] = { value: this.user_data.disabilities[dis] }
+          })
+          break;
+        }
+        case 'qr_code': {
+          for (var i = 0; i < this.MAX_QRs; i++)
+            newUser['QR' + (i + 1)] = { value: this.user_data.qr_code[i] === undefined ? '' : this.user_data.qr_code[i] }
+          break;
+        }
+        case'nfc_code': {
+          for (var i = 0; i < this.MAX_NFCs; i++)
+            newUser['NFC' + (i + 1)] = { value: this.user_data.nfc_code[i] === undefined ? '' : this.user_data.nfc_code[i] }
+          break;
+        }
+        case 'public_emergency_contacts': {
+          Object.keys(this.user_data.public_emergency_contacts).forEach((element) => {
+            newUser[element] = { value: this.user_data.public_emergency_contacts[element] }
+          })
+          break;
+        }
+        case 'paired_devices': {
+          for (var i = 0; i < this.MAX_DEVICEs; i++)
+            newUser['jewel' + (i + 1) + 'ID'] = { value: this.user_data.paired_devices[i] === undefined ? '' : this.user_data.paired_devices[i] }
+          break;
+        }
+        default: {
+          console.log('default-> '+field_name)
+          console.log(newUser)
+          newUser[field_name] = { value: this.user_data[field_name] === undefined ? '' : this.user_data[field_name] }
+          break;
+        }
+      }
+    })
+    console.log('RETURN_NEW_USER')
+    return newUser;
   }
 }

@@ -1,11 +1,6 @@
-import { ThrowStmt } from '@angular/compiler';
 import { Injectable } from '@angular/core';
-import { resolve } from 'dns';
-import * as Keycloak from 'keycloak-ionic';
-import { element } from 'protractor';
-import { DeviceType, Emergency_Contact, QRNFCEvent, SharedDataService, typeChecking, AlertEvent, FakeKeycloak } from '../data/shared-data.service'
+import { DeviceType, QRNFCEvent, SharedDataService, typeChecking, AlertEvent } from '../data/shared-data.service'
 import { AuthenticationService } from '../services/authentication.service'
-import { NGSIv2QUERYService } from './ngsiv2-query.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -59,6 +54,7 @@ export class Snap4CityService {
           id: device_id,
           type: type,
           contextbroker: broker,
+          subnature: 'Private_security',
           kind: 'sensor',
           format: 'json',
           latitude: lat,
@@ -78,7 +74,6 @@ export class Snap4CityService {
           console.log(mydata)
           if (mydata.status != 'ko') {
             this.changeVisibilityToPublic(device_id).then(() => {
-              //console.log('all ok')
               resolve(mydata)
             }, err => reject(err))
           }
@@ -95,7 +90,7 @@ export class Snap4CityService {
       })
     })
   }
-  changeVisibilityToPublic(device_id) {
+  private changeVisibilityToPublic(device_id) {
     return new Promise((resolve, reject) => {
       $.ajax({
         url: "https://iotdirectory.snap4city.org/api/device.php",
@@ -122,7 +117,7 @@ export class Snap4CityService {
     })
 
   }
-  generateUUID() { // Public Domain/MIT
+  private generateUUID() { // Public Domain/MIT
     var d = new Date().getTime();
     if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
       d += performance.now(); //use high-precision timer if available
@@ -133,95 +128,78 @@ export class Snap4CityService {
       return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
   }
-  getAttributesPayload(type: DeviceType) {
+  private getAttributesPayload(type: DeviceType) {
     switch (type) {
       case DeviceType.PROFILE:
-        return this.getUserIDPayload();
+        return this.getUserIDPayload(true);
       case DeviceType.ALERT_EVENT:
-        return this.getAlertEventPayload();
+        return this.getEventPayload(true, new AlertEvent());
       case DeviceType.QR_NFC_EVENT:
-        return this.getQRNFCEventPayload();
+        return this.getEventPayload(true, new QRNFCEvent('', '', ''));
     }
   }
-  createField(name, value) {
-    if (value === null)
-      return {
-        value_name: name,
-        value_type: 'description',
-        value_unit: 'text',
-        data_type: 'string',
-        editable: "0",
-        healthiness_criteria: 'refresh_rate',
-        healthiness_value: '300'
-      };
-  }
-  createDateTimeField() {
-    return {
-      value_name: 'dateObserved',
-      value_type: 'timestamp',
-      value_unit: 'timestamp',
-      data_type: 'string',
-      editable: "0",
-      healthiness_criteria: 'refresh_rate',
-      healthiness_value: 300
-    }
-  }
-  getAlertEventPayload(createDevice = true, event = new AlertEvent()) {
-    var newEvent;
-    if (createDevice)
-      newEvent = [];
-    else
-      newEvent = {};
-    Object.keys(event).forEach((element) => {
-      console.log(event[element])
-      if (element != 'latitude' && element != 'longitude')
-        if (createDevice)
-          if (element != 'dateObserved')
-            newEvent.push(this.createField(element, null))
-          else
-            newEvent.push(this.createDateTimeField());
-        else {
-          var newValue = event[element];
-          newEvent[element] = { value: newValue.toString() }
+  private createField(name) {
+    console.log(name)
+    switch (name) {
+      case 'identifier': {
+        return {
+          value_name: 'identifier',
+          value_type: 'Identifier',
+          value_unit: 'SURI',
+          data_type: 'string',
+          editable: "0",
+          healthiness_criteria: 'refresh_rate',
+          healthiness_value: '300'
         }
-    })
-    console.log('newEvent');
-    console.log(newEvent)
-    return newEvent;
+      }
+      case 'dateObserved': {
+        return {
+          value_name: 'dateObserved',
+          value_type: 'timestamp',
+          value_unit: 'timestamp',
+          data_type: 'string',
+          editable: "0",
+          healthiness_criteria: 'refresh_rate',
+          healthiness_value: '300'
+        }
+      }
+      default: {
+        return {
+          value_name: name,
+          value_type: 'description',
+          value_unit: 'text',
+          data_type: 'string',
+          editable: "0",
+          healthiness_criteria: 'refresh_rate',
+          healthiness_value: '300'
+        };
+      }
+    }
   }
-  getUserIDPayload(createDevice = true) {
-    console.log(createDevice)
+  getUserIDPayload(createModel:boolean) {
     var newUser: any;
-    if (createDevice)
-      newUser = [];
+    console.log('UserIdPayLoad')
+    if (createModel)
+      newUser = this.createModelProfile();
     else
-      newUser = {}
+      newUser = this.shared_data.getUserFromLocalToServer()
+    return newUser;
+  }
+  createModelProfile() {
+    var newUser = []
     Object.keys(this.shared_data.user_data).forEach((field_name) => {
       switch (field_name) {
         case 'id': {
           break;
         }
         case 'dateObserved': {
-          if (createDevice)
-            newUser.push(this.createDateTimeField())
-          else
-            newUser[field_name] = { value: this.shared_data.user_data.dateObserved }
-          break;
+          newUser.push(this.createField('dateObserved',))
         }
         case typeChecking.EMERGENCY_CONTACTS: {
-          for (var i = 0; i < 5; i++) {
-            if (createDevice) {
-              newUser.push(this.createField('emergencyContact' + (i + 1) + 'Name', null))
-              newUser.push(this.createField('emergencyContact' + (i + 1) + 'Surname', null))
-              newUser.push(this.createField('emergencyContact' + (i + 1) + 'Number', null))
-            }
-            else {
-              console.log('emergencyContact ' + i)
-              console.log(this.shared_data.user_data.emergency_contacts[i]?.name)
-              newUser['emergencyContact' + (i + 1) + 'Name'] = { value: this.shared_data.user_data.emergency_contacts[i]?.name === undefined ? '' : this.shared_data.user_data.emergency_contacts[i]?.name }
-              newUser['emergencyContact' + (i + 1) + 'Surname'] = { value: this.shared_data.user_data.emergency_contacts[i]?.surname === undefined ? '' : this.shared_data.user_data.emergency_contacts[i]?.surname }
-              newUser['emergencyContact' + (i + 1) + 'Number'] = { value: this.shared_data.user_data.emergency_contacts[i]?.number === undefined ? '' : this.shared_data.user_data.emergency_contacts[i]?.number }
-            }
+          for (var i = 0; i < this.shared_data.MAX_EMERGENCY_CONTACTs; i++) {
+            newUser.push(this.createField('emergencyContact' + (i + 1) + 'Name'))
+            newUser.push(this.createField('emergencyContact' + (i + 1) + 'Surname'))
+            newUser.push(this.createField('emergencyContact' + (i + 1) + 'Number'))
           }
           break;
         }
@@ -229,72 +207,81 @@ export class Snap4CityService {
           console.log('ERROR?')
           console.log(this.shared_data.user_data.disabilities)
           Object.keys(this.shared_data.user_data.disabilities).forEach((dis) => {
-            if (createDevice)
-              newUser.push(this.createField(dis, null))
-            else
-              newUser[dis] = { value: this.shared_data.user_data.disabilities[dis] }
+            newUser.push(this.createField(dis))
           })
           break;
         }
         case typeChecking.QR_CODE: {
-          for (var i = 0; i < 4; i++)
-            if (createDevice)
-              newUser.push(this.createField('QR' + (i + 1), null))
-            else
-              newUser['QR' + (i + 1)] = { value: this.shared_data.user_data.qr_code[i] === undefined ? '' : this.shared_data.user_data.qr_code[i] }
+          for (var i = 0; i < this.shared_data.MAX_QRs; i++)
+            newUser.push(this.createField('QR' + (i + 1)))
           break;
         }
         case typeChecking.NFC_CODE: {
-          for (var i = 0; i < 4; i++)
-            if (createDevice)
-              newUser.push(this.createField('NFC' + (i + 1), null))
-            else
-              newUser['NFC' + (i + 1)] = { value: this.shared_data.user_data.nfc_code[i] === undefined ? '' : this.shared_data.user_data.nfc_code[i] }
+          for (var i = 0; i < this.shared_data.MAX_NFCs; i++)
+            newUser.push(this.createField('NFC' + (i + 1)))
           break;
         }
         case typeChecking.PUB_EMERGENCY_CONTACTS: {
           Object.keys(this.shared_data.user_data.public_emergency_contacts).forEach((element) => {
-            if (createDevice)
-              newUser.push(this.createField('call_' + element, null))
-            else
-              newUser['call_' + element] = { value: this.shared_data.user_data.public_emergency_contacts[element] }
+            newUser.push(this.createField('call_' + element))
           })
           break;
         }
         case typeChecking.PAIRED_DEVICES: {
-          for (var i = 0; i < 2; i++)
-            if (createDevice)
-              newUser.push(this.createField('jewel' + (i + 1) + 'ID', null))
-            else
-              newUser['jewel' + (i + 1) + 'ID'] = { value: this.shared_data.user_data.paired_devices[i] === undefined ? '' : this.shared_data.user_data.paired_devices[i] }
+          for (var i = 0; i < this.shared_data.MAX_DEVICEs; i++)
+            newUser.push(this.createField('jewel' + (i + 1) + 'ID'))
           break;
         }
         default: {
-          if (createDevice)
-            newUser.push(this.createField(field_name, null))
-          else
-            newUser[field_name] = { value: this.shared_data.user_data[field_name] === undefined ? '' : this.shared_data.user_data[field_name] }
+          newUser.push(this.createField(field_name))
           break;
         }
       }
     })
     return newUser;
   }
-  getQRNFCEventPayload(createDevice = true, event: QRNFCEvent = new QRNFCEvent('', '', '')) {
+  // getAlertEventPayload(createModel = true, event = new AlertEvent()) {
+  //   var newEvent;
+  //   if (createModel)
+  //     newEvent = [];
+  //   else
+  //     newEvent = {};
+  //   Object.keys(event).forEach((element) => {
+  //     if (createModel)
+  //       newEvent.push(this.createField(element))
+  //     else
+  //       newEvent[element] = { value: event[element].toString() }
+  //   })
+  //   return newEvent;
+  // }
+  getEventPayload(createModel, event: QRNFCEvent | AlertEvent) {
     var newQRNFCEvent;
-    if (createDevice)
-      newQRNFCEvent = [];
+    if (createModel)
+      newQRNFCEvent = this.createModelEvent(event);
     else
-      newQRNFCEvent = {};
-    Object.keys(event).forEach((element) => {
-      if (createDevice)
-        if (element != 'dateObserved')
-          newQRNFCEvent.push(this.createField(element, null))
-        else
-          newQRNFCEvent.push(this.createDateTimeField());
-      else
-        newQRNFCEvent[element] = { value: event[element] }
-    })
+      newQRNFCEvent = this.getEventFromLocalToServer(event);
     return newQRNFCEvent;
   }
+  createModelEvent(event: QRNFCEvent | AlertEvent) {
+    var newEvent=[];
+    Object.keys(event).forEach((element) => {
+      newEvent.push(this.createField(element))
+    })
+    return newEvent;
+  }
+  private getEventFromLocalToServer(event: QRNFCEvent | AlertEvent) {
+    var newEvent={}
+    Object.keys(event).forEach((element) => {
+      newEvent[element] = { value: event[element] }
+    })
+    return newEvent
+  }
+  // getQRNFCEventPayload(createModel = true, event: QRNFCEvent = new QRNFCEvent('', '', '')) {
+  //   var newQRNFCEvent;
+  //   if (createModel)
+  //     newQRNFCEvent = this.createModelEvent(DeviceType.QR_NFC_EVENT);
+  //   else
+  //     newQRNFCEvent = this.getPayloadEvent(event);
+  //   return newQRNFCEvent;
+  // }
 }
