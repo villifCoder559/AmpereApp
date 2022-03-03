@@ -29,9 +29,6 @@
     flex-direction: column;
 }
 .buttons{
-    // height: 90%;
-    // max-width: 90%;
-    //margin: 10vw 10vw !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -89,28 +86,6 @@
         width: inherit;
     }
 }
-// @media screen and (min-width: 568px) and (orientation:landscape){
-//     .buttons{
-//         display: flex;
-//         align-items: center;
-//         justify-content: center;
-//         font-size: 16vw;
-        
-//     }
-//     .button_bottom{
-//         width: 98%;
-//         display: flex;
-//         align-items: center;
-//         justify-content: center;
-//         font-size: 16vw;
-//     }
-//     .mat-icon{
-//         font-size: 16vw;
-//         display: inherit;
-//         height: inherit;
-//         width: inherit;
-//     }
-// }
 @media screen and (min-width: 800px){
     .buttons{
         display: flex;
