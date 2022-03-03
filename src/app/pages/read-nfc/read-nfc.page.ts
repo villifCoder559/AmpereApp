@@ -1,10 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NFC, Ndef } from '@ionic-native/nfc/ngx'
-import { Platform, ToastController } from '@ionic/angular';
-import { DeviceType, QRNFCEvent, SharedDataService, StorageNameType, typeChecking } from 'src/app/data/shared-data.service';
-import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
-import { Snap4CityService } from 'src/app/data/snap4-city.service';
-import { LoadingController } from '@ionic/angular';
+import { NFC } from '@ionic-native/nfc/ngx'
+import { Platform } from '@ionic/angular';
+import { SharedDataService, StorageNameType, typeChecking } from 'src/app/data/shared-data.service';
 import { ReadingCodeService } from 'src/app/data/reading-code.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogModifyNameComponent } from '../signup/dialog-modify-name/dialog-modify-name.component';
@@ -13,7 +10,7 @@ import { DialogModifyNameComponent } from '../signup/dialog-modify-name/dialog-m
   selector: 'app-read-nfc',
   templateUrl: './read-nfc.page.html',
   styleUrls: ['./read-nfc.page.scss'],
-  providers: [NGSIv2QUERYService]
+  providers: []
 })
 export class ReadNFCPage implements OnInit {
   StorageNameType = StorageNameType
@@ -22,7 +19,7 @@ export class ReadNFCPage implements OnInit {
   scannedCode = null;
   constructor(private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private nfc: NFC, private platform: Platform) {
     console.log(this.shared_data.user_data)
-    console.log(this.shared_data.storageName)
+    console.log(this.shared_data.localStorage)
   }
   ngOnInit() {
     this.nfc.enabled().then(() => {
