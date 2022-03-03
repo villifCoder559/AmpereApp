@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent } from '@angular/router';
 import { MenuController } from '@ionic/angular';
-import { SharedDataService } from 'src/app/data/shared-data.service';
+import { SharedDataService, UserData } from 'src/app/data/shared-data.service';
 import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
@@ -14,37 +14,32 @@ export class MenuPage implements OnInit {
     {
       title: 'Homepage',
       url: '/profile/menu/homepage',
-      icon:'home'
+      icon: 'home',
     },
     {
       title: 'Emergency contacts',
       url: '/profile/menu/callemergencycontacts',
-      icon:'people'
+      icon: 'people',
     },
     {
       title: 'Webpage',
       url: '/profile/menu/webpage',
-      icon:'earth'
+      icon: 'earth',
     },
     {
       title: 'Devices Status',
       url: '/profile/menu/testAlert',
-      icon:'phone-portrait'
+      icon: 'phone-portrait',
     },
     {
       title: 'Term of Use',
       url: '/profile/menu/termOfUse',
-      icon:'document'
+      icon: 'document',
     },
     {
       title: 'Privacy Policy',
       url: '/profile/menu/privacyPolicy',
-      icon:'document'
-    },
-    {
-      title: 'Logout',
-      url: '',
-      icon:"log-out"
+      icon: 'document',
     }
   ]
   selectedPath = ''
@@ -61,10 +56,16 @@ export class MenuPage implements OnInit {
 
   }
   logout() {
+    this.shared_data.presentLoading('Logout...')
     this.ctrlMenu.close().then(() => {
       console.log('logout');
-      console.log('autentcated.next is false')
-      this.authService.logout();
+      this.shared_data.user_data = new UserData();
+      this.authService.logout().then(() => {
+        this.shared_data.dismissLoading()
+      }, err => {
+        this.shared_data.dismissLoading();
+        alert(err.msg);
+      })
     })
   }
 }
