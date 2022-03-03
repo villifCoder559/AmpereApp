@@ -26,7 +26,9 @@
 @import "~@ionic/angular/css/flex-utils.css";
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
-
+ion-content{
+    --ion-background-color:#fff;
+}
 .alert-msg{
     text-align: center;
     padding: 8px 0px;
@@ -179,6 +181,9 @@ ngx-qrcode{
 .icon_code{
     width: 30px; 
     height: 30px;
+}
+mat-dialog-container {
+    display: contents;
 }
 @media(min-width:800px){ //mediaQueries also in signup.scss,signup.ts constructor, homepage.scss
     .reader{
