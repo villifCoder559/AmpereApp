@@ -1,28 +1,13 @@
-<ion-content>
-
-  <form (ngSubmit)="login('')" [formGroup]="credentials">
-    <div class="input-group">
-      <ion-item>
-        <ion-input type="email" placeholder="Email" formControlName="email"></ion-input>
-      </ion-item>
-      <div *ngIf="(email.dirty || email.touched) && email.errors" class="errors">
-        <span *ngIf="email.errors?.required">Email is required</span>
-        <span *ngIf="email.errors?.email">Email is invalid</span>
-      </div>
-      <ion-item>
-        <ion-input type="password" placeholder="Password" formControlName="password"></ion-input>
-      </ion-item>
-      <div *ngIf="(password.dirty || password.touched) && password.errors" class="errors">
-        <span *ngIf="password.errors?.required">Password is required</span>
-        <span *ngIf="password.errors?.minlength">Password needs to be 6 characters</span>
-      </div>
+<div class="container_login">
+  <button mat-raised-button color="light" (click)="login()">
+    <div class='button'>
+      <img src="assets/images/s4c.png" class="img">
+      <div class="text">Login with Snap4City</div>
     </div>
-    <ion-button class="button_forgotten" type="button" (click)="go_to_forgot_psw()" color="light" fill="clear">
-      <u>Forgot password?</u></ion-button>
-    <ion-button type="submit" expand="block" [disabled]="!credentials.valid">Log in</ion-button>
-    <ion-button type="button" (click)="go_to_signup()" expand="block" color="light" fill="clear">Not yet a member? Sign
-      up!
-    </ion-button>
-    <ion-button (click)="login('snap4city')">Login Snap4City </ion-button>
-  </form>
-</ion-content>
+  </button>
+  <button mat-raised-button color="light" (click)="loginTest()">
+    <div class='button'>
+      <div class="text">Fast login for testing</div>
+    </div>
+  </button>
+</div>
