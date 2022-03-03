@@ -9,8 +9,6 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import {Contacts} from '@ionic-native/contacts'
 import {MaterialModule} from '../app/material-module';
-//import { ShowAlertPage } from '../app/show-alert/show-alert.page'
-//import { ShowAlertPageModule } from '../app/show-alert/show-alert.module'
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
@@ -26,11 +24,12 @@ import {BluetoothService} from '../app/data/bluetooth.service'
 import { IBeacon } from '@ionic-native/ibeacon/ngx'
 import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
 import { Snap4CityService } from '../app/data/snap4-city.service'
-import { AutoLoginGuard } from '../app/guards/auto-login.guard'
 import { AuthenticationService } from '../app/services/authentication.service'
 import { ReadingCodeService } from '../app/data/reading-code.service'
+import { SendAuthService } from '../app/data/send-auth.service'
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { FormsModule } from '@angular/forms';
+import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -53,9 +52,10 @@ import { FormsModule } from '@angular/forms';
     IBeacon,
     BluetoothLE,
     Snap4CityService,
-    AutoLoginGuard,
     AuthenticationService,
-    ReadingCodeService
+    ReadingCodeService,
+    SendAuthService,
+    InAppBrowser
   ],
   bootstrap: [AppComponent],
 })
