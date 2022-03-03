@@ -1,8 +1,7 @@
-import { Component, Injectable, NgModule } from '@angular/core';
-import { Beacon, IBeacon, Region } from '@ionic-native/ibeacon/ngx'
+import {  Injectable, NgModule } from '@angular/core';
+import { IBeacon } from '@ionic-native/ibeacon/ngx'
 import { BLE } from '@ionic-native/ble/ngx';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-// import * as crypto from 'crypto'
+import { BehaviorSubject } from 'rxjs';
 import { SharedDataService } from './shared-data.service';
 import { AuthenticationService } from '../services/authentication.service'
 /** save data
@@ -16,20 +15,15 @@ import { AuthenticationService } from '../services/authentication.service'
   providedIn: 'root'
 })
 export class BluetoothService {
-  beaconList: Beacon[] = [];
+  detectedValue = new BehaviorSubject(null);
   constructor(private authService: AuthenticationService, private ble: BLE, private ibeacon: IBeacon, private shared_data: SharedDataService) {
   }
   /*52414449-5553-4e45-5457-4f524b53434f*/
-  beacon_regions = [];
-  detectedValue = new BehaviorSubject(null);
   stopScan() {
-    this.ble.stopScan().then(() => {
-      console.log('stop scan')
-    })
+    this.ble.stopScan()
   }
-  scanBLE(scanningTime: number = 10000) /*milliseconds */ {
+  scanBLE(scanningTime: number = 10000) {
     return new Promise((resolve, reject) => {
-      //var array = [];
       this.ble.isEnabled().then(
         () => { }
         , (err) => {
@@ -41,9 +35,7 @@ export class BluetoothService {
         }).then(() => {
           this.ble.startScanWithOptions([], { reportDuplicates: false }).subscribe(device => {
             this.detectedValue.next(device);
-            //array.push(device);
-            //console.log(JSON.stringify(device));
-          }, (err) => console.log(err));
+          }, (err) => reject(err));
         });
       setTimeout(() => {
         this.ble.stopScan();
@@ -51,70 +43,28 @@ export class BluetoothService {
       }, scanningTime);
     })
   }
-  toHexString(byteArray) {
+  private toHexString(byteArray) {
     return Array.from(byteArray, function (byte: number) {
       return ('0' + (byte & 0xFF).toString(16)).slice(-2);
     }).join('')
   }
-  connectDevice(device) { //major->1 minor->2
-    console.log('DEVICE CONNECTION...')
-    console.log(device)
+  connectDevice(device) {
     return new Promise((resolve, reject) => {
       this.ble.stopScan();
       this.ble.connect(device.id).subscribe((peripheralData) => {
-        console.log(peripheralData)
-        console.log('enable connection')
-        console.log('HEX DATA')
         var int8View = new Int8Array(peripheralData.advertising);
         var hex = this.toHexString(int8View);
-        console.log(hex)
-        var manufacturer_id = hex[10] + hex[11] + hex[12] + hex[13];
-        peripheralData.protocol = 'ibeacon'
-        console.log(hex);
         var uuid = hex.substring(18, 26) + '-' + hex.substring(26, 30) + '-' + hex.substring(30, 34) + '-' + hex.substring(34, 38) + '-' + hex.substring(38, 50);
-        peripheralData.uuid = uuid;
-        console.log('uuid-> ' + uuid);
-        // var major = parseInt('' + hex[50] + hex[51] + hex[52] + hex[53])
-        // var minor = parseInt('' + hex[54] + hex[55] + hex[56] + hex[57])
         this.startRegisterBeacon(uuid);
-        console.log(device)
         resolve(uuid)
-        // this.addPairedDeviceANDregister(uuid)
-        // this.ble.autoConnect(peripheralData.id, () => {
-        //   console.log('autoconnection')
-        //   if (this.authService.isAuthenticated.value)
-        //     this.shared_data.showAlert(peripheralData.id);
-        // }, (err) => {
-        //   console.log(err);
-        // })
-
       }, (err) => { reject(err) })
     })
   }
-  addPairedDeviceANDregister(device) {
-    var indexOf = this.shared_data.user_data.paired_devices.indexOf(device);
-    if (indexOf == -1) {
-      this.shared_data.user_data.paired_devices.push(device);
-      // if (this.shared_data.user_data.paired_devices[0] == null) {
-      //   this.shared_data.user_data.paired_devices[0] = device;
-      //   this.shared_data.user_data.paired_devices[0]['name'] = 'Device1'
-      //   alert('Successfully paired');
-      // }
-      // else {
-      //   this.shared_data.user_data.paired_devices[1] = device;
-      //   this.shared_data.user_data.paired_devices[1]['name'] = 'Device2'
-      //   alert('Successfully paired');
-      // }
-    }
-    else
-      alert('Device already registred')
-    //this.shared_data.saveData();
-  }
-  enableAllUserBeaconFromSnap4City() {
+  enableAllBeaconFromSnap4City() {
     this.shared_data.user_data.paired_devices.forEach((element) => {
-      console.log(element)
       this.startRegisterBeacon(element);
-    }, err => console.log(err))
+      console.log('enabled '+element)
+    }, err => alert(err))
   }
   enableAllUserBeacon() {
     // console.log('enableUserBeacon')
@@ -149,14 +99,14 @@ export class BluetoothService {
     // }, err => console.log(err))
   }
   checkRangeBeaconsInRegion(index) {
-    this.ibeacon.requestAlwaysAuthorization();
+    //this.ibeacon.requestAlwaysAuthorization(); only iOS
     // create a new delegate and register it with the native layer
     let delegate = this.ibeacon.Delegate();
     //Subscribe to some of the delegate's event handlers
     delegate.didRangeBeaconsInRegion() //this can detect beacon in region
       .subscribe(
         data => {
-          // console.log(data)
+          console.log(data)
           // console.log('didRangeBeaconsInRegion: ', data)
           // this.shared_data.user_data.paired_devices[index].inRegion = true;
           // let beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + this.shared_data.user_data.paired_devices[index].uuid, this.shared_data.user_data.paired_devices[index].uuid);
@@ -165,105 +115,33 @@ export class BluetoothService {
         error => console.error()
       );
   }
-  startRegisterBeacon(uuid) {
-    // console.log('minor->' + minor);
-    // console.log('major->' + major)
-    this.ibeacon.requestAlwaysAuthorization();
-    // create a new delegate and register it with the native layer
-    let delegate = this.ibeacon.Delegate();
+  private async startRegisterBeacon(uuid) {
+    //this.ibeacon.requestAlwaysAuthorization(); only iOS
+    var delegate = this.ibeacon.Delegate()
     let beaconRegion;
-    // if (minor != -1 && major != -1)
     beaconRegion = this.ibeacon.BeaconRegion(uuid, uuid);
-    // else
-    //   beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + uuid, uuid, major, minor);
-    //let beaconRegion = this.ibeacon.BeaconRegion('test', null, null, null);
-    console.log(beaconRegion)
-    //console.log('uuid-> ' + uuid)
-    //Subscribe to some of the delegate's event handlers
-    delegate.didRangeBeaconsInRegion()//this can detect beacon in region
-      .subscribe(
-        //data=>console.log('')
-      );
+    delegate.didRangeBeaconsInRegion()
+      .subscribe();
     delegate.didStartMonitoringForRegion()
-      .subscribe(
-        data => console.log('didStartMonitoringForRegion: ', data),
-        error => console.error()
-      );
+      .subscribe();
     delegate.didEnterRegion()
       .subscribe(
         data => {
-          console.log('didEnterRegion: ', data);
           if (this.authService.isAuthenticated.value) {
-            console.log('IdentifierRegion-> ' + data.region.identifier)
             var found = false;
             var index = 0;
-            console.log(this.shared_data.user_data.paired_devices.length)
             for (index = 0; index < this.shared_data.user_data.paired_devices.length && !found; index++) {
-              console.log(this.shared_data.user_data.paired_devices[index])
-              console.log(this.shared_data.user_data.paired_devices[index] === data.region.identifier)
               if (this.shared_data.user_data.paired_devices[index] === data.region.identifier)
                 found = true;
             }
             if (found) {
-              console.log('Detected uuid ' + data.region.identifier);
               this.shared_data.showAlert(this.shared_data.user_data.paired_devices[index - 1]);
             }
           }
-        }, err => console.log(err)
+        }, err => alert(err)
       );
-    console.log("created beaconRegion")
-    this.ibeacon.startAdvertising(beaconRegion).then((obj) => {
-      console.log(obj)
-      console.log('startAdvertisment');
-    }, err => console.log(err))
-    this.ibeacon.startRangingBeaconsInRegion(beaconRegion).then((obj) => {
-      console.log(obj)
-      console.log('startRangingBeaconsInRegion');
-    }, err => console.log(err))
-    this.ibeacon.startMonitoringForRegion(beaconRegion)
-      .then(
-        () => console.log('Native layer received the request to monitoring'),
-        error => console.error('Native layer failed to begin monitoring: ', error)
-      );
-  }
-  // detectAllBeacon() {
-  //   let delegate = this.ibeacon.Delegate();
-  //   delegate.didRangeBeaconsInRegion().subscribe((data) => {
-  //     this.beaconList = data.beacons;
-  //     console.log(data)//this
-  //     console.log('didRangeBeaconsInRegion: ')
-  //   }, (err) => console.log(err))
-  //   delegate.didStartMonitoringForRegion()
-  //     .subscribe(
-  //       data => console.log('didStartMonitoringForRegion: ', data),
-  //       error => console.error()
-  //     );
-  //   delegate.didEnterRegion()
-  //     .subscribe(
-  //       data => {
-  //         ///this.shared_data.showAlert();
-  //         alert('Alert detected')
-  //         console.log('didEnterRegion: ', data);
-  //       }
-  //     );
-  // }
-  // private beaconEnterRegion(data) {
-  //   console.log('Beacon ', data, ' detected');
-  // }
-  disableAll() {
-    this.shared_data.user_data.paired_devices.forEach((element) => {
-      if (element.protocol != 'ble') {
-        this.ibeacon.Delegate();
-        console.log('Stop monitoring ' + element.uuid);
-        this.ibeacon.stopMonitoringForRegion(element);
-        this.ibeacon.stopRangingBeaconsInRegion(element);
-        this.ibeacon.stopAdvertising(element);
-        console.log('disconnected ibeacon');
-      }
-      else {
-        this.ble.disconnect(element.id);
-        console.log('disconnected ble')
-      }
-    })
+    this.ibeacon.startAdvertising(beaconRegion).then((obj) => { }, err => console.log(err))
+    this.ibeacon.startRangingBeaconsInRegion(beaconRegion).then((obj) => { }, err => console.log(err))
+    this.ibeacon.startMonitoringForRegion(beaconRegion).then(() => { }, error => console.error('Native layer failed to begin monitoring: ', error));
   }
 }
