@@ -1,15 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AlertController, Platform } from '@ionic/angular';
 import { CountdownComponent, CountdownConfig, CountdownModule } from 'ngx-countdown';
-import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-import { SMS } from '@ionic-native/sms/ngx';
 import { AlertEvent, DeviceType, SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@awesome-cordova-plugins/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
-import { NativeAudio } from '@ionic-native/native-audio/ngx'
 import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
 import { Snap4CityService } from '../data/snap4-city.service'
 import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@awesome-cordova-plugins/background-geolocation/ngx';
@@ -22,19 +17,22 @@ import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@awesome-cor
 export class ShowAlertPage implements OnInit {
   pin = ['', '', '', '']
   details_emergency = new AlertEvent();
+  countFails = 0;
   @ViewChild('countdown', { static: false }) private countdown: CountdownComponent
   config: CountdownConfig = {
     leftTime: 20,
     formatDate: ({ date }) => `${date / 1000}`,
-    // notify: 1
   };;
-  constructor(private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private s4c: Snap4CityService, private NGSIv2Query: NGSIv2QUERYService, private route: ActivatedRoute, private platform: Platform, private nativeAudio: NativeAudio, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private sms: SMS, private alertController: AlertController, private router: Router, private locationAccuracy: LocationAccuracy,
-    private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private s4c: Snap4CityService, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
     this.localNotifications.schedule({
       id: 1,
       text: 'Emergency notification, click to open and insert PIN to disable alert or click again to send emergency immediatly',
       data: ""
     });
+    this.backgroundGeolocation.configure(this.configGeolocation).then(() => {
+      console.log('Starting geolocation background...')
+      this.backgroundGeolocation.start();
+    })
   }
   ngOnInit() {
     this.details_emergency.deviceID = this.router.getCurrentNavigation().extras?.state?.deviceID;
@@ -84,6 +82,7 @@ export class ShowAlertPage implements OnInit {
       })
     }
     else {
+      this.backgroundGeolocation.stop().catch((err) => console.log(err));
       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }
   }
@@ -104,10 +103,10 @@ export class ShowAlertPage implements OnInit {
     console.log(event)
     if (event.action === 'done') {
       console.log('activateSensors')
-      this.shared_data.createToast('Sending emergency...', 5500);
+      this.shared_data.createToast('Sending emergency...', 4000);
       this.activateSensors().then(() => {
         console.log('sendEmergency')
-        this.sendEmergency().then(() => {
+        this.sendAlert().then(() => {
           console.log('emergencySended')
           this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
           this.shared_data.createToast('Emergency sent successfully')
@@ -121,45 +120,69 @@ export class ShowAlertPage implements OnInit {
       })
     }
   }
-  position;
-  acceleration;
-  interval = 30000 //milliseconds
+  watchAccelerationFunction;
+  offSensorsInterval = 30000 //milliseconds
+  checkingPositionInterval = null;
+  configGeolocation: BackgroundGeolocationConfig = {
+    desiredAccuracy: 10,
+    stationaryRadius: 10,
+    distanceFilter: 10,
+    debug: true, //  enable this hear sounds for background-geolocation life-cycle.
+    stopOnTerminate: true, // enable this to clear background location settings when the app terminates
+    interval: 3000,
+    fastestInterval: 6000,
+    activitiesInterval: 1500
+  };
   getPosition() {
     return new Promise((resolve, reject) => {
       console.log('startwatchPosition')
-      const config: BackgroundGeolocationConfig = {
-        desiredAccuracy: 0,
-        stationaryRadius: 20,
-        distanceFilter: 50,
-        debug: true, //  enable this hear sounds for background-geolocation life-cycle.
-        stopOnTerminate: true, // enable this to clear background location settings when the app terminates
-        interval: 3000,
-        fastestInterval: 3000,
-        activitiesInterval: 3000
-      };
-      this.backgroundGeolocation.configure(config)
-        .then(() => {
-          this.backgroundGeolocation.start();
-        }, err => reject(err));
-      // start recording location
       this.backgroundGeolocation.getCurrentLocation().then((position) => {
         console.log(position)
-        this.details_emergency.latitude = position.latitude;
-        this.details_emergency.longitude = position.longitude;
-        this.details_emergency.quote = position.altitude;
-        this.details_emergency.velocity = position.speed !== null ? position.speed : 0;
-        this.details_emergency.dateObserved = new Date().toISOString();
-        setTimeout(() => {
-          this.backgroundGeolocation.stop()
-        }, this.interval)
+        this.setPositionToSend(position)
+        if (this.checkingPositionInterval !== null)
+          clearInterval(this.checkingPositionInterval)
+        this.checkingPositionInterval = this.setIntervalPositionCheck()
+        this.timeoutStopCheckPosition();
+        this.backgroundGeolocation.deleteAllLocations()
         resolve(true)
       }, err => reject(err))
+      // start recording location
+      console.log('getCurrentPosition')
     })
+  }
+  private timeoutStopCheckPosition() {
+    setTimeout(() => {
+      clearInterval(this.checkingPositionInterval);
+      this.backgroundGeolocation.stop().catch(err => console.log(err))
+    }, this.offSensorsInterval)
+  }
+  private setIntervalPositionCheck() {
+    return setInterval(() => (
+      this.backgroundGeolocation.getCurrentLocation().then((position) => {
+        console.log('intervall')
+        console.log(position)
+        if (position.time != new Date(this.details_emergency.dateObserved).getTime()) {
+          var distance = this.distance(this.details_emergency.latitude, this.details_emergency.longitude, position.latitude, position.longitude);
+          if (distance >= 100) {
+            this.setPositionToSend(position)
+            this.send_Emergency('done')
+          }
+        }
+        console.log()
+      }, err => console.log(err))
+    ), 5000)
+  }
+  private setPositionToSend(position) {
+    this.details_emergency.latitude = position.latitude;
+    this.details_emergency.longitude = position.longitude;
+    this.details_emergency.quote = position.altitude != undefined ? position.altitude : 0;
+    this.details_emergency.velocity = position.speed != undefined ? position.speed : 0;
+    this.details_emergency.dateObserved = new Date().toISOString();
   }
   getAcceleration() {
     return new Promise((resolve, reject) => {
       var freq = 1000;
-      this.acceleration = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
+      this.watchAccelerationFunction = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
         this.details_emergency.accelX = acceleration.x;
         this.details_emergency.accelY = acceleration.y;
         this.details_emergency.accelZ = acceleration.z;
@@ -177,8 +200,8 @@ export class ShowAlertPage implements OnInit {
         console.log('GETACCELERATION')
         this.getAcceleration().then(() => {
           setTimeout(() => {
-            this.acceleration.unsubscribe();
-          }, this.interval)
+            this.watchAccelerationFunction.unsubscribe();
+          }, this.offSensorsInterval)
           console.log('resolve')
           resolve(true)
         }, err => resolve(false))
@@ -194,35 +217,25 @@ export class ShowAlertPage implements OnInit {
       (1 - c((lon2 - lon1) * p)) / 2;
     return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
   }
-  private sendEvent() {
-    this.NGSIv2Query.sendAlertEvent(this.details_emergency).then(() => {
-      this.localNotifications.schedule({
-        id: 2,
-        text: 'Emergency sent!',
-        data: ""
-      })
-    }, err => {
-      console.log(err)
-      //this.sendEvent();
-    })
-  }
-  private sendEmergency() {
+  private sendAlert() {
     return new Promise((resolve, reject) => {
-      var id = new Date(this.details_emergency.dateObserved);
-      console.log('CREATION_DEVICE')
-      this.s4c.createDevice(DeviceType.ALERT_EVENT, id.getTime().toString(), this.details_emergency.latitude, this.details_emergency.longitude).then(() => {
-        console.log('CREATE DEVICE')
-        this.sendEvent();
-        resolve(true)
+      this.NGSIv2Query.sendAlertEvent(this.details_emergency).then(() => {
+        this.localNotifications.schedule({
+          id: 2,
+          text: 'Emergency sent!',
+          data: ""
+        })
+        resolve(true);
       }, err => {
-        console.log(err.msg);
-        reject(err.msg)
-        //this.sendEmergency();
+        console.log(err)
+        setTimeout(() => {
+          this.countFails++;
+          if (this.countFails < 5)
+            this.sendAlert();
+          else
+            reject(err)
+        }, 2500)
       })
     })
-    // var intervalSendEmergency = setInterval(() => {
-    //   this.details_emergency.dateObserved = new Date().toISOString();
-    //   this.NGSIv2Query.sendEvent(this.details_emergency);
-    // }, freq)
   }
 }
