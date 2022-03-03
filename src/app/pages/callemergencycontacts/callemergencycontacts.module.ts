@@ -4,7 +4,6 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { CallemergencycontactsPageRoutingModule } from './callemergencycontacts-routing.module';
-
 import { CallemergencycontactsPage } from './callemergencycontacts.page';
 import { MaterialModule } from '../../material-module'
 import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx'
