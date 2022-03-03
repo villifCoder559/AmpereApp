@@ -1,16 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgModule } from '@angular/core';
 import { NGSIv2QUERYService } from './ngsiv2-query.service';
 import { DeviceType, QRNFCEvent, SharedDataService, typeChecking } from './shared-data.service';
 import { Snap4CityService } from './snap4-city.service';
-
+import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
+@NgModule({
+  providers: [InAppBrowser]
+})
 @Injectable({
   providedIn: 'root'
 })
+
 export class ReadingCodeService {
   readonly numQRNFC = 4;
   readonly array_id = ['broker', 'org', 'deviceID']
-
-  constructor(private NGSIv2Query: NGSIv2QUERYService, private sharedData: SharedDataService, private s4c: Snap4CityService) { }
+  constructor(private NGSIv2Query: NGSIv2QUERYService, private iab: InAppBrowser, private sharedData: SharedDataService, private s4c: Snap4CityService) { }
   readURLFromServer(scanned_text, type: typeChecking.NFC_CODE | typeChecking.QR_CODE) {
     return new Promise((resolve, reject) => {
       var json_id = this.parseText(scanned_text)
@@ -19,26 +22,20 @@ export class ReadingCodeService {
         if (this.checkIDValidityNFCorQR(type, json_id['deviceID'])) {
           this.NGSIv2Query.getEntity(json_id['deviceID'], DeviceType.DICTIONARY, json_id['broker']).then((response: any) => {
             console.log(response)
+            var action: string = response.identifier.value;
             var event = new QRNFCEvent(type == typeChecking.QR_CODE ? 'QR' : 'NFC', response.identifier.value, action);
-            var action: string = response.action.value;
-            var identifier_event = (new Date(event.dateObserved).getTime()).toString() //seconds
-            console.log(identifier_event)
-            this.s4c.createDevice(DeviceType.QR_NFC_EVENT, identifier_event).then(() => {
-              this.NGSIv2Query.sendQRNFCEvent(event, identifier_event)
-              //this.scannedCode = action;
+            console.log(event)
+            this.NGSIv2Query.sendQRNFCEvent(event).then(() => {
               console.log(action);
-              window.open('https://' + action, '_system', 'location=yes')
+              //window.open('https://' + action, '_self')
+              this.iab.create('https://' + action)
               resolve(true);
-            }, (err) => {
-              console.log(err)
-              reject(err)
-            })
+            }, err => reject(err))
           }, (err) => {
             reject(err);
           })
         }
         else {
-          //this.sharedData.createToast('Permission denied!')
           reject({ msg: 'Permission denied' })
         }
       }, err => {
