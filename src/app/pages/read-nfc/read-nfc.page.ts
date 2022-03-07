@@ -25,7 +25,13 @@ export class ReadNFCPage implements OnInit {
     this.nfc.enabled().then(() => {
       this.NFC_enable = true;
       this.read_NFC();
-    }, err => this.shared_data.createToast('Error :' + err))
+    }, err => {
+      this.shared_data.createToast('Error :' + err);
+      if (err != 'NO_NFC')
+        this.nfc.showSettings().then(() => {
+          this.read_NFC().catch(err => console.log(err))
+        })
+    })
   }
   async read_NFC() {
     if (this.platform.is('android')) {
