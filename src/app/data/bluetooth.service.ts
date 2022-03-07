@@ -115,15 +115,15 @@ export class BluetoothService {
         error => console.error()
       );
   }
-  private async startRegisterBeacon(uuid) {
+  private startRegisterBeacon(uuid) {
     //this.ibeacon.requestAlwaysAuthorization(); only iOS
     var delegate = this.ibeacon.Delegate()
     let beaconRegion;
     beaconRegion = this.ibeacon.BeaconRegion(uuid, uuid);
     delegate.didRangeBeaconsInRegion()
-      .subscribe();
+      .subscribe(()=>{});
     delegate.didStartMonitoringForRegion()
-      .subscribe();
+      .subscribe(()=>{});
     delegate.didEnterRegion()
       .subscribe(
         data => {
