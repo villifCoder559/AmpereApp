@@ -26,7 +26,7 @@ export class Snap4CityService {
         dataType: 'JSON',
         success: (mydata) => {
           console.log(mydata)
-          if (mydata.status != 'ko')
+          if (mydata?.status != 'ko')
             resolve(mydata)
           else
             reject(mydata)
@@ -42,7 +42,7 @@ export class Snap4CityService {
       console.log('CREATION')
       console.log(type)
       var attr = this.getAttributesPayload(type);
-      console.log(JSON.stringify(attr))
+      console.log(attr)
       var device_id = this.shared_data.user_data.id + type + name;
       console.log('NAME')
       console.log(device_id)
@@ -72,7 +72,7 @@ export class Snap4CityService {
         dataType: 'JSON',
         success: (mydata) => {
           console.log(mydata)
-          if (mydata.status != 'ko') {
+          if (mydata?.status != 'ko') {
             this.changeVisibilityToPublic(device_id).then(() => {
               resolve(mydata)
             }, err => reject(err))
@@ -135,7 +135,7 @@ export class Snap4CityService {
       case DeviceType.ALERT_EVENT:
         return this.getEventPayload(true, new AlertEvent());
       case DeviceType.QR_NFC_EVENT:
-        return this.getEventPayload(true, new QRNFCEvent('', '', ''));
+        return this.getEventPayload(true, new QRNFCEvent('', '', '', -1, -1));
     }
   }
   private createField(name) {
@@ -176,7 +176,7 @@ export class Snap4CityService {
       }
     }
   }
-  getUserIDPayload(createModel:boolean) {
+  getUserIDPayload(createModel: boolean) {
     var newUser: any;
     console.log('UserIdPayLoad')
     if (createModel)
@@ -187,15 +187,18 @@ export class Snap4CityService {
   }
   createModelProfile() {
     var newUser = []
+    console.log(this.shared_data.user_data)
     Object.keys(this.shared_data.user_data).forEach((field_name) => {
       switch (field_name) {
         case 'id': {
           break;
         }
         case 'dateObserved': {
-          newUser.push(this.createField('dateObserved',))
+          newUser.push(this.createField('dateObserved'))
+          break;
         }
-        case typeChecking.EMERGENCY_CONTACTS: {
+        case 'emergency_contacts': {
+          console.log(field_name)
           for (var i = 0; i < this.shared_data.MAX_EMERGENCY_CONTACTs; i++) {
             newUser.push(this.createField('emergencyContact' + (i + 1) + 'Name'))
             newUser.push(this.createField('emergencyContact' + (i + 1) + 'Surname'))
@@ -203,7 +206,7 @@ export class Snap4CityService {
           }
           break;
         }
-        case typeChecking.DISABILITIES: {
+        case 'disabilities': {
           console.log('ERROR?')
           console.log(this.shared_data.user_data.disabilities)
           Object.keys(this.shared_data.user_data.disabilities).forEach((dis) => {
@@ -211,23 +214,23 @@ export class Snap4CityService {
           })
           break;
         }
-        case typeChecking.QR_CODE: {
+        case 'qr_code': {
           for (var i = 0; i < this.shared_data.MAX_QRs; i++)
             newUser.push(this.createField('QR' + (i + 1)))
           break;
         }
-        case typeChecking.NFC_CODE: {
+        case 'nfc_code': {
           for (var i = 0; i < this.shared_data.MAX_NFCs; i++)
             newUser.push(this.createField('NFC' + (i + 1)))
           break;
         }
-        case typeChecking.PUB_EMERGENCY_CONTACTS: {
+        case 'public_emergency_contacts': {
           Object.keys(this.shared_data.user_data.public_emergency_contacts).forEach((element) => {
-            newUser.push(this.createField('call_' + element))
+            newUser.push(this.createField(element))
           })
           break;
         }
-        case typeChecking.PAIRED_DEVICES: {
+        case 'paired_devices': {
           for (var i = 0; i < this.shared_data.MAX_DEVICEs; i++)
             newUser.push(this.createField('jewel' + (i + 1) + 'ID'))
           break;
@@ -263,14 +266,14 @@ export class Snap4CityService {
     return newQRNFCEvent;
   }
   createModelEvent(event: QRNFCEvent | AlertEvent) {
-    var newEvent=[];
+    var newEvent = [];
     Object.keys(event).forEach((element) => {
       newEvent.push(this.createField(element))
     })
     return newEvent;
   }
   private getEventFromLocalToServer(event: QRNFCEvent | AlertEvent) {
-    var newEvent={}
+    var newEvent = {}
     Object.keys(event).forEach((element) => {
       newEvent[element] = { value: event[element] }
     })
