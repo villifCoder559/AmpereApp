@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SharedDataService, UserData } from '../../data/shared-data.service'
+import { SharedDataService, StorageNameType } from '../../data/shared-data.service'
 import { NavigationExtras, Router } from '@angular/router'
 import { BluetoothService } from 'src/app/data/bluetooth.service';
 @Component({
@@ -8,6 +8,7 @@ import { BluetoothService } from 'src/app/data/bluetooth.service';
   styleUrls: ['./test-device.page.scss'],
 })
 export class TestDevicePage implements OnInit {
+  StorageNameType = StorageNameType
 
   constructor(public shared_data: SharedDataService, private router: Router, private bluetoothService: BluetoothService) {
   }
