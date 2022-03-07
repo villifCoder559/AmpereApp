@@ -4,12 +4,12 @@
       <div *ngIf="!this.authService.isAuthenticated.getValue();then thenBlock else elseBlock"></div>
       <ng-template #thenBlock>
         <button mat-icon-button routerLink="/" class="go_back_button">
-          <mat-icon style="display: flex;">arrow_back</mat-icon>
+          <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
       </ng-template>
       <ng-template #elseBlock>
         <button mat-icon-button class="go_back_button" (click)="askSave()">
-          <mat-icon style="display: flex;">arrow_back</mat-icon>
+          <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
       </ng-template>
       <span *ngIf="!this.authService.isAuthenticated.getValue()">Registration Form</span>

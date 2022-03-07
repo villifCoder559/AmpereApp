@@ -21,11 +21,8 @@
           <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff; display: flex;"
             *ngIf="device.name!=''">
             <ion-label style="background-color: white; margin: 0px;">
-              <h2>{{device.name || 'Unnamed'}}</h2>
-              <h2 style="color: green;">Paired</h2>
-              <!-- <h3>{{device.uuid}}</h3> -->
-              <h3>{{device.proximity}}</h3>
-              <!-- <p> RSSI: {{device.rssi}}</p> -->
+              <h2>{{this.shared_data?.localStorage[StorageNameType.DEVICES][i]?.name ||
+                this.shared_data.user_data?.paired_devices[i]}}</h2>
             </ion-label>
             <ion-button (click)="isBeaconInRegion(i)">TestBeacon</ion-button>
           </ion-item>
