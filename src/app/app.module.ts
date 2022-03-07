@@ -10,7 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {Contacts} from '@ionic-native/contacts'
 import {MaterialModule} from '../app/material-module';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
@@ -30,6 +30,7 @@ import { SendAuthService } from '../app/data/send-auth.service'
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { FormsModule } from '@angular/forms';
 import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
+import { BackgroundFetch } from '@awesome-cordova-plugins/background-fetch/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -55,7 +56,8 @@ import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
     AuthenticationService,
     ReadingCodeService,
     SendAuthService,
-    InAppBrowser
+    InAppBrowser,
+    BackgroundFetch
   ],
   bootstrap: [AppComponent],
 })
