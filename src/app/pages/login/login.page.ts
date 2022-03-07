@@ -43,7 +43,7 @@ export class LoginPage implements OnInit {
             this.sharedData.user_data.id = data.username;
             this.ngsi.getEntity(this.sharedData.user_data.id + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
               this.authService.isAuthenticated.next(true);
-              this.sendAuth.checkAndRequestValidToken();
+              //this.sendAuth.checkAndRequestValidToken();
               console.log('SetUsertValueFromData')
               this.sharedData.setUserValueFromData(data)
               console.log('ENABLE_ALL_BEACON')
