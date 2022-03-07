@@ -9,6 +9,7 @@ import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { CountdownModule } from 'ngx-countdown';
 import { Storage } from '@ionic/storage-angular'
+
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
 @NgModule({
@@ -95,6 +96,66 @@ export class UserData {
   nfc_code = []
   status = 'active'
   constructor() { }
+  isEqualTo(data: UserData) {
+    var equal = true
+    var fields = Object.keys(this);
+    for (let i = 0; equal && i < fields.length; i++) {
+      console.log(fields[i])
+      switch (fields[i]) {
+        default: {
+          if (this[fields[i]] != data[fields[i]])
+            equal = false
+          break;
+        }
+        case 'disabilities': case 'public_emergency_contacts': {
+          Object.keys(this[fields[i]]).forEach((element) => {
+            if (this[fields[i]][element] != data[fields[i]][element])
+              equal = false;
+          })
+          break;
+        }
+        case 'paired_devices': case 'qr_code': case 'nfc_code': {
+          var found = true
+          if (this[fields[i]].length != data[fields[i]].length)
+            equal = false;
+          else
+            for (let j = 0; found && j < this[fields[i]].length; j++) {
+              if (this[fields[i]].indexOf(data[fields[i]][j]) == -1) {
+                found = false
+                equal = false
+              }
+            }
+          break;
+        }
+        case 'emergency_contacts': {
+          var found = true
+          if (this[fields[i]].length != data[fields[i]].length)
+            equal = false;
+          else
+            for (let j = 0; found && j < this[fields[i]].length; j++) {
+              var index = this[fields[i]].findIndex((obj) => {
+                var ok = true;
+                console.log('loop nr. ' + j)
+                var array_element_contact = Object.keys(obj);
+                let equal_contact_field = true;
+                for (let k = 0; equal_contact_field && k < array_element_contact.length; k++) {
+                  if (this[fields[i]][j][array_element_contact[k]] != data[fields[i]][j][array_element_contact[k]]) {
+                    ok = false;
+                    equal_contact_field = false
+                  }
+                }
+                return ok;
+              })
+              console.log(index)
+              if (index == -1)
+                equal = false
+            }
+          break;
+        }
+      }
+    }
+    return equal
+  }
 }
 export class AlertEvent {
   latitude = -1.0
@@ -113,11 +174,15 @@ export class QRNFCEvent {
   QRIDorNFC: string = ''
   identifier: string = ''
   action: string = ''
+  latitude = -1
+  longitude = -1
   dateObserved = new Date().toISOString();
-  constructor(qridNfc, id, action) {
+  constructor(qridNfc, id, action, latitude, longitude) {
     this.QRIDorNFC = qridNfc;
     this.identifier = id;
     this.action = action;
+    this.latitude = latitude;
+    this.longitude = longitude
   }
 }
 @Injectable({
@@ -127,7 +192,7 @@ export class SharedDataService {
   /**List of StorageNameType */
   readonly MAX_NFCs = 4;
   readonly MAX_QRs = 4;
-  readonly MAX_EMERGENCY_CONTACTs = 4;
+  readonly MAX_EMERGENCY_CONTACTs = 5;
   readonly MAX_DEVICEs = 2;
 
   public accessToken;
@@ -135,16 +200,13 @@ export class SharedDataService {
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   constructor(private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
-    this.storage.create();
-    console.log('UserData')
-    console.log(this.user_data)
     this.platform.ready().then(() => {
+      this.storage.create();
       console.log('StorageNameType')
       Object.keys(StorageNameType).forEach(element => {
         console.log(StorageNameType[element])
         this.localStorage[StorageNameType[element]] = []
       })
-      //this.enableAllBackgroundMode();
       this.nativeAudio.preloadSimple('alert', 'assets/sounds/alert.mp3').then(() => { }, (err) => console.log(err));
       this.nativeAudio.preloadSimple('sendData', 'assets/sounds/send_data.mp3').then(() => { }, (err) => console.log(err));
     })
@@ -168,6 +230,9 @@ export class SharedDataService {
   async dismissLoading() {
     await this.loading.dismiss()
   }
+  async setTextLoading(text) {
+    $('.loading-content').html(text);
+  }
   showAlert(id) {
     console.log(id)
     let navigationExtras: NavigationExtras = {
@@ -180,7 +245,6 @@ export class SharedDataService {
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
     this.backgroundMode.enable();
-    this.backgroundMode.configure({ resume: true })
     this.backgroundMode.disableWebViewOptimizations();
     this.backgroundMode.disableBatteryOptimizations();
   }
@@ -191,6 +255,7 @@ export class SharedDataService {
     var check = true;
     if (this.localStorage[type] === null)
       this.localStorage[type] = []
+    console.log('LOCAL_STORAGE')
     console.log(this.localStorage)
     this.localStorage[type].forEach(element => {
       if (element.id === device) {
@@ -238,7 +303,7 @@ export class SharedDataService {
         }
         case 'public_emergency_contacts': {
           Object.keys(this.user_data[element]).forEach((number) => {
-            this.user_data[element][number] = data[number].value;
+            this.user_data[element][number] = data[number].value === 'true' ? true : false;
           })
           break;
         }
@@ -275,13 +340,12 @@ export class SharedDataService {
         this.user_data.nfc_code.push(nfccode)
     }
     this.user_data.public_emergency_contacts = { call_112: data.call_112.value, call_115: data.call_115.value, call_118: data.call_118.value }
-    //this.old_user_data = JSON.parse(JSON.stringify(this.user_data))
+    this.old_user_data = JSON.parse(JSON.stringify(this.user_data))
   }
   getUserFromLocalToServer() {
     console.log(this.user_data)
-    var newUser={}
+    var newUser = {}
     Object.keys(this.user_data).forEach((field_name) => {
-      console.log(field_name)
       switch (field_name) {
         case 'id': { break; }
         case 'dateObserved': {
@@ -299,7 +363,7 @@ export class SharedDataService {
         case 'disabilities': {
           console.log('disabilities')
           Object.keys(this.user_data.disabilities).forEach((dis) => {
-            newUser[dis] = { value: this.user_data.disabilities[dis] }
+            newUser[dis] = { value: this.user_data.disabilities[dis] + '' }
           })
           break;
         }
@@ -308,14 +372,14 @@ export class SharedDataService {
             newUser['QR' + (i + 1)] = { value: this.user_data.qr_code[i] === undefined ? '' : this.user_data.qr_code[i] }
           break;
         }
-        case'nfc_code': {
+        case 'nfc_code': {
           for (var i = 0; i < this.MAX_NFCs; i++)
             newUser['NFC' + (i + 1)] = { value: this.user_data.nfc_code[i] === undefined ? '' : this.user_data.nfc_code[i] }
           break;
         }
         case 'public_emergency_contacts': {
           Object.keys(this.user_data.public_emergency_contacts).forEach((element) => {
-            newUser[element] = { value: this.user_data.public_emergency_contacts[element] }
+            newUser[element] = { value: this.user_data.public_emergency_contacts[element] + '' }
           })
           break;
         }
@@ -325,7 +389,7 @@ export class SharedDataService {
           break;
         }
         default: {
-          console.log('default-> '+field_name)
+          console.log('default-> ' + field_name)
           console.log(newUser)
           newUser[field_name] = { value: this.user_data[field_name] === undefined ? '' : this.user_data[field_name] }
           break;
