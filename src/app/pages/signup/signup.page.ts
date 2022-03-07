@@ -1,33 +1,25 @@
 import { Component, OnInit, ChangeDetectorRef, Input, ElementRef } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors, ValidatorFn, FormControl } from '@angular/forms';
-import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatStep, MatStepper, StepperOrientation } from '@angular/material/stepper';
 import { interval, Observable, timer } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { NgZone, ViewChild } from '@angular/core';
-import { take } from 'rxjs/operators';
-import { Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatTooltip } from '@angular/material/tooltip';
-import { BLE } from '@ionic-native/ble/ngx';
 import * as bcrypt from 'bcryptjs';
 import { AlertController, AngularDelegate, IonContent, Platform, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedDataService, UserData, Emergency_Contact, typeChecking, DeviceType, StorageNameType } from '../../data/shared-data.service'
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 import * as moment from 'moment';
-import { Contacts, ContactName, ContactField } from '@ionic-native/contacts/ngx';
 import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
 import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
 import { BluetoothService } from '../../data/bluetooth.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
 import { AuthenticationService } from '../../services/authentication.service'
 import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
-import { LoadingController } from '@ionic/angular';
 import { DialogSaveComponent } from './dialog-save/dialog-save.component';
 import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component';
-import { Geolocation } from '@ionic-native/geolocation/ngx'
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -74,12 +66,12 @@ export class SignupPage implements OnInit {
     wheelchairUser: false
   });
   fourthFormGroup = this._formBuilder.group({
-    call_112: ['', Validators.required],
-    call_115: ['', Validators.required],
-    call_118: ['', Validators.required]
+    call_112: [Validators.required],
+    call_115: [Validators.required],
+    call_118: [Validators.required]
   });
   readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.fourthFormGroup]
-  constructor(private geo: Geolocation, private route: ActivatedRoute, private platform: Platform, public authService: AuthenticationService, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private toastCtrl: ToastController, private router: Router, private alertController: AlertController, public dialog: MatDialog, private _formBuilder: FormBuilder, breakpointObserver: BreakpointObserver, private ngZone: NgZone, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(public authService: AuthenticationService, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder,public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     console.log('From signup')
     console.log(this.shared_data.user_data)
   }
@@ -113,23 +105,19 @@ export class SignupPage implements OnInit {
           this.shared_data.user_data.nfc_code = [];
           this.shared_data.user_data.emergency_contacts = [];
           this.shared_data.setUserValueFromData(data)
+          console.log(this.shared_data.user_data)
           this.setFormGroupFromUser();
           Object.keys(this.shared_data.localStorage).forEach((element: StorageNameType) => {
             this.shared_data.getNameDevices(element);
           })
-          //this.bluetoothService.enableAllUserBeaconFromSnap4City();
           this.changeDetection.detectChanges();
           this.shared_data.dismissLoading();
-          // this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
         }, err => {
-          console.log(err)
           this.shared_data.dismissLoading();
-          if (err.status == '401' || err.status == '404') {
-            this.router.navigateByUrl('/signup', { replaceUrl: true })
-          }
+          alert(err)
+          this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
         })
       })
-
     }
   }
   checkDate(ev) {
@@ -171,10 +159,6 @@ export class SignupPage implements OnInit {
       }
     }
   }
-  triggerResize() {
-    this.ngZone.onStable.pipe(take(1))
-      .subscribe(() => this.autosize.resizeToFitContent(true));
-  }
   onlyNumbersAllowed(input, id) {
     console.log(input)
     console.log(parseInt(input.data) === NaN)
@@ -202,7 +186,6 @@ export class SignupPage implements OnInit {
   openDialogEmergencyContact(value, index): void {
     var ok = true;
     console.log('pass');
-    var oldList = this.shared_data.user_data.paired_devices;
     if (value == 0) {
       value = { name: '', surnamne: '', number: '' }
       if (this.shared_data.user_data.emergency_contacts.length > 4)
@@ -377,7 +360,8 @@ export class SignupPage implements OnInit {
         }
         case 'public_emergency_contacts': {
           Object.keys(this.shared_data.user_data[element]).forEach((number) => {
-            this.fourthFormGroup.get(number).setValue(this.shared_data.user_data[element][number]);
+            console.log(this.shared_data.user_data[element][number])
+            this.fourthFormGroup.get(number).setValue(this.shared_data.user_data[element][number] == 'true' ? true : false);
           })
           break;
         }
@@ -448,31 +432,48 @@ export class SignupPage implements OnInit {
     if (this.shared_data.user_data.emergency_contacts.length > 0) {
       this.getUserFromFormGroup();
       console.log(this.shared_data.user_data)
-      this.shared_data.presentLoading('Creating user').then(() => {
+      this.shared_data.presentLoading('Creating device 1/3').then(() => {
         this.snap4CityService.createDevice(DeviceType.PROFILE).then(() => {
-          console.log('DEVICE_PROFILE_CREATE')
-          this.snap4CityService.createDevice(DeviceType.ALERT_EVENT).catch((err) => alert('ALERT_EVENT. ' + err))
-          this.snap4CityService.createDevice(DeviceType.QR_NFC_EVENT).catch((err) => alert('QRNFC_EVENT. ' + err))
-          console.log()
-          this.shared_data.user_data.dateObserved = new Date().toISOString();
-          this.NGSIv2QUERY.sendUserProfile().then(() => {
-            this.shared_data.dismissLoading();
-            this.shared_data.createToast('Successfully registered')
-            this.authService.isAuthenticated.next(true);
-            this.bluetoothService.enableAllBeaconFromSnap4City();
-            this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
-            this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true })
+          this.shared_data.setTextLoading('Creating device 2/3')
+          this.snap4CityService.createDevice(DeviceType.ALERT_EVENT).then(() => {
+            this.shared_data.setTextLoading('Creating device 3/3')
+            this.snap4CityService.createDevice(DeviceType.QR_NFC_EVENT).then(() => {
+              this.shared_data.setTextLoading('Storing data...')
+              this.NGSIv2QUERY.sendUserProfile().then(() => {
+                this.shared_data.dismissLoading();
+                this.shared_data.createToast('Successfully registered')
+                this.authService.isAuthenticated.next(true);
+                this.bluetoothService.enableAllBeaconFromSnap4City();
+                this.shared_data.old_user_data = JSON.parse(JSON.stringify(this.shared_data.user_data))
+                this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true })
+              }, err => {
+                alert('Retry registration. ' + err.msg);
+                this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
+                  this.snap4CityService.deleteDevice(DeviceType.ALERT_EVENT).then(() => {
+                    this.snap4CityService.deleteDevice(DeviceType.QR_NFC_EVENT).then(() => {
+                      this.shared_data.dismissLoading();
+                    }, err => { alert('ERROR_DELETING_QRNFCEVENT. ' + err.msg); this.shared_data.dismissLoading() })
+                  }, err => { alert('ERROR_DELETING_ALERTEVENT. ' + err.msg); this.shared_data.dismissLoading() })
+                }, err => { alert('ERROR_DELETING_PROFILE. ' + err.msg); this.shared_data.dismissLoading() })
+              })
+            }, err => {
+              alert('Retry registration. ' + err.msg);
+              this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
+                this.snap4CityService.deleteDevice(DeviceType.ALERT_EVENT).then(() => {
+                  this.shared_data.dismissLoading();
+                }, err => { alert('ERROR_DELETING_ALERTEVENT. ' + err.msg); this.shared_data.dismissLoading() })
+              }, err => { alert('ERROR_DELETING_PROFILE. ' + err.msg); this.shared_data.dismissLoading() })
+            })
           }, (err) => {
-            console.log('SendUserProfile')
-            console.log(err)
+            alert('Retry registration. ' + err.msg);
+            this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
+              this.shared_data.dismissLoading();
+            }, err => { alert('ERROR_DELETING_PROFILE. ' + err.msg); this.shared_data.dismissLoading() })
             this.shared_data.dismissLoading();
-            alert(err.msg)
           })
         }, err => {
-          console.log('createDevice')
-          console.log(err)
           this.shared_data.dismissLoading();
-          alert(err.msg)
+          alert('Retry registration. ' + err.msg);
         })
       })
     }
@@ -486,20 +487,24 @@ export class SignupPage implements OnInit {
     this.router.navigateByUrl('/', { replaceUrl: true });
   }
   askSave() {
-    // const dialog = this.dialog.open(DialogSaveComponent, {
-    //   maxWidth: '90vw',
-    //   minWidth: '40vw'
-    // })
-    // dialog.afterClosed().subscribe(result => {
-    //   console.log(result)
-    //   if (result !== undefined) {
-    //     if (result.value == 'yes')
-    //       this.save_data();
-    //     else
-    //       this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
+    console.log(this.shared_data.user_data)
+    console.log(this.shared_data.old_user_data)
+    if (!this.shared_data.user_data.isEqualTo(this.shared_data.old_user_data)) {
+      const dialog = this.dialog.open(DialogSaveComponent, {
+        maxWidth: '90vw',
+        minWidth: '40vw'
+      })
+      dialog.afterClosed().subscribe(result => {
+        console.log(result)
+        if (result !== undefined) {
+          if (result.value == 'yes')
+            this.save_data();
+          else
+            this.shared_data.user_data = JSON.parse(JSON.stringify(this.shared_data.old_user_data))
+        }
+      })
+    }
     this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-    //   }
-    // })
   }
   modifyNameDevice(i) {
     const dialogRef = this.dialog.open(DialogModifyNameComponent, {
