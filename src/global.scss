@@ -28,6 +28,11 @@
 
 ion-content{
     --ion-background-color:#fff;
+    --ion-text-color:#000;
+    --ion-item-background:#fff;
+}
+button .mat-button-wrapper{
+    display: contents;
 }
 .alert-msg{
     text-align: center;
@@ -181,6 +186,9 @@ ngx-qrcode{
 .icon_code{
     width: 30px; 
     height: 30px;
+}
+.custom-mat-card{
+    background-color: #fff;
 }
 mat-dialog-container {
     display: contents;

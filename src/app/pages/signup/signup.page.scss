@@ -1,3 +1,6 @@
+ion-content input{
+  color:#000;
+}
 .go_back_button{
   display: flex;
   justify-content: center;
@@ -22,6 +25,7 @@ body {
 }
 ion-content{
   --ion-background-color: #FAFAFA;
+  color: #000;
 }
 mat-stepper{
   background-color: #FAFAFA;
@@ -39,11 +43,11 @@ ion-button{
 
 }
 
-.toolbar{
-    background-color: #3F51B5;
-    color: white;
-    justify-content: space-between;
-}
+// .toolbar{
+//     background-color: #3F51B5;
+//     color: white;
+//     justify-content: space-between;
+// }
 // @media(min-width: 1024px){
 //   mat-form-field{
 //     padding: 5px 10px;
@@ -93,6 +97,7 @@ mat-form-field{
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    color: #000;
   }
   ::ng-deep .mat-step-header{
     justify-content: center;
