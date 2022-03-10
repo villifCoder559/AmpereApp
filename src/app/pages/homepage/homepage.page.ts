@@ -26,7 +26,7 @@ export class HomepagePage implements OnInit {
     //this.sharedData.dismissLoading().then(() => {
       this.sharedData.presentLoading('Checking permission...').then(()=>{
         this.sharedData.enableAllPermission().catch(err=>alert(err))
-      })
+      },err=>console.log(err))
     //}).catch((err) => console.log(err))
     console.log('ngAfterViewInit')
   }
@@ -103,7 +103,7 @@ export class HomepagePage implements OnInit {
           this.sharedData.dismissLoading();
         }, 2000)
       }, 2000)
-    })
+    },err=>console.log(err))
   }
   testSendStatus() {
     this.ngsi.updateEntity({ 'status': this.sharedData.user_data.status }, DeviceType.PROFILE).catch((err) => console.log(err))
