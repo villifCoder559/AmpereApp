@@ -24,20 +24,20 @@
               <h2>{{this.shared_data?.localStorage[StorageNameType.DEVICES][i]?.name ||
                 this.shared_data.user_data?.paired_devices[i]}}</h2>
             </ion-label>
-            <ion-button (click)="isBeaconInRegion(i)">TestBeacon</ion-button>
           </ion-item>
         </ion-list>
       </mat-card>
-      <div style="padding-top: 50px; display: flex;">
+      <div class="div_battery">
+        <button mat-raised-button id='batteryButton' (click)="testBattery()">Test Battery</button>
+      </div>
+      <div style="padding-top: 50px; display: none;" id="testDeviceCard">
         <mat-card style="border-radius: 25px; border: outset">
           <mat-card-title-group style="justify-content: center; padding-top: 10px;">
             <mat-card-title>Test Device</mat-card-title>
           </mat-card-title-group>
           <mat-card-content style="padding: 10px; font-size: 15px;">
-            Bring the phone and the device closer, click the button on the device and enter the PIN
-            {{this.shared_data.user_data.pin}} to cancel the sending
-            of the emergency call<br>
-            <b>Be careful if you do not enter the PIN you will send an emergency report</b>
+            Keep your phone and jewel close, click the button on the jewel and check if the app sends a test alert.
+            Remember to disable the test button, otherwise your alert will not be send in a proper way.
           </mat-card-content>
         </mat-card>
       </div>
