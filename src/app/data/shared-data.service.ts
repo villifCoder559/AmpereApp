@@ -462,7 +462,7 @@ export class SharedDataService {
             }, err => { reject(err) })
           }, err => reject(err))
         },err=>reject(err+'. App can\'t work properly!'))
-      })
+      },err=>reject(err))
     })
   }
   askGeoPermission() {
@@ -516,12 +516,10 @@ export class SharedDataService {
       this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
         () => {
           resolve(true)
-        },
-        error => {
+        },error => {
           alert(JSON.stringify(error))
           reject(false)
-        }
-      );
+        })
     })
   }
   locationAccPermission() {
@@ -542,7 +540,7 @@ export class SharedDataService {
               }
             );
         }
-      });
+      },err=>reject(err));
     })
   }
   checkLocationEnabled() {
