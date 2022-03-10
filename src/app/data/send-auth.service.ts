@@ -16,14 +16,21 @@ export class SendAuthService {
   requestTokenTimeout = null;
 
   constructor(private platform: Platform, private localNotifications: LocalNotifications, private shared_data: SharedDataService, private ngsi: NGSIv2QUERYService, private authService: AuthenticationService) {
-    this.platform.ready().then(this.onDeviceReady.bind(this));
   }
   async onDeviceReady() {
     // Your BackgroundFetch event handler.
     console.log('OnDeviceReady')
     let onEvent = async (taskId) => {
       console.log('[BackgroundFetch] event received: ', taskId);
-      this.checkAndRequestValidToken()
+      var date=new Date().toISOString();
+      console.log(date)
+      if (this.authService.isAuthenticated)
+        this.ngsi.sendUserProfile();
+      else{
+        console.log('Stop BACKGROUND_FETCH')
+        BackgroundFetch.stop()
+      }
+      //this.checkAndRequestValidToken()
       // Required: Signal completion of your task to native code
       // If you fail to do this, the OS can terminate your app
       // or assign battery-blame for consuming too much background-time
@@ -49,25 +56,12 @@ export class SendAuthService {
     this.ngsi.updateEntity({ "status": { "value": this.shared_data.user_data.status } }, DeviceType.PROFILE).catch((err) => console.log(err))
   }
   startSendingValidStatus() {
-    var status: "valid"
-    console.log(typeof (status))
-    let time = 1000 * 60 * 30;
-    this.sendStatus(status);
-    this.interval_active_user = setInterval(() => {
-      this.shared_data.user_data.status = typeof (status)
-      this.ngsi.sendUserProfile().catch((err) => console.log(err))
-    }, time)
+    this.platform.ready().then(this.onDeviceReady.bind(this))
   }
 
-  // sendAccessAndCheckStatusToken() {
-  //   this.sendStatusToken('valid')
-  //   var expiration_date_token = helper.getTokenExpirationDate(this.authService.keycloak.token);
-  //   console.log('Expiration token-> ' + expiration_date_token)
-  //   this.checkAndRequestValidToken();
-  // }
   checkAndRequestValidToken() {
     var now_date = new Date();
-    var expiration_date_token = new Date(helper.getTokenExpirationDate(this.authService.keycloak.token))
+    var expiration_date_token = new Date(helper.getTokenExpirationDate(this.shared_data.accessToken))
     console.log('EXPIRATION_TOKEN')
     console.log(expiration_date_token)
     //this.requestTokenTimeout = setTimeout(() => {
@@ -78,7 +72,6 @@ export class SendAuthService {
       else
         console.log('token still valid')
       this.sendStatus('valid')
-      //this.checkAndRequestValidToken();
     }, err => {
       console.log(err)
       this.sendStatus('expired');
