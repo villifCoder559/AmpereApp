@@ -41,8 +41,7 @@ export class AuthenticationService {
               resolve(true)
             });
         }, (err) => {
-          alert(err);
-          reject(false)
+          reject(err)
         })
     })
   }
