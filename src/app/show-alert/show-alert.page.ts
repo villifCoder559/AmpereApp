@@ -46,16 +46,22 @@ export class ShowAlertPage implements OnInit {
       this.backgroundGeolocation.start();
     })
   }
-  ngOnInit() {
-    this.details_emergency.deviceID = this.router.getCurrentNavigation().extras?.state?.deviceID;
-    if(this.shared_data.enabled_test_battery_mode.getValue()){
-      this.details_emergency.status='testBattery'
-      this.details_emergency.evolution='finish'
+  ngAfterViewChecked() {
+    console.log('Value batteryTest')
+    console.log(this.shared_data.enabled_test_battery_mode.getValue())
+    if (this.shared_data.enabled_test_battery_mode.getValue()) {
+      console.log('BatteryTest')
+      this.details_emergency.status = 'testBattery'
+      this.details_emergency.evolution = 'finish'
       this.shared_data.enabled_test_battery_mode.next(false);
-      this.countdown.left=0;
+      this.countdown.left = 1;
       this.changeRef.detectChanges();
     }
   }
+  ngOnInit() {
+    this.details_emergency.deviceID = this.router.getCurrentNavigation().extras?.state?.deviceID;
+  }
+
   immediateEmergency() {
     this.countdown.left = 1;
     this.changeRef.detectChanges();
@@ -127,7 +133,10 @@ export class ShowAlertPage implements OnInit {
         this.sendAlert().then(() => {
           console.log('emergencySended')
           this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-          this.shared_data.createToast('Emergency sent successfully')
+          if (!this.shared_data.enabled_test_battery_mode.getValue())
+            this.shared_data.createToast('Emergency sent successfully')
+          else
+            this.shared_data.createToast('Test battery completed succesfully')
         }, err => {
           alert(err);
           this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
