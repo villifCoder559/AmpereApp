@@ -14,6 +14,9 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 import { Device } from '@awesome-cordova-plugins/device/ngx'
 import { BehaviorSubject } from 'rxjs';
+import { BLE } from '@ionic-native/ble/ngx';
+import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
+
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
 // @NgModule({
@@ -100,11 +103,11 @@ export class UserData {
   nfc_code = []
   status = 'active'
   constructor() { }
-  copyFrom(data:UserData){
-    this.emergency_contacts=[];
-    this.paired_devices=[];
-    this.qr_code=[]
-    this.nfc_code=[]
+  copyFrom(data: UserData) {
+    this.emergency_contacts = [];
+    this.paired_devices = [];
+    this.qr_code = []
+    this.nfc_code = []
     var fields = Object.keys(this);
     for (let i = 0; i < fields.length; i++) {
       switch (fields[i]) {
@@ -119,14 +122,14 @@ export class UserData {
           break;
         }
         case 'paired_devices': case 'qr_code': case 'nfc_code': {
-            for (let j = 0; j < data[fields[i]].length; j++) 
-              this[fields[i]][j]=data[fields[i]][j]
+          for (let j = 0; j < data[fields[i]].length; j++)
+            this[fields[i]][j] = data[fields[i]][j]
           break;
         }
         case 'emergency_contacts': {
-            for(let j=0;j<data[fields[i]].length;j++){
-              this[fields[i]].push(new Emergency_Contact(data[fields[i]][j].name,data[fields[i]][j].surname,data[fields[i]][j].number))
-            }
+          for (let j = 0; j < data[fields[i]].length; j++) {
+            this[fields[i]].push(new Emergency_Contact(data[fields[i]][j].name, data[fields[i]][j].surname, data[fields[i]][j].number))
+          }
         }
       }
     }
@@ -231,7 +234,7 @@ export class SharedDataService {
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   enabled_test_battery_mode = new BehaviorSubject(false);
-  constructor(private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private locationAccuracy: LocationAccuracy,private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.storage.create();
       console.log('StorageNameType')
@@ -430,22 +433,35 @@ export class SharedDataService {
     console.log('RETURN_NEW_USER')
     return newUser;
   }
+  enableBluetooth() {
+    return new Promise((resolve, reject) => {
+      this.ble.isEnabled().then(() => {
+        resolve(true)
+      }, err => {
+        this.ble.enable().then(() => resolve(true), err => reject(err))
+      })
+    })
+  }
   enableAllPermission() {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
         console.log('enableAllPermission')
-        this.askGeoPermission().then(() => {
-          this.enableAllBackgroundMode();
-          console.log('ASK_PERMISSION')
-          this.localNotifications.hasPermission().then(result => {
-            if (!result.valueOf())
-              this.localNotifications.requestPermission().then(() => {
-                resolve(true)
-              }).catch(err => reject(err))
-            else
-              resolve(true)
-          }, (err) => reject(err))
-        }, err => { reject(err) })
+        this.checkLocationEnabled().then(()=>{
+          this.enableBluetooth().then(() => {
+            this.askGeoPermission().then(() => {
+              this.enableAllBackgroundMode();
+              console.log('ASK_PERMISSION')
+              this.localNotifications.hasPermission().then(result => {
+                if (!result.valueOf())
+                  this.localNotifications.requestPermission().then(() => {
+                    resolve(true)
+                  }).catch(err => reject(err))
+                else
+                  resolve(true)
+              }, (err) => reject(err))
+            }, err => { reject(err) })
+          }, err => reject(err))
+        },err=>reject(err+'. App can\'t work properly!'))
       })
     })
   }
@@ -493,6 +509,64 @@ export class SharedDataService {
       }
       else
         resolve(true)
+    })
+  }
+  enableGPS() {
+    return new Promise((resolve, reject) => {
+      this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
+        () => {
+          resolve(true)
+        },
+        error => {
+          alert(JSON.stringify(error))
+          reject(false)
+        }
+      );
+    })
+  }
+  locationAccPermission() {
+    return new Promise((resolve, reject) => {
+      this.locationAccuracy.canRequest().then((canRequest: boolean) => {
+        if (canRequest) {
+          resolve(true)
+        } else {
+          this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.ACCESS_COARSE_LOCATION)
+            .then(
+              () => {
+                this.enableGPS().then(() => {
+                  resolve(true)
+                }, err => reject(err));
+              },
+              error => {
+                reject(error)
+              }
+            );
+        }
+      });
+    })
+  }
+  checkLocationEnabled() {
+    return new Promise((resolve, reject) => {
+      this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.ACCESS_COARSE_LOCATION).then(
+        result => {
+          if (result.hasPermission) {
+            this.enableGPS().then(() => {
+              console.log('hasPermission')
+              resolve(true)
+            });
+          } else {
+            console.log('requestPermission')
+            this.locationAccPermission().then(() => {
+              console.log('requestPermissionDone')
+              resolve(true)
+            });
+          }
+        },
+        error => {
+          console.log(error)
+          reject(error)
+        }
+      );
     })
   }
   changeBatteryTestMode() {
