@@ -69,11 +69,12 @@ export class LoginPage implements OnInit {
         }
       }, async (err) => {
         console.log(err)
+        alert(err===undefined?'Check your internet connection':err)
         await this.sharedData.dismissLoading();
       });
     } catch (e) {
       await this.sharedData.dismissLoading();
-      alert((e as Error).message=='undefined'?'Check internet connection':e.message)
+      alert((e as Error).message)
     }
   }
   async show_toast(txt) {
