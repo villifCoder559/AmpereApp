@@ -12,11 +12,9 @@ import { Snap4CityService } from '../data/snap4-city.service'
 export class NGSIv2QUERYService {
   constructor(private s4c: Snap4CityService, private shared_data: SharedDataService) { }
   sendQRNFCEvent(qrnfc_event: QRNFCEvent, name = '') {
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
       var id = this.shared_data.user_data.id;
       var attrs: any = this.s4c.getEventPayload(false, qrnfc_event);
-      //attrs.dateObserved = { value: new Date().toISOString() }
-      console.log(attrs)
       $.ajax({
         url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + id + DeviceType.QR_NFC_EVENT + name + "/attrs?elementid=" + id + DeviceType.QR_NFC_EVENT + name + "&type=" + DeviceType.QR_NFC_EVENT,
         headers: {
@@ -49,6 +47,7 @@ export class NGSIv2QUERYService {
 
   sendUserProfile() {
     return new Promise((resolve, reject) => {
+      this.shared_data.user_data.dateObserved = new Date().toISOString();
       var data = this.s4c.getUserIDPayload(false);
       console.log('Send data ' + data)
       var device_id = this.shared_data.user_data.id + DeviceType.PROFILE;
