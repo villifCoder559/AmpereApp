@@ -25,7 +25,7 @@ export class SendAuthService {
       var date=new Date().toISOString();
       console.log(date)
       if (this.authService.isAuthenticated)
-        this.ngsi.sendUserProfile();
+        this.ngsi.updateEntity({ "status": { "value": this.shared_data.user_data.status } }, DeviceType.PROFILE).catch(err=>console.log(err));
       else{
         console.log('Stop BACKGROUND_FETCH')
         BackgroundFetch.stop()

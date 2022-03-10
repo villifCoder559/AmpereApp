@@ -255,8 +255,6 @@ export class SignupPage implements OnInit {
         data: { result: '' }
       })
       dialogRef.afterClosed().subscribe((result) => {
-        console.log('RESULT')
-        console.log(result)
         if (result != '' && result !== undefined)
           this.addPairedDeviceANDregister(result);
       }, err => (console.log(err)));
@@ -269,8 +267,7 @@ export class SignupPage implements OnInit {
     this.shared_data.user_data.paired_devices.push(device);
     console.log(this.shared_data.user_data.paired_devices.length)
     if (indexOf == -1) {
-      // var attr = {}
-      // attr['jewel' + this.shared_data.user_data.paired_devices.length + 'ID'] = { value: device }
+      alert('Properly connected')
       if (this.authService.isAuthenticated.getValue())
         this.saveUserProfile().then(() => {
           this.shared_data.setNameDevice(device, device);

@@ -60,13 +60,12 @@ export class DialogScanBluetoothComponent implements OnInit {
       $('#matSpinner' + i).hide();
       this.data = peripheralData;
       console.log(peripheralData)
-      alert('Correctly connected');
       this.closeDialog();
     }, (err) => {
       $('#matSpinner' + i).hide();
       this.data = '';
       console.log(err);
-      alert('Error' + err)
+      alert('Error' + err.errorMessage)
     });
   }
 

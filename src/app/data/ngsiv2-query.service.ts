@@ -33,12 +33,12 @@ export class NGSIv2QUERYService {
           }
           else {
             console.log('error')
-            reject(mydata)
+            reject('error package')
           }
         },
         error: function (err) {
           console.log("Insert values pool KO");
-          console.log(err);
+          console.log(err.responseText);
           reject(err)
         }
       })
@@ -66,9 +66,7 @@ export class NGSIv2QUERYService {
           resolve(mydata)
         },
         error: function (err) {
-          console.log("Insert values pool KO");
-          reject('error')
-          console.log(err);
+          reject(err.responseText)
         }
       });
     })
@@ -92,18 +90,13 @@ export class NGSIv2QUERYService {
         dataType: 'json',
         success: function (mydata) {
           if (mydata?.status != 'ko') {
-            console.log('Data')
-            console.log(mydata);
             resolve(true)
           }
-          else {
-            console.log('error')
-            reject(false)
-          }
+          else 
+            reject('error package')
         },
         error: function (err) {
-          console.log("Insert values pool KO");
-          console.log(err);
+          console.log(err.responseText);
         }
       });
     })
@@ -124,19 +117,15 @@ export class NGSIv2QUERYService {
         dataType: 'json',
         success: function (mydata) {
           if (mydata?.status != 'ko') {
-            console.log('Data')
-            console.log(mydata);
             resolve(true)
           }
-          else {
-            console.log('error')
-            reject('error')
-          }
+          else 
+            reject('error_package') 
         },
         error: function (err) {
           console.log("Insert values pool KO");
           console.log(err);
-          reject(err)
+          reject(err.responseText)
         }
       });
     })
@@ -160,7 +149,7 @@ export class NGSIv2QUERYService {
           }
         },
         error: function (xhr) {
-          reject(xhr)
+          reject(xhr.responseText)
         }
       });
     })
