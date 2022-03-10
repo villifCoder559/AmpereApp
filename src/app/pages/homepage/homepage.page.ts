@@ -18,24 +18,16 @@ import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions
 export class HomepagePage implements OnInit {
   gps_enable = true;
   constructor(private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
-    this.enableAllPermission()
   }
-  enableAllPermission() {
-    this.platform.ready().then(() => {
-      this.askPermission().then(() => {
-        this.sharedData.enableAllBackgroundMode();
-        console.log('ASK_PERMISSION')
-        this.localNotifications.hasPermission().then(result => {
-          if (!result.valueOf())
-            this.localNotifications.requestPermission()
-        }, (err) => console.log(err))
-      }, err => console.log(err))
-    })
-  }
+  
   ngOnInit() {
   }
   ngAfterViewInit() {
-    this.sharedData.dismissLoading().catch((err) => console.log(err))
+    //this.sharedData.dismissLoading().then(() => {
+      this.sharedData.presentLoading('Checking permission...').then(()=>{
+        this.sharedData.enableAllPermission().catch(err=>alert(err))
+      })
+    //}).catch((err) => console.log(err))
     console.log('ngAfterViewInit')
   }
   enableGPS() {
@@ -173,9 +165,6 @@ export class HomepagePage implements OnInit {
   SendEventQRNFC() {
     var attr = this.ngsi.sendQRNFCEvent(new QRNFCEvent('', '', '', -1, -1))
   }
-  testDeviceID() {
-    this.sharedData.showAlert('25a')
-  }
   testLoading() {
     this.sharedData.presentLoading('TEST 1');
     setTimeout(() => {
@@ -186,34 +175,10 @@ export class HomepagePage implements OnInit {
       }, 3500)
     }, 2000)
   }
-  /** From API 28 must ask about perimission ACCESS_BACKGROUND_LOCATION (android) */
-  askPermission() {
-    return new Promise((resolve, reject) => {
-      this.androidPermissions.checkPermission("android.permission.ACCESS_BACKGROUND_LOCATION").then((value) => {
-        if (!value.hasPermission) {
-          this.geolocation.getCurrentPosition().then((position) => {
-            alert('This app needs location access for all the time. Allow it so this app can work properly')
-            this.androidPermissions.requestPermissions([
-              "android.permission.ACCESS_BACKGROUND_LOCATION",
-              "android.permission.ACCESS_COARSE_LOCATION",
-              this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
-            ]).then((response) => {
-              console.log('ReusltResponse')
-              console.log(response)
-              resolve(true)
-            }, err => reject(err))
-          }, err => reject(err))
-        }
-      })
-    })
-  }
-  checkAndroidPermission() {
-    this.androidPermissions.checkPermission('ACCESS_BACKGROUND_LOCATION').then((value) => {
-      if (!value.hasPermission)
-        this.askPermission();
-      console.log(value)
-    })
-  }
+  /** From API 28 must ask about perimission ACCESS_BACKGROUND_LOCATION (android).
+   *  I have to ask for currentPosition for fixing a bug on Samsung devices */
+
+
   enableWatchPosition() {
     this.geolocation.watchPosition().subscribe((data) => {
       console.log(data)
