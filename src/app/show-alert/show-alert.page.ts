@@ -6,7 +6,6 @@ import { AlertEvent, DeviceType, SharedDataService, UserData } from '../data/sha
 import { DeviceMotion, DeviceMotionAccelerationData } from '@awesome-cordova-plugins/device-motion/ngx'
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
-import { Snap4CityService } from '../data/snap4-city.service'
 import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@awesome-cordova-plugins/background-geolocation/ngx';
 
 @Component({
@@ -22,8 +21,21 @@ export class ShowAlertPage implements OnInit {
   config: CountdownConfig = {
     leftTime: 20,
     formatDate: ({ date }) => `${date / 1000}`,
-  };;
-  constructor(private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private s4c: Snap4CityService, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
+  };
+  watchAccelerationFunction;
+  offSensorsInterval = 30000 //milliseconds
+  checkingPositionInterval = null;
+  configGeolocation: BackgroundGeolocationConfig = {
+    desiredAccuracy: 10,
+    stationaryRadius: 10,
+    distanceFilter: 10,
+    debug: true, //  enable this hear sounds for background-geolocation life-cycle.
+    stopOnTerminate: true, // enable this to clear background location settings when the app terminates
+    interval: 3000,
+    fastestInterval: 6000,
+    activitiesInterval: 1500
+  };
+  constructor(private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
     this.localNotifications.schedule({
       id: 1,
       text: 'Emergency notification, click to open and insert PIN to disable alert or click again to send emergency immediatly',
@@ -36,7 +48,13 @@ export class ShowAlertPage implements OnInit {
   }
   ngOnInit() {
     this.details_emergency.deviceID = this.router.getCurrentNavigation().extras?.state?.deviceID;
-    console.log(this.details_emergency)
+    if(this.shared_data.enabled_test_battery_mode.getValue()){
+      this.details_emergency.status='testBattery'
+      this.details_emergency.evolution='finish'
+      this.shared_data.enabled_test_battery_mode.next(false);
+      this.countdown.left=0;
+      this.changeRef.detectChanges();
+    }
   }
   immediateEmergency() {
     this.countdown.left = 1;
@@ -120,19 +138,7 @@ export class ShowAlertPage implements OnInit {
       })
     }
   }
-  watchAccelerationFunction;
-  offSensorsInterval = 30000 //milliseconds
-  checkingPositionInterval = null;
-  configGeolocation: BackgroundGeolocationConfig = {
-    desiredAccuracy: 10,
-    stationaryRadius: 10,
-    distanceFilter: 10,
-    debug: true, //  enable this hear sounds for background-geolocation life-cycle.
-    stopOnTerminate: true, // enable this to clear background location settings when the app terminates
-    interval: 3000,
-    fastestInterval: 6000,
-    activitiesInterval: 1500
-  };
+
   getPosition() {
     return new Promise((resolve, reject) => {
       console.log('startwatchPosition')
