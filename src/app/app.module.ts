@@ -21,7 +21,7 @@ import {SharedDataService} from '../app/data/shared-data.service'
 import {NGSIv2QUERYService} from '../app/data/ngsiv2-query.service'
 import {BluetoothService} from '../app/data/bluetooth.service'
 import { IBeacon } from '@ionic-native/ibeacon/ngx'
-import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx'
+import { BLE } from '@ionic-native/ble/ngx';
 import { Snap4CityService } from '../app/data/snap4-city.service'
 import { AuthenticationService } from '../app/services/authentication.service'
 import { ReadingCodeService } from '../app/data/reading-code.service'
@@ -51,7 +51,7 @@ import {AndroidPermissions} from '@awesome-cordova-plugins/android-permissions/n
     NGSIv2QUERYService,
     BluetoothService,
     IBeacon,
-    BluetoothLE,
+    BLE,
     Snap4CityService,
     AuthenticationService,
     ReadingCodeService,
