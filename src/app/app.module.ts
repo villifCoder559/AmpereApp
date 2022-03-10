@@ -11,7 +11,6 @@ import {Contacts} from '@ionic-native/contacts'
 import {MaterialModule} from '../app/material-module';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
-import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
@@ -31,7 +30,8 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { FormsModule } from '@angular/forms';
 import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
 import { BackgroundFetch } from '@awesome-cordova-plugins/background-fetch/ngx';
-
+import {Device} from '@awesome-cordova-plugins/device/ngx'
+import {AndroidPermissions} from '@awesome-cordova-plugins/android-permissions/ngx'
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -57,7 +57,8 @@ import { BackgroundFetch } from '@awesome-cordova-plugins/background-fetch/ngx';
     ReadingCodeService,
     SendAuthService,
     InAppBrowser,
-    BackgroundFetch
+    BackgroundFetch,
+    Device
   ],
   bootstrap: [AppComponent],
 })
