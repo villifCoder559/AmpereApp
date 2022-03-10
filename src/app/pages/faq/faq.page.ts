@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./faq.page.scss'],
 })
 export class FaqPage implements OnInit {
-
+  collapsedHeight='90px';
   constructor() { }
 
   ngOnInit() {
