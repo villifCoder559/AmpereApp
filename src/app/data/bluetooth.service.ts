@@ -1,9 +1,10 @@
-import {  Injectable, NgModule } from '@angular/core';
+import { Injectable, NgModule } from '@angular/core';
 import { IBeacon } from '@ionic-native/ibeacon/ngx'
 import { BLE } from '@ionic-native/ble/ngx';
 import { BehaviorSubject } from 'rxjs';
-import { SharedDataService } from './shared-data.service';
+import { AlertEvent, SharedDataService } from './shared-data.service';
 import { AuthenticationService } from '../services/authentication.service'
+import { NGSIv2QUERYService } from './ngsiv2-query.service';
 /** save data
  * DD:31:A4:AD:A3:05
  */
@@ -63,80 +64,28 @@ export class BluetoothService {
   enableAllBeaconFromSnap4City() {
     this.shared_data.user_data.paired_devices.forEach((element) => {
       this.startRegisterBeacon(element);
-      console.log('enabled '+element)
+      console.log('enabled ' + element)
     }, err => alert(err))
   }
-  enableAllUserBeacon() {
-    // console.log('enableUserBeacon')
-    // console.log(this.shared_data.user_data)
-    // this.shared_data.user_data.paired_devices.forEach((element) => {
-    //   console.log(element)
-    //   if (element != null) {
-    //     //  if (element?.protocol == 'ibeacon') {
-    //     //   console.log('ibeacon');
-    //     //   console.log(element)
-    //     //   this.startRegisterBeacon(element.uuid, element.minor, element.major);
-    //     // }
-    //     // else {
-    //     console.log('ble');
-    //     console.log(element)
-    //     this.ble.autoConnect(element.id, () => {
-    //       console.log('autoconnection')
-    //       if (this.authService.isAuthenticated.value)
-    //         this.shared_data.showAlert(element.id);
-    //     }, (err) => {
-    //       console.log(err);
-    //     })
-    //     // }
-    //   }
-    //   // console.log('elemento')
-    //   // console.log(element)
-    //   // if (element != null) {
-    //   //   console.log('enable userBeacon')
-    //   //   console.log(element)
-    //   //   this.startRegisterBeacon(element.uuid)
-    //   // }
-    // }, err => console.log(err))
-  }
-  checkRangeBeaconsInRegion(index) {
-    //this.ibeacon.requestAlwaysAuthorization(); only iOS
-    // create a new delegate and register it with the native layer
-    let delegate = this.ibeacon.Delegate();
-    //Subscribe to some of the delegate's event handlers
-    delegate.didRangeBeaconsInRegion() //this can detect beacon in region
-      .subscribe(
-        data => {
-          console.log(data)
-          // console.log('didRangeBeaconsInRegion: ', data)
-          // this.shared_data.user_data.paired_devices[index].inRegion = true;
-          // let beaconRegion = this.ibeacon.BeaconRegion('Beacon_' + this.shared_data.user_data.paired_devices[index].uuid, this.shared_data.user_data.paired_devices[index].uuid);
-          // this.ibeacon.stopRangingBeaconsInRegion(beaconRegion);
-        },
-        error => console.error()
-      );
-  }
   private startRegisterBeacon(uuid) {
-    //this.ibeacon.requestAlwaysAuthorization(); only iOS
     var delegate = this.ibeacon.Delegate()
     let beaconRegion;
     beaconRegion = this.ibeacon.BeaconRegion(uuid, uuid);
     delegate.didRangeBeaconsInRegion()
-      .subscribe(()=>{});
+      .subscribe(() => { });
     delegate.didStartMonitoringForRegion()
-      .subscribe(()=>{});
+      .subscribe(() => { });
     delegate.didEnterRegion()
       .subscribe(
         data => {
           if (this.authService.isAuthenticated.value) {
             var found = false;
-            var index = 0;
-            for (index = 0; index < this.shared_data.user_data.paired_devices.length && !found; index++) {
+            for (var index = 0; index < this.shared_data.user_data.paired_devices.length && !found; index++) {
               if (this.shared_data.user_data.paired_devices[index] === data.region.identifier)
                 found = true;
             }
-            if (found) {
+            if (found)
               this.shared_data.showAlert(this.shared_data.user_data.paired_devices[index - 1]);
-            }
           }
         }, err => alert(err)
       );
