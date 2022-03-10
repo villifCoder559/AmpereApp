@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import {  FormGroup } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { DeviceType, SharedDataService } from '../../data/shared-data.service'
+import { DeviceType, SharedDataService, StorageNameType } from '../../data/shared-data.service'
 import * as Keycloak from 'keycloak-ionic/keycloak';
 import { BluetoothService } from 'src/app/data/bluetooth.service';
 import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
@@ -51,7 +51,12 @@ export class LoginPage implements OnInit {
               console.log('END_ENABLE_BEACON')
               console.log('Start_Sendig_Valid_Status')
               this.sendAuth.startSendingValidStatus()
-              this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true });
+              Object.keys(this.sharedData.localStorage).forEach((element: StorageNameType) => {
+                this.sharedData.getNameDevices(element);
+              })
+              this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true }).then(()=>{
+                this.sharedData.dismissLoading();
+              })
               console.log('END_ROUTER')
             }, err => {
               console.log(err)
@@ -68,7 +73,7 @@ export class LoginPage implements OnInit {
       });
     } catch (e) {
       await this.sharedData.dismissLoading();
-      alert((e as Error).message)
+      alert((e as Error).message=='undefined'?'Check internet connection':e.message)
     }
   }
   async show_toast(txt) {
