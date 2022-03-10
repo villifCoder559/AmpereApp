@@ -9,19 +9,23 @@ import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { CountdownModule } from 'ngx-countdown';
 import { Storage } from '@ionic/storage-angular'
-
+import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
+import { Device } from '@awesome-cordova-plugins/device/ngx'
+import { BehaviorSubject } from 'rxjs';
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
-@NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    CountdownModule
-  ],
-  providers: [
-    NativeAudio, BackgroundMode]
-})
+// @NgModule({
+//   imports: [
+//     CommonModule,
+//     FormsModule,
+//     IonicModule,
+//     CountdownModule
+//   ],
+//   providers: [
+//     NativeAudio, BackgroundMode]
+// })
 export class NFCCode {
   id: number = -1;
 }
@@ -96,11 +100,41 @@ export class UserData {
   nfc_code = []
   status = 'active'
   constructor() { }
+  copyFrom(data:UserData){
+    this.emergency_contacts=[];
+    this.paired_devices=[];
+    this.qr_code=[]
+    this.nfc_code=[]
+    var fields = Object.keys(this);
+    for (let i = 0; i < fields.length; i++) {
+      switch (fields[i]) {
+        default: {
+          this[fields[i]] = data[fields[i]]
+          break;
+        }
+        case 'disabilities': case 'public_emergency_contacts': {
+          Object.keys(this[fields[i]]).forEach((element) => {
+            this[fields[i]][element] = data[fields[i]][element]
+          })
+          break;
+        }
+        case 'paired_devices': case 'qr_code': case 'nfc_code': {
+            for (let j = 0; j < data[fields[i]].length; j++) 
+              this[fields[i]][j]=data[fields[i]][j]
+          break;
+        }
+        case 'emergency_contacts': {
+            for(let j=0;j<data[fields[i]].length;j++){
+              this[fields[i]].push(new Emergency_Contact(data[fields[i]][j].name,data[fields[i]][j].surname,data[fields[i]][j].number))
+            }
+        }
+      }
+    }
+  }
   isEqualTo(data: UserData) {
     var equal = true
     var fields = Object.keys(this);
     for (let i = 0; equal && i < fields.length; i++) {
-      console.log(fields[i])
       switch (fields[i]) {
         default: {
           if (this[fields[i]] != data[fields[i]])
@@ -135,7 +169,6 @@ export class UserData {
             for (let j = 0; found && j < this[fields[i]].length; j++) {
               var index = this[fields[i]].findIndex((obj) => {
                 var ok = true;
-                console.log('loop nr. ' + j)
                 var array_element_contact = Object.keys(obj);
                 let equal_contact_field = true;
                 for (let k = 0; equal_contact_field && k < array_element_contact.length; k++) {
@@ -146,7 +179,6 @@ export class UserData {
                 }
                 return ok;
               })
-              console.log(index)
               if (index == -1)
                 equal = false
             }
@@ -194,12 +226,12 @@ export class SharedDataService {
   readonly MAX_QRs = 4;
   readonly MAX_EMERGENCY_CONTACTs = 5;
   readonly MAX_DEVICEs = 2;
-
   public accessToken;
   localStorage = {}
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
-  constructor(private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  enabled_test_battery_mode = new BehaviorSubject(false);
+  constructor(private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.storage.create();
       console.log('StorageNameType')
@@ -236,7 +268,9 @@ export class SharedDataService {
   showAlert(id) {
     console.log(id)
     let navigationExtras: NavigationExtras = {
-      state: { deviceID: id },
+      state: {
+        deviceID: id
+      },
       replaceUrl: true
     };
     this.nativeAudio.play('alert');
@@ -247,6 +281,11 @@ export class SharedDataService {
     this.backgroundMode.enable();
     this.backgroundMode.disableWebViewOptimizations();
     this.backgroundMode.disableBatteryOptimizations();
+    this.backgroundMode.on('activate').subscribe(() => {
+      console.log('ActivateBackground')
+      if (this.enabled_test_battery_mode.getValue())
+        this.enabled_test_battery_mode.next(false)
+    })
   }
   setNameDevice(device, type: StorageNameType, name = '') {
     var app = { id: '', name: '' };
@@ -255,8 +294,6 @@ export class SharedDataService {
     var check = true;
     if (this.localStorage[type] === null)
       this.localStorage[type] = []
-    console.log('LOCAL_STORAGE')
-    console.log(this.localStorage)
     this.localStorage[type].forEach(element => {
       if (element.id === device) {
         element.name = name;
@@ -265,8 +302,6 @@ export class SharedDataService {
     })
     if (check)
       this.localStorage[type].push(app)
-    console.log('SET_TYPE->' + type)
-    console.log(this.localStorage[type])
     this.storage.set(type, this.localStorage[type])
   }
   deleteDeviceFromLocalStorage(device, type: StorageNameType) {
@@ -277,12 +312,8 @@ export class SharedDataService {
   getNameDevices(type: StorageNameType) {
     this.storage.get(type).then((result) => {
       this.localStorage[type] = result;
-      console.log('TYPE_STORAGE')
-      console.log(this.localStorage[type])
-      console.log(this.localStorage[type] == null)
       if (this.localStorage[type] == null) {
         this.user_data[type].forEach(element => {
-          console.log('SETNAME_' + type)
           this.setNameDevice(element, type)
         })
       }
@@ -303,13 +334,13 @@ export class SharedDataService {
         }
         case 'public_emergency_contacts': {
           Object.keys(this.user_data[element]).forEach((number) => {
-            this.user_data[element][number] = data[number].value === 'true' ? true : false;
+            this.user_data[element][number] = data[number].value === "true" ? true : false;
           })
           break;
         }
         case 'disabilities': {
           Object.keys(this.user_data[element]).forEach((dis) => {
-            this.user_data[element][dis] = data[dis].value
+            this.user_data[element][dis] = data[dis].value === "true" ? true : false
           })
           break;
         }
@@ -339,8 +370,8 @@ export class SharedDataService {
       if (nfccode != '')
         this.user_data.nfc_code.push(nfccode)
     }
-    this.user_data.public_emergency_contacts = { call_112: data.call_112.value, call_115: data.call_115.value, call_118: data.call_118.value }
-    this.old_user_data = JSON.parse(JSON.stringify(this.user_data))
+    //this.user_data.public_emergency_contacts = { call_112: data.call_112.value, call_115: data.call_115.value, call_118: data.call_118.value }
+    this.old_user_data.copyFrom(this.user_data)
   }
   getUserFromLocalToServer() {
     console.log(this.user_data)
@@ -398,5 +429,73 @@ export class SharedDataService {
     })
     console.log('RETURN_NEW_USER')
     return newUser;
+  }
+  enableAllPermission() {
+    return new Promise((resolve, reject) => {
+      this.platform.ready().then(() => {
+        console.log('enableAllPermission')
+        this.askGeoPermission().then(() => {
+          this.enableAllBackgroundMode();
+          console.log('ASK_PERMISSION')
+          this.localNotifications.hasPermission().then(result => {
+            if (!result.valueOf())
+              this.localNotifications.requestPermission().then(() => {
+                resolve(true)
+              }).catch(err => reject(err))
+            else
+              resolve(true)
+          }, (err) => reject(err))
+        }, err => { reject(err) })
+      })
+    })
+  }
+  askGeoPermission() {
+    return new Promise((resolve, reject) => {
+      this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION).then((fineLocation) => {
+        this.androidPermissions.checkPermission("android.permission.ACCESS_BACKGROUND_LOCATION").then((backgroundLocation) => {
+          this.androidPermissions.checkPermission("android.permission.ACCESS_COARSE_LOCATION").then((coarseLocation) => {
+            console.log(fineLocation)
+            console.log(backgroundLocation)
+            console.log(coarseLocation);
+            if (!fineLocation.hasPermission || !backgroundLocation.hasPermission || !coarseLocation.hasPermission) {
+              console.log('GetPosition')
+              this.geolocation.getCurrentPosition({ timeout: 3500 }).then((position) => {
+                this.dismissLoading().catch(err => console.log(err));
+                this.askGeoLocationPermissions().then(() => resolve(true), err => resolve(false))
+              }, err => {
+                this.dismissLoading().catch(err => console.log(err));
+                this.askGeoLocationPermissions().then(() => resolve(true), err => resolve(false))
+              })
+            }
+            else {
+              this.dismissLoading().catch(err => console.log(err))
+              resolve(true)
+            }
+          }, err => reject(err))
+        }, err => reject(err))
+      }, err => reject(err))
+    })
+  }
+  askGeoLocationPermissions() {
+    return new Promise((resolve, reject) => {
+      console.log(this.device.version)
+      if (parseInt(this.device.version) >= 10) {
+        alert('This app needs location access for all the time. Allow it so this app can work properly')
+        this.androidPermissions.requestPermissions([
+          "android.permission.ACCESS_BACKGROUND_LOCATION",
+          "android.permission.ACCESS_COARSE_LOCATION",
+          this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
+        ]).then((response) => {
+          console.log('ReusltResponse')
+          console.log(response)
+          resolve(true)
+        }, err => reject(err))
+      }
+      else
+        resolve(true)
+    })
+  }
+  changeBatteryTestMode() {
+    this.enabled_test_battery_mode.next(!this.enabled_test_battery_mode.getValue());
   }
 }
