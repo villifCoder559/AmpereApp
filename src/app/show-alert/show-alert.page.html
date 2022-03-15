@@ -8,7 +8,7 @@
         <ion-icon name="alert-circle"></ion-icon>
       </div>
       <div class="immediate_emergency">
-        <button mat-raised-button (click)="immediateEmergency()">Send immediatly Emergency</button>
+        <button mat-raised-button id="immediateEmergencyButton" [disabled]="this.shared_data.enabled_test_battery_mode.getValue()" (click)="immediateEmergency()">Send immediatly Emergency</button>
       </div>
       <div class="section">
         Accidentally triggered?
