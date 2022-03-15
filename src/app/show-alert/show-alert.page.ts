@@ -35,7 +35,7 @@ export class ShowAlertPage implements OnInit {
     fastestInterval: 6000,
     activitiesInterval: 1500
   };
-  constructor(private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, private shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
+  constructor(private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, public shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
     this.localNotifications.schedule({
       id: 1,
       text: 'Emergency notification, click to open and insert PIN to disable alert or click again to send emergency immediatly',
@@ -46,15 +46,15 @@ export class ShowAlertPage implements OnInit {
       this.backgroundGeolocation.start();
     })
   }
-  ngAfterViewChecked() {
-    console.log('Value batteryTest')
+  ngAfterViewInit() {
     console.log(this.shared_data.enabled_test_battery_mode.getValue())
     if (this.shared_data.enabled_test_battery_mode.getValue()) {
-      console.log('BatteryTest')
       this.details_emergency.status = 'testBattery'
       this.details_emergency.evolution = 'finish'
       this.shared_data.enabled_test_battery_mode.next(false);
-      this.countdown.left = 1;
+      this.countdown.left = 0;
+      for (let i = 0; i < this.pin.length; i++)
+        $('#' + i).attr('disabled', 'disabled')
       this.changeRef.detectChanges();
     }
   }
@@ -123,7 +123,7 @@ export class ShowAlertPage implements OnInit {
       alert.dismiss();
     });
   }
-  send_Emergency(event) {//when time is expired
+  send_Emergency(event) {
     console.log(event)
     if (event.action === 'done') {
       console.log('activateSensors')
@@ -244,9 +244,10 @@ export class ShowAlertPage implements OnInit {
       }, err => {
         console.log(err)
         setTimeout(() => {
+          console.log('Fail nr. ' + this.countFails)
           this.countFails++;
           if (this.countFails < 5)
-            this.sendAlert();
+            this.sendAlert().catch((err) => { console.log('ERROR->SendAlert'); reject(err) });
           else
             reject(err)
         }, 2500)
