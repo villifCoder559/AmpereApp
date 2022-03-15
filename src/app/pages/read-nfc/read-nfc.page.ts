@@ -5,6 +5,7 @@ import { SharedDataService, StorageNameType, typeChecking } from 'src/app/data/s
 import { ReadingCodeService } from 'src/app/data/reading-code.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogModifyNameComponent } from '../signup/dialog-modify-name/dialog-modify-name.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-read-nfc',
@@ -17,20 +18,23 @@ export class ReadNFCPage implements OnInit {
   NFC_data = '';
   NFC_enable = false;
   scannedCode = null;
-  constructor(private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private nfc: NFC, private platform: Platform) {
+  constructor(private router:Router,private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private nfc: NFC, private platform: Platform) {
     console.log(this.shared_data.user_data)
     console.log(this.shared_data.localStorage)
   }
   ngOnInit() {
     this.nfc.enabled().then(() => {
       this.NFC_enable = true;
-      this.read_NFC();
     }, err => {
       this.shared_data.createToast('Error :' + err);
-      if (err != 'NO_NFC')
-        this.nfc.showSettings().then(() => {
-          this.read_NFC().catch(err => console.log(err))
+      if (err != 'NO_NFC'){
+        alert('Enable NFC from settings')
+        this.nfc.showSettings().then((result) => {
+          this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+          console.log(result)
+          //this.read_NFC()
         })
+      }
     })
   }
   async read_NFC() {
