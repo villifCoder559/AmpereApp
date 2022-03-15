@@ -9,26 +9,36 @@ import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
 import { HttpClient } from '@angular/common/http';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { SendAuthService } from 'src/app/data/send-auth.service';
+
+declare var cordovaHTTP: any;
+
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.page.html',
   styleUrls: ['./homepage.page.scss'],
 })
-
 export class HomepagePage implements OnInit {
+
   gps_enable = true;
-  constructor(private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private send: SendAuthService, private authService: AuthenticationService, private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
   }
-  
+
   ngOnInit() {
+    this.platform.ready().then(() => {
+      console.log(cordovaHTTP)
+    })
   }
   ngAfterViewInit() {
-    //this.sharedData.dismissLoading().then(() => {
-      this.sharedData.presentLoading('Checking permission...').then(()=>{
-        this.sharedData.enableAllPermission().catch(err=>alert(err))
-      },err=>console.log(err))
-    //}).catch((err) => console.log(err))
-    console.log('ngAfterViewInit')
+    console.log(this.sharedData.checkPermissionDone)
+    if (!this.sharedData.checkPermissionDone)
+      this.sharedData.presentLoading('Checking permission...').then(() => {
+        this.sharedData.enableAllPermission().then(() => {
+          this.sharedData.checkPermissionDone = true;
+          console.log(this.sharedData.checkPermissionDone)
+        }, err => console.log(err))
+      }, err => console.log(err))
   }
   enableGPS() {
     return new Promise((resolve, reject) => {
@@ -103,10 +113,10 @@ export class HomepagePage implements OnInit {
           this.sharedData.dismissLoading();
         }, 2000)
       }, 2000)
-    },err=>console.log(err))
+    }, err => console.log(err))
   }
   testSendStatus() {
-    this.ngsi.updateEntity({ 'status': this.sharedData.user_data.status }, DeviceType.PROFILE).catch((err) => console.log(err))
+    this.ngsi.updateBackgroundEntity({ 'status': this.sharedData.user_data.status }, DeviceType.PROFILE).catch((err) => console.log(err))
   }
   testQuery() {
   }
@@ -188,5 +198,24 @@ export class HomepagePage implements OnInit {
     window.addEventListener("devicemotion", function (event) {
       console.log(event)
     }, true);
+  }
+  uploadToken() {
+    this.authService.keycloak.updateToken(18000).then((refreshed) => {
+      if (refreshed)
+        console.log('refreshed')
+      else
+        console.log('token still valid')
+    }, err => console.log(err))
+  }
+  checkANDupdateToken() {
+    // var url = 'https://www.snap4city.org/auth/realms/master/protocol/openid-connect/token'
+    // var params = 'grant_type=refresh_token&refresh_token=' + this.authService.keycloak.refreshToken + '&client_id=js-snap4city-mobile-app'
+    this.ngsi.checkANDupdateToken()
+  }
+  updateProfile() {
+    var date = new Date().toISOString()
+    this.ngsi.updateBackgroundEntity({ "status": { "value": this.sharedData.user_data.status }, "dateObserved": { "value": date } }, DeviceType.PROFILE).then((response) => {
+      console.log(response)
+    }, err => console.log(err))
   }
 }
