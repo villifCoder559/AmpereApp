@@ -20,6 +20,8 @@ import { AuthenticationService } from '../../services/authentication.service'
 import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
 import { DialogSaveComponent } from './dialog-save/dialog-save.component';
 import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component';
+import { Geolocation } from '@ionic-native/geolocation/ngx'
+
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -70,7 +72,7 @@ export class SignupPage implements OnInit {
     call_118: [Validators.required]
   });
   readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.fourthFormGroup]
-  constructor(public authService: AuthenticationService, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(public authService: AuthenticationService, private geoLocation: Geolocation, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     console.log('From signup')
     console.log(this.shared_data.user_data)
   }
@@ -122,6 +124,8 @@ export class SignupPage implements OnInit {
         })
       })
     }
+    else
+      this.getPosition();
   }
   checkDate(ev) {
     console.log(ev)
@@ -418,15 +422,23 @@ export class SignupPage implements OnInit {
     });
     return result;
   }
+  getPosition() {
+    this.geoLocation.getCurrentPosition().then((position) => {
+      this.lat = position.coords.latitude;
+      this.lon = position.coords.longitude;
+    },err=>{console.log(err)})
+  }
+  lat = 43.7;
+  lon = 11.2;
   register_user() {
     var error = this.getUserFromFormGroup();
     if (!error) {
       this.shared_data.presentLoading('Creating device 1/3').then(() => {
-        this.snap4CityService.createDevice(DeviceType.PROFILE).then(() => {
+        this.snap4CityService.createDevice(DeviceType.PROFILE, this.lat, this.lon).then(() => {
           this.shared_data.setTextLoading('Creating device 2/3')
-          this.snap4CityService.createDevice(DeviceType.ALERT_EVENT).then(() => {
+          this.snap4CityService.createDevice(DeviceType.ALERT_EVENT, this.lat, this.lon).then(() => {
             this.shared_data.setTextLoading('Creating device 3/3')
-            this.snap4CityService.createDevice(DeviceType.QR_NFC_EVENT).then(() => {
+            this.snap4CityService.createDevice(DeviceType.QR_NFC_EVENT, this.lat, this.lon).then(() => {
               this.shared_data.setTextLoading('Storing data...')
               this.NGSIv2QUERY.sendUserProfile().then(() => {
                 this.shared_data.dismissLoading();
