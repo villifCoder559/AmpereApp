@@ -230,11 +230,12 @@ export class SharedDataService {
   readonly MAX_EMERGENCY_CONTACTs = 5;
   readonly MAX_DEVICEs = 2;
   public accessToken;
+  checkPermissionDone=false;
   localStorage = {}
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   enabled_test_battery_mode = new BehaviorSubject(false);
-  constructor(private locationAccuracy: LocationAccuracy,private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.storage.create();
       console.log('StorageNameType')
@@ -281,11 +282,13 @@ export class SharedDataService {
   }
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
+    this.backgroundMode.configure({text:'Ampere is working'})
     this.backgroundMode.enable();
     this.backgroundMode.disableWebViewOptimizations();
     this.backgroundMode.disableBatteryOptimizations();
     this.backgroundMode.on('activate').subscribe(() => {
       console.log('ActivateBackground')
+      this.checkPermissionDone=false;
       if (this.enabled_test_battery_mode.getValue())
         this.enabled_test_battery_mode.next(false)
     })
@@ -442,27 +445,43 @@ export class SharedDataService {
       })
     })
   }
+  askForegroundService() {
+    return new Promise((resolve, reject) => {
+      this.androidPermissions.checkPermission("android.permission.FOREGROUND_SERVICE").then((enabled) => {
+        console.log('ForegroundService')
+        if (!enabled.hasPermission)
+          this.androidPermissions.requestPermission("android.permission.FOREGROUND_SERVICE").then(() => {
+            resolve(true)
+          }, err => reject(err))
+        else
+          resolve(true)
+      }, err => reject(err))
+    })
+  }
   enableAllPermission() {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
+        this.enableAllBackgroundMode();
         console.log('enableAllPermission')
-        this.checkLocationEnabled().then(()=>{
-          this.enableBluetooth().then(() => {
-            this.askGeoPermission().then(() => {
-              this.enableAllBackgroundMode();
-              console.log('ASK_PERMISSION')
-              this.localNotifications.hasPermission().then(result => {
-                if (!result.valueOf())
-                  this.localNotifications.requestPermission().then(() => {
+        this.askForegroundService().then(()=>{
+          this.checkLocationEnabled().then(() => {
+            this.enableBluetooth().then(() => {
+              this.askGeoPermission().then(() => {
+                //this.enableAllBackgroundMode();
+                console.log('ASK_PERMISSION')
+                this.localNotifications.hasPermission().then(result => {
+                  if (!result.valueOf())
+                    this.localNotifications.requestPermission().then(() => {
+                      resolve(true)
+                    }).catch(err => reject(err))
+                  else
                     resolve(true)
-                  }).catch(err => reject(err))
-                else
-                  resolve(true)
-              }, (err) => reject(err))
-            }, err => { reject(err) })
-          }, err => reject(err))
-        },err=>reject(err+'. App can\'t work properly!'))
-      },err=>reject(err))
+                }, (err) => reject(err))
+              }, err => { reject(err) })
+            }, err => reject(err))
+          }, err => reject(err + '. App can\'t work properly!'))
+        },err=>reject(err))
+      }, err => reject(err))
     })
   }
   askGeoPermission() {
@@ -516,7 +535,7 @@ export class SharedDataService {
       this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
         () => {
           resolve(true)
-        },error => {
+        }, error => {
           alert(JSON.stringify(error))
           reject(false)
         })
@@ -540,7 +559,7 @@ export class SharedDataService {
               }
             );
         }
-      },err=>reject(err));
+      }, err => reject(err));
     })
   }
   checkLocationEnabled() {
@@ -567,7 +586,5 @@ export class SharedDataService {
       );
     })
   }
-  changeBatteryTestMode() {
-    this.enabled_test_battery_mode.next(!this.enabled_test_battery_mode.getValue());
-  }
+
 }
