@@ -1,11 +1,8 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { BLE } from '@ionic-native/ble/ngx';
-import { Platform } from '@ionic/angular';
-import { SharedDataService } from '../app/data/shared-data.service'
-import { BluetoothService } from '../app/data/bluetooth.service'
 import { Pipe, PipeTransform} from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
+import { LottieSplashScreen } from '@awesome-cordova-plugins/lottie-splash-screen/ngx';
+import { Platform } from '@ionic/angular';
 
 @Pipe({ name: 'safe' })
 export class SafePipe implements PipeTransform {
@@ -20,7 +17,7 @@ export class SafePipe implements PipeTransform {
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor() {
-    /* if logged enbale bluetooth */
+  constructor(private platform:Platform,private lottieSplashScreen:LottieSplashScreen) {
   }
+
 }
