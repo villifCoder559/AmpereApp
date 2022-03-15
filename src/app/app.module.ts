@@ -32,6 +32,10 @@ import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
 import { BackgroundFetch } from '@awesome-cordova-plugins/background-fetch/ngx';
 import {Device} from '@awesome-cordova-plugins/device/ngx'
 import {AndroidPermissions} from '@awesome-cordova-plugins/android-permissions/ngx'
+import {ForegroundService} from '@awesome-cordova-plugins/foreground-service/ngx'
+import {HTTP} from '@awesome-cordova-plugins/http/ngx'
+import { LottieSplashScreen } from '@awesome-cordova-plugins/lottie-splash-screen/ngx';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -57,8 +61,11 @@ import {AndroidPermissions} from '@awesome-cordova-plugins/android-permissions/n
     ReadingCodeService,
     SendAuthService,
     InAppBrowser,
+    HTTP,
     BackgroundFetch,
-    Device
+    Device,
+    ForegroundService,
+    LottieSplashScreen
   ],
   bootstrap: [AppComponent],
 })
