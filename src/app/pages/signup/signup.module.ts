@@ -10,9 +10,10 @@ import { Contacts } from '@ionic-native/contacts/ngx'
 import { DialogScanBluetoothComponent } from './dialog-scan-bluetooth/dialog-scan-bluetooth.component';
 import { BLE } from '@ionic-native/ble/ngx'
 import { DialogAddEmergencyContactComponent } from './dialog-add-emergency-contact/dialog-add-emergency-contact.component';
-import {DialogSaveComponent} from './dialog-save/dialog-save.component'
+import { DialogSaveComponent } from './dialog-save/dialog-save.component'
 import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-name.component';
 import { DialogImportContactsComponent } from './dialog-import-contacts/dialog-import-contacts.component';
+import { Geolocation } from '@ionic-native/geolocation/ngx'
 
 @NgModule({
   imports: [
@@ -24,8 +25,8 @@ import { DialogImportContactsComponent } from './dialog-import-contacts/dialog-i
     MaterialModule,
     HttpClientModule
   ],
-  declarations: [SignupPage,DialogModifyNameComponent, DialogImportContactsComponent, DialogScanBluetoothComponent,DialogAddEmergencyContactComponent,DialogSaveComponent],
-  providers: [Contacts, BLE],
+  declarations: [SignupPage, DialogModifyNameComponent, DialogImportContactsComponent, DialogScanBluetoothComponent, DialogAddEmergencyContactComponent, DialogSaveComponent],
+  providers: [Contacts, BLE,Geolocation],
   //entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent,DialogSaveComponent]
 })
 export class SignupPageModule { }
