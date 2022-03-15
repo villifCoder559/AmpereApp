@@ -37,7 +37,7 @@ export class Snap4CityService {
       })
     })
   }
-  createDevice(type: DeviceType, name = '', lat = 42, long = 12, broker = 'orionAMPERE-UNIFI') {
+  createDevice(type: DeviceType,lat = 42, long = 12, name = '', broker = 'orionAMPERE-UNIFI') {
     return new Promise((resolve, reject) => {
       console.log('CREATION')
       console.log(type)
