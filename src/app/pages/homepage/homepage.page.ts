@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
-import { Platform } from '@ionic/angular';
+import { AlertController, IonMenuButton, MenuController, Platform } from '@ionic/angular';
 import { AlertEvent, DeviceType, Emergency_Contact, QRNFCEvent, SharedDataService, UserData } from '../../data/shared-data.service'
 import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
 import { Snap4CityService } from '../../data/snap4-city.service'
@@ -11,7 +11,9 @@ import { HttpClient } from '@angular/common/http';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { SendAuthService } from 'src/app/data/send-auth.service';
-
+import { Storage } from '@ionic/storage-angular'
+import { MdMenuPlacement, TourService } from 'ngx-ui-tour-md-menu'
+import { MenuPositionX } from '@angular/material/menu';
 declare var cordovaHTTP: any;
 
 @Component({
@@ -22,16 +24,110 @@ declare var cordovaHTTP: any;
 export class HomepagePage implements OnInit {
 
   gps_enable = true;
-  constructor(private send: SendAuthService, private authService: AuthenticationService, private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private tour: TourService, private alertController: AlertController, private storage: Storage, private menu: MenuController, private send: SendAuthService, private authService: AuthenticationService, private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
   }
-
+  openMenu() {
+    this.menu.open();
+  }
   ngOnInit() {
-    this.platform.ready().then(() => {
-      console.log(cordovaHTTP)
-    })
+
   }
+  startTour() {
+    this.sharedData.tour_enabled = true;
+    this.tour.initialize([{
+      anchorId: 'QR',
+      content: 'QR content',
+      title: 'QR title',
+      enableBackdrop: true
+    }, {
+      anchorId: 'NFC',
+      content: 'NFC content',
+      title: 'NFC title',
+      enableBackdrop: true
+    }, {
+      anchorId: 'Emergency',
+      content: 'Emergency content',
+      title: 'Emergency title',
+      enableBackdrop: true
+    }, {
+      anchorId: 'Profile',
+      content: 'Profile content',
+      title: 'Profile title',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'FAQ',
+      content: 'FAQ content',
+      title: 'FAQ title',
+      enableBackdrop: true,
+      route: 'profile/menu/homepage',
+    }, {
+      anchorId: 'Menu',
+      content: 'Menu content',
+      title: 'Menu title',
+      route: 'profile/menu/homepage',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'show-alert',
+      content: 'AlertPage button',
+      title: 'Alert title',
+      route: 'show-alert',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'Immediate',
+      content: 'Immediate button',
+      title: 'Immediate title',
+      route: 'show-alert',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'Pin',
+      content: 'Pin box',
+      title: 'Pin title',
+      route: 'show-alert',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'test-device',
+      content: 'Page content',
+      title: 'Page title',
+      route: '/profile/menu/test-device'
+    }, {
+      anchorId: 'Pairing',
+      content: 'Pairing content',
+      title: 'Pairing title',
+      enableBackdrop: true,
+      route: '/profile/menu/test-device',
+    }, {
+      anchorId: 'Battery',
+      content: 'Battery content',
+      title: 'Battery title',
+      enableBackdrop: true,
+      route: '/profile/menu/test-device',
+    }])
+    this.tour.start();
+    // this.tour.end$.subscribe(() => {
+    //   this.sharedData.tour_enabled = false;
+    //   this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true });
+    //   this.storage.set('tour', true).then(async () => {
+    //     this.sharedData.createToast('Tour ended. Enjoy using our app!')
+    //     this.enableCheckPermission();
+    //   })
+    // })
+  }
+  /**Put in the last step html element (done)="finishTour()" */
   ngAfterViewInit() {
     console.log(this.sharedData.checkPermissionDone)
+    this.platform.ready().then(() => {
+      this.storage.get('tourl').then((value) => {
+        if (!value) {
+          //this.startTour();
+        }
+        else {
+          this.sharedData.tour_enabled = false;
+          this.enableCheckPermission();
+        }
+      })
+    })
+  }
+  enableCheckPermission() {
     if (!this.sharedData.checkPermissionDone)
       this.sharedData.presentLoading('Checking permission...').then(() => {
         this.sharedData.enableAllPermission().then(() => {
