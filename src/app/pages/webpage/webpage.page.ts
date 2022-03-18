@@ -10,7 +10,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class WebpagePage implements OnInit {
   urlSafe;
   constructor(public sanitizier: DomSanitizer) {
-    this.urlSafe=this.sanitizier.bypassSecurityTrustResourceUrl('https://www.gazzetta.it/');
+    this.urlSafe=this.sanitizier.bypassSecurityTrustResourceUrl('https://www.snap4city.org/707');
   }
 
   ngOnInit() {
