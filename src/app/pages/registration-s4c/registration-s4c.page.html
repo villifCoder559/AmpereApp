@@ -1,0 +1,37 @@
+<ion-header #content>
+  <mat-toolbar class="toolbar">
+    <div class="toolbar_content">
+      <button mat-icon-button routerLink="/login" class="go_back_button">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <span>Registration</span>
+      <div class="fake-icon"></div>
+    </div>
+  </mat-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="content">
+    <form id="registration" [formGroup]="registrationGroup">
+      <div class="form">
+        <mat-form-field appearance="fill">
+          <mat-label>Name</mat-label>
+          <input matInput required formControlName="name" placeholder="Name">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input type="email" matInput required formControlName="email" placeholder="example@mail.com">
+        </mat-form-field>
+      </div>
+    </form>
+    <div class="list-checkbox">
+      <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.termsOfUseCheckbox"></mat-checkbox><a
+        (click)="openPage('https://www.snap4city.org/drupal/legal')">Accept terms of use</a></div>
+      <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.privacyPolicyCheckbox"></mat-checkbox><a
+        (click)="openPage('https://www.snap4city.org/drupal/node/49')">Accept privacy policy</a></div>
+      <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.cookiesPolicyCheckbox"></mat-checkbox><a
+        (click)="openPage('https://www.snap4city.org/drupal/node/48')">Accept cookies policy</a></div> 
+      <button class="buttonSIgnIn" mat-raised-button (click)="sendRegistration()">Sign in</button>
+    </div>
+  </div>
+</ion-content>

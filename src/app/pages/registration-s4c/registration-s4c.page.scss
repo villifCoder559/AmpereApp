@@ -1,0 +1,29 @@
+#registration{
+    width: 80%;
+}
+.buttonSIgnIn{
+    margin-top: 20px;
+}
+.content{
+    height:100%;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.form{
+    display: flex;
+    flex-direction: column;
+}
+.list-checkbox{
+    display: flex;
+    flex-direction: column;
+}
+.row{
+    flex-direction: row;
+    padding: 5px;
+}
+mat-checkbox{
+    padding-right: 10px;
+}
