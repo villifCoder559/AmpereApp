@@ -1,0 +1,41 @@
+<ion-content>
+  <swiper #swiper>
+    <ng-template swiperSlide>
+      <div class="content-slide">
+        <img class="image" src="assets/images/icon_app.png" />
+        <h1>Welcome</h1>
+        <h3>This app is for those who want to feel safe at all times, if you are in trouble you can keep press
+          the charm to send an S.O.S. with your location
+        </h3>
+      </div>
+    </ng-template>
+    <ng-template swiperSlide>
+      <div class="content-slide">
+        <img class="image" src="assets/images/operator.jpg" />
+        <h1>How it works</h1>
+        <h3>During the registartion you can insert up to 5 contats and in an emergency case, if you have a subscription, the operator will call
+          all contacts setted during registration,
+          operator can also call some public emergency numbers if you have enabled it in the registration phase.
+        </h3>
+      </div>
+    </ng-template>
+    <ng-template swiperSlide>
+      <div class="content-slide">
+        <img class="image" src="assets/images/star.png"/>
+        <h1>Other features</h1>
+        <h3>If you usually forget how to take a medicine you can ask for a tag or a QRCode and simple scanning it you can see
+          in the app all the procedure.
+          In general you can personalize the code and see what you want
+        </h3>
+      </div>
+    </ng-template>
+    <ng-template swiperSlide>
+      <div class="content-slide">
+        <img class="image" src="assets/images/join.png"/>
+        <h1>Ready to join?</h1>
+        <h3>You can sign up for free trial without subscription, but remember that in this case your alerts will be rejected!</h3>
+      </div>
+      <button mat-raised-button (click)="goToLoginPage()">Start using the app</button>
+    </ng-template>
+  </swiper>
+</ion-content>

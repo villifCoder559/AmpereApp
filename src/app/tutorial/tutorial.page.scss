@@ -1,0 +1,36 @@
+swiper{
+    height: 100%;
+}
+.image{
+    height: 256px;
+    width: 256px;
+    padding-bottom: 40px;
+}
+.swiper-container{
+    width: 100%;
+    height: 100%;
+}
+.swiper-slide{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height:100%;
+}
+.content-slide{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    align-items: center;
+    text-align: center;
+}
+.content-slidel h1{
+    margin-bottom: 5px;
+}
+button{
+    padding-top: 20px;
+}
+h1{
+    font-weight: bold;
+}
