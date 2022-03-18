@@ -249,41 +249,6 @@ export class SignupPage implements OnInit {
     })
 
   }
-  openBeaconDialog() {
-    //this.shared_data.user_data.paired_devices[0] == null || this.shared_data.user_data.paired_devices[1] == null
-    console.log(this.shared_data.user_data.paired_devices)
-    if (this.shared_data.user_data.paired_devices.length < 2) {
-      const dialogRef = this.dialog.open(DialogScanBluetoothComponent, {
-        maxWidth: '90vw',
-        minWidth: '40vw',
-        data: { result: '' }
-      })
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result != '' && result !== undefined)
-          this.addPairedDeviceANDregister(result);
-      }, err => (console.log(err)));
-    }
-    else
-      this.shared_data.createToast('You have already paired 2 devices!');
-  };
-  addPairedDeviceANDregister(device) {
-    var indexOf = this.shared_data.user_data.paired_devices.indexOf(device);
-    this.shared_data.user_data.paired_devices.push(device);
-    console.log(this.shared_data.user_data.paired_devices.length)
-    if (indexOf == -1) {
-      alert('Properly connected')
-      if (this.authService.isAuthenticated.getValue())
-        this.saveUserProfile().then(() => {
-          this.shared_data.setNameDevice(device, device);
-          this.shared_data.createToast('Data saved succesfully')
-        }, err => {
-          alert(err)
-          this.shared_data.createToast('Recovery old data')
-        })
-    }
-    else
-      alert('Device already registred')
-  }
   click_next() {
     if (this.shared_data.user_data.emergency_contacts.length > 0)
       this.stepper.next()
@@ -294,31 +259,31 @@ export class SignupPage implements OnInit {
     this.tooltip.show();
     interval(4000).subscribe(() => { this.tooltip.hide(); })
   }
-  delete(device, index) {
-    console.log('delete pos ' + index + " -> " + device.uuid)
-    var a = $('#device' + index).hide(400, () => {
-      //var data_to_send = this.NGSIv2QUERY.getEmergencyContactsToSend(newContacts);
-      var el_deleted = this.shared_data.user_data.paired_devices.splice(index, 1);
-      this.changeDetection.detectChanges()
-      console.log(this.shared_data.user_data.paired_devices)
-      //this.bluetoothservice.disableRegion(deviceDeleted)
-      if (this.authService.isAuthenticated.getValue())
-        this.saveUserProfile().then(() => {
-          this.shared_data.deleteDeviceFromLocalStorage(el_deleted, StorageNameType.DEVICES);
-          this.shared_data.createToast('Data saved succesfully')
-        }, err => {
-          //alert(err)
-          console.log(this.shared_data.user_data)
-          this.shared_data.createToast('Error ' + 'Recovery old data')
-          this.shared_data.old_user_data.copyFrom(this.shared_data.user_data)
-          this.changeDetection.detectChanges()
-        })
-      //.then(()=>{ alert('Successfully updated)},err=>aler('Update error' + err))
-      //this.shared_data.user_data.paired_devices[index] = null;
-      //this.shared_data.saveData();
-      console.log(this.shared_data.user_data.paired_devices)
-    })
-  }
+  // delete(device, index) {
+  //   console.log('delete pos ' + index + " -> " + device.uuid)
+  //   var a = $('#device' + index).hide(400, () => {
+  //     //var data_to_send = this.NGSIv2QUERY.getEmergencyContactsToSend(newContacts);
+  //     var el_deleted = this.shared_data.user_data.paired_devices.splice(index, 1);
+  //     this.changeDetection.detectChanges()
+  //     console.log(this.shared_data.user_data.paired_devices)
+  //     //this.bluetoothservice.disableRegion(deviceDeleted)
+  //     if (this.authService.isAuthenticated.getValue())
+  //       this.saveUserProfile().then(() => {
+  //         this.shared_data.deleteDeviceFromLocalStorage(el_deleted, StorageNameType.DEVICES);
+  //         this.shared_data.createToast('Data saved succesfully')
+  //       }, err => {
+  //         //alert(err)
+  //         console.log(this.shared_data.user_data)
+  //         this.shared_data.createToast('Error ' + 'Recovery old data')
+  //         this.shared_data.old_user_data.copyFrom(this.shared_data.user_data)
+  //         this.changeDetection.detectChanges()
+  //       })
+  //     //.then(()=>{ alert('Successfully updated)},err=>aler('Update error' + err))
+  //     //this.shared_data.user_data.paired_devices[index] = null;
+  //     //this.shared_data.saveData();
+  //     console.log(this.shared_data.user_data.paired_devices)
+  //   })
+  // }
   getUserFromFormGroup() {
     var error = this.findErrorsAllFormsGroup()
     if (!error)
@@ -333,7 +298,7 @@ export class SignupPage implements OnInit {
           }
           case 'public_emergency_contacts': {
             Object.keys(this.shared_data.user_data[element]).forEach((number) => {
-              console.log(number)
+              console.log(typeof (number))
               console.log(this.shared_data.user_data[element][number])
               this.shared_data.user_data[element][number] = this.fourthFormGroup.get(number)?.value;
             })
@@ -347,6 +312,10 @@ export class SignupPage implements OnInit {
             break;
           }
           default:
+            if (this.shared_data.user_data[element] === 'phoneNumber'){
+              console.log(this.shared_data.user_data[element])
+              console.log(typeof (this.shared_data.user_data[element]))
+            }
             this.shared_data.user_data[element] = this.firstFormGroup.get(element)?.value
         }
       })
@@ -426,7 +395,7 @@ export class SignupPage implements OnInit {
     this.geoLocation.getCurrentPosition().then((position) => {
       this.lat = position.coords.latitude;
       this.lon = position.coords.longitude;
-    },err=>{console.log(err)})
+    }, err => { console.log(err) })
   }
   lat = 43.7;
   lon = 11.2;
@@ -520,24 +489,24 @@ export class SignupPage implements OnInit {
 
     }
   }
-  modifyNameDevice(i) {
-    const dialogRef = this.dialog.open(DialogModifyNameComponent, {
-      maxWidth: '90vw',
-      minWidth: '40vw',
-      panelClass: 'custom-dialog-container',
-      data: {
-        id: this.shared_data.user_data.paired_devices[i],
-        name: '',
-      }
-    })
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
-      this.shared_data.setNameDevice(result.value.id, StorageNameType.DEVICES, result.value.name);
-      const slidingItem = document.getElementById('slidingItem' + i) as any;
-      slidingItem.close();
-      this.changeDetection.detectChanges();
-    });
-  }
+  // modifyNameDevice(i) {
+  //   const dialogRef = this.dialog.open(DialogModifyNameComponent, {
+  //     maxWidth: '90vw',
+  //     minWidth: '40vw',
+  //     panelClass: 'custom-dialog-container',
+  //     data: {
+  //       id: this.shared_data.user_data.paired_devices[i],
+  //       name: '',
+  //     }
+  //   })
+  //   dialogRef.afterClosed().subscribe(result => {
+  //     console.log(result)
+  //     this.shared_data.setNameDevice(result.value.id, StorageNameType.DEVICES, result.value.name);
+  //     const slidingItem = document.getElementById('slidingItem' + i) as any;
+  //     slidingItem.close();
+  //     this.changeDetection.detectChanges();
+  //   });
+  // }
 }
 export class SpecialCharValidator {
   static specialCharValidator(control: FormControl): { [key: string]: boolean } {
