@@ -26,10 +26,6 @@ export class SendAuthService {
         console.log('Stop BACKGROUND_FETCH')
         BackgroundFetch.stop()
       }
-      //this.checkAndRequestValidToken()
-      // Required: Signal completion of your task to native code
-      // If you fail to do this, the OS can terminate your app
-      // or assign battery-blame for consuming too much background-time
       BackgroundFetch.finish(taskId);
     };
 
@@ -39,12 +35,17 @@ export class SendAuthService {
       console.log('[BackgroundFetch] TIMEOUT: ', taskId);
       BackgroundFetch.finish(taskId);
     };
-    // Configure the plugin.
     let status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEvent, onTimeout);
     console.log('[BackgroundFetch] configure, status: ', status);
   }
-
   startSendingValidStatus() {
     this.platform.ready().then(this.onDeviceReady.bind(this))
+  }
+  saveUserProfile() {
+    return new Promise((resolve, reject) => {
+      this.ngsi.sendUserProfile().then(() => {
+        resolve(true)
+      }, err => reject(err))
+    })
   }
 }
