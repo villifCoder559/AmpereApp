@@ -14,14 +14,15 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 import { BackgroundGeolocation} from '@awesome-cordova-plugins/background-geolocation/ngx'
-
+import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
     HomepagePageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    TourMatMenuModule
   ],
   declarations: [HomepagePage],
   providers: [

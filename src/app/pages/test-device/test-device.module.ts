@@ -8,14 +8,15 @@ import { TestDevicePageRoutingModule } from './test-device-routing.module';
 
 import { TestDevicePage } from './test-device.page';
 import { MaterialModule } from '../../material-module'
-
+import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
     TestDevicePageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    TourMatMenuModule
   ],
   declarations: [TestDevicePage]
 })

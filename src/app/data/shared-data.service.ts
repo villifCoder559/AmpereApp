@@ -16,6 +16,7 @@ import { Device } from '@awesome-cordova-plugins/device/ngx'
 import { BehaviorSubject } from 'rxjs';
 import { BLE } from '@ionic-native/ble/ngx';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
+import { TourService } from 'ngx-ui-tour-md-menu';
 
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
@@ -225,6 +226,7 @@ export class QRNFCEvent {
 })
 export class SharedDataService {
   /**List of StorageNameType */
+  tour_enabled=false;
   readonly MAX_NFCs = 4;
   readonly MAX_QRs = 4;
   readonly MAX_EMERGENCY_CONTACTs = 5;
@@ -235,7 +237,7 @@ export class SharedDataService {
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   enabled_test_battery_mode = new BehaviorSubject(false);
-  constructor(private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private tour: TourService,private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.storage.create();
       console.log('StorageNameType')
@@ -282,11 +284,16 @@ export class SharedDataService {
   }
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
-    this.backgroundMode.configure({text:'Ampere is working'})
+    //this.backgroundMode.configure({text:'Ampere is working'})
     this.backgroundMode.enable();
     this.backgroundMode.disableWebViewOptimizations();
     this.backgroundMode.disableBatteryOptimizations();
+    //this.backgroundMode.excludeFromTaskList();
     this.backgroundMode.on('activate').subscribe(() => {
+      if(this.tour.getStatus()!=0){
+        this.tour.end();
+        this.tour_enabled=false;
+      }
       console.log('ActivateBackground')
       this.checkPermissionDone=false;
       if (this.enabled_test_battery_mode.getValue())
