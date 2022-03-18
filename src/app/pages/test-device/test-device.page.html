@@ -6,7 +6,7 @@
       </ion-buttons>
       <span>Devices Status</span>
       <button mat-icon-button style="font-size: 23px;" (click)="go_to_deviceSettings()">
-        <ion-icon name="settings"></ion-icon>
+        <div class="fake-icon"></div>
       </button>
     </div>
   </mat-toolbar>
@@ -14,21 +14,45 @@
 
 <ion-content>
   <div class="content">
-    <div class="reader">
-      <mat-card>
-        <ion-list *ngFor="let device of this.shared_data.user_data.paired_devices;let i=index"
-          style="padding: 0px; display: flex;">
-          <ion-item class="ion-no-padding" style="padding-left: 15px; background-color: #fff; display: flex;"
-            *ngIf="device.name!=''">
-            <ion-label style="background-color: white; margin: 0px;">
-              <h2>{{this.shared_data?.localStorage[StorageNameType.DEVICES][i]?.name ||
-                this.shared_data.user_data?.paired_devices[i]}}</h2>
-            </ion-label>
-          </ion-item>
-        </ion-list>
+    <!-- <div class="reader"> -->
+      <mat-card tourAnchor="Pairing" appearance="fill" id="bluetooth">
+        <mat-card-title class="mat-title">Pairing</mat-card-title>
+        <mat-card-subtitle class="mat-subtitle">Keep press your smart jewerly and then press the button below to pair it with the app (swipe
+          to
+          delete device or edit the name)
+        </mat-card-subtitle>
+        <mat-card-content>
+          <button mat-fab color="primary" (click)="openBeaconDialog()">
+            <mat-icon>bluetooth</mat-icon> 
+          </button>
+          <ion-list *ngFor="let device of this.shared_data.user_data.paired_devices;let i=index;">
+            <ion-item-sliding *ngIf="device?.id != '-1'" id="slidingItem{{i}}">
+              <ion-item class="ion-no-padding" class="bluetooth_item" id="device{{i}}">
+                <ion-label class="label_bluetooth_item">
+                  <h2>{{this.shared_data?.localStorage[StorageNameType.DEVICES][i]?.name ||
+                    this.shared_data.user_data?.paired_devices[i]}}</h2>
+                </ion-label>
+              </ion-item>
+              <ion-item-options side="end" (ionSwipe)="delete(device,i)" class="bluetooth_item_options">
+                <ion-item-option color="primary" (click)="modifyNameDevice(i)" expandable class="bluetooth_item_option">
+                  <div>
+                    <ion-icon name="cog" class="trash_icon"></ion-icon>
+                    <p>Modify</p>
+                  </div>
+                </ion-item-option>
+                <ion-item-option color="danger" (click)="delete(device,i)" expandable class="bluetooth_item_option">
+                  <div>
+                    <ion-icon name="trash-outline" class="trash_icon"></ion-icon>
+                    <p>Delete</p>
+                  </div>
+                </ion-item-option>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ion-list>
+        </mat-card-content>
       </mat-card>
       <div class="div_battery">
-        <button mat-raised-button id='batteryButton' (click)="testBattery()">Test Battery</button>
+        <button tourAnchor="Battery" mat-raised-button id='batteryButton' (click)="testBattery()">Test Battery</button>
       </div>
       <div style="padding-top: 50px; display: none;" id="testDeviceCard">
         <mat-card style="border-radius: 25px; border: outset">
@@ -41,6 +65,8 @@
           </mat-card-content>
         </mat-card>
       </div>
-    </div>
+    <!-- </div> -->
   </div>
+  <div class="centered-tour-element" tourAnchor="test-device"></div>
 </ion-content>
+<tour-step-template></tour-step-template>
