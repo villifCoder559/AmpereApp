@@ -9,4 +9,17 @@ mat-card{
 .div_battery{
     display: flex;
     justify-content: center;
+    padding-top: 5px;
+}
+.content{
+    flex-direction: column;
+    padding: 0px 30px;
+    padding-top: 10px;
+}
+.mat-title{
+    text-align-last: center;
+    padding: 10px 0px;
+}
+.mat-subtitle{
+    padding: 5px 15px;
 }
