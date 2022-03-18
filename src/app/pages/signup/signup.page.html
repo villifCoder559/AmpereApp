@@ -118,7 +118,7 @@
           </div>
           <div class="tablet_view" style="justify-content: center;">
             <button mat-button matStepperPrevious>Back</button>
-            <button mat-button matStepperNext >Next</button>
+            <button mat-button matStepperNext>Next</button>
           </div>
         </form>
       </ng-template>
@@ -156,7 +156,7 @@
         </form>
       </ng-template>
     </mat-step>
-    <mat-step >
+    <mat-step>
       <ng-template matStepLabel>Emergency Contacts</ng-template>
       <ng-template matStepContent>
         <div id="emergency_contacts">
@@ -234,18 +234,20 @@
           </div>
           <div class="tablet_view" style="justify-content: center;">
             <button mat-button matStepperPrevious>Back</button>
-            <button mat-button matStepperNext>Next</button>
+            <button *ngIf="!this.authService.isAuthenticated.getValue()" mat-button
+              (click)="register_user()">Register</button>
+            <button *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">Done</button>
           </div>
         </form>
       </ng-template>
     </mat-step>
 
-    <mat-step>
+    <!-- <mat-step>
       <ng-template matStepLabel>Smart devices</ng-template>
-      <!-- <ng-template matStepContent> -->
       <mat-card appearance="fill" id="bluetooth">
         <mat-card-title>Pairing</mat-card-title>
-        <mat-card-subtitle>Keep press your smart jewerly and then press the button below to pair it with the app (swipe to
+        <mat-card-subtitle>Keep press your smart jewerly and then press the button below to pair it with the app (swipe
+          to
           delete device)
         </mat-card-subtitle>
         <mat-card-content>
@@ -278,14 +280,7 @@
           </ion-list>
         </mat-card-content>
       </mat-card>
-      <div class="tablet_view" style="justify-content: center;">
-        <button mat-button matStepperPrevious>Back</button>
-        <button *ngIf="!this.authService.isAuthenticated.getValue()" mat-button
-          (click)="register_user()">Register</button>
-        <button *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">Done</button>
+    </mat-step> -->
 
-      </div>
-      <!-- </ng-template> -->
-    </mat-step>
   </mat-stepper>
 </ion-content>
