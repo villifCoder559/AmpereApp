@@ -33,93 +33,15 @@ export class HomepagePage implements OnInit {
 
   }
   startTour() {
-    this.sharedData.tour_enabled = true;
-    this.tour.initialize([{
-      anchorId: 'QR',
-      content: 'QR content',
-      title: 'QR title',
-      enableBackdrop: true
-    }, {
-      anchorId: 'NFC',
-      content: 'NFC content',
-      title: 'NFC title',
-      enableBackdrop: true
-    }, {
-      anchorId: 'Emergency',
-      content: 'Emergency content',
-      title: 'Emergency title',
-      enableBackdrop: true
-    }, {
-      anchorId: 'Profile',
-      content: 'Profile content',
-      title: 'Profile title',
-      enableBackdrop: true,
-    }, {
-      anchorId: 'FAQ',
-      content: 'FAQ content',
-      title: 'FAQ title',
-      enableBackdrop: true,
-      route: 'profile/menu/homepage',
-    }, {
-      anchorId: 'Menu',
-      content: 'Menu content',
-      title: 'Menu title',
-      route: 'profile/menu/homepage',
-      enableBackdrop: true,
-    }, {
-      anchorId: 'show-alert',
-      content: 'AlertPage button',
-      title: 'Alert title',
-      route: 'show-alert',
-      enableBackdrop: true,
-    }, {
-      anchorId: 'Immediate',
-      content: 'Immediate button',
-      title: 'Immediate title',
-      route: 'show-alert',
-      enableBackdrop: true,
-    }, {
-      anchorId: 'Pin',
-      content: 'Pin box',
-      title: 'Pin title',
-      route: 'show-alert',
-      enableBackdrop: true,
-    }, {
-      anchorId: 'test-device',
-      content: 'Page content',
-      title: 'Page title',
-      route: '/profile/menu/test-device'
-    }, {
-      anchorId: 'Pairing',
-      content: 'Pairing content',
-      title: 'Pairing title',
-      enableBackdrop: true,
-      route: '/profile/menu/test-device',
-    }, {
-      anchorId: 'Battery',
-      content: 'Battery content',
-      title: 'Battery title',
-      enableBackdrop: true,
-      route: '/profile/menu/test-device',
-    }])
-    this.tour.start();
-    // this.tour.end$.subscribe(() => {
-    //   this.sharedData.tour_enabled = false;
-    //   this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true });
-    //   this.storage.set('tour', true).then(async () => {
-    //     this.sharedData.createToast('Tour ended. Enjoy using our app!')
-    //     this.enableCheckPermission();
-    //   })
-    // })
+    this.sharedData.startTour();
   }
   /**Put in the last step html element (done)="finishTour()" */
   ngAfterViewInit() {
-    console.log(this.sharedData.checkPermissionDone)
+    console.log(this.sharedData.checkPermissionAlreadyMake)
     this.platform.ready().then(() => {
-      this.storage.get('tourl').then((value) => {
-        if (!value) {
-          //this.startTour();
-        }
+      this.storage.get('tour').then((value) => {
+        if (!value && !this.sharedData.tour_enabled) 
+          this.startTour();
         else {
           this.sharedData.tour_enabled = false;
           this.enableCheckPermission();
@@ -128,11 +50,11 @@ export class HomepagePage implements OnInit {
     })
   }
   enableCheckPermission() {
-    if (!this.sharedData.checkPermissionDone)
+    if (!this.sharedData.checkPermissionAlreadyMake)
       this.sharedData.presentLoading('Checking permission...').then(() => {
         this.sharedData.enableAllPermission().then(() => {
-          this.sharedData.checkPermissionDone = true;
-          console.log(this.sharedData.checkPermissionDone)
+          this.sharedData.checkPermissionAlreadyMake = true;
+          console.log(this.sharedData.checkPermissionAlreadyMake)
         }, err => console.log(err))
       }, err => console.log(err))
   }
