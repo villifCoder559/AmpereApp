@@ -21,7 +21,7 @@
     <preference name="LottieAutoHideSplashScreen" value="true" />
     <preference name="LottieFullScreen" value="true" />
     <preference name="LottieLoopAnimation" value="true" />
-    <preference name="LottieBackgroundColor" value="#000" />
+    <preference name="LottieBackgroundColor" value="#fff" />
     <preference name="AndroidXEnabled" value="true" />
     <preference name="GradlePluginKotlinEnabled" value="true" />
     <preference name="GradlePluginKotlinCodeStyle" value="official" />
