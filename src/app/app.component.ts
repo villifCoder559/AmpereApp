@@ -17,7 +17,7 @@ export class SafePipe implements PipeTransform {
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(private platform:Platform,private lottieSplashScreen:LottieSplashScreen) {
+  constructor() {
   }
 
 }
