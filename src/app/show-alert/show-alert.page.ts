@@ -36,18 +36,23 @@ export class ShowAlertPage implements OnInit {
     activitiesInterval: 1500
   };
   constructor(private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, public shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
-    this.localNotifications.schedule({
-      id: 1,
-      text: 'Emergency notification, click to open and insert PIN to disable alert or click again to send emergency immediatly',
-      data: ""
-    });
-    this.backgroundGeolocation.configure(this.configGeolocation).then(() => {
-      console.log('Starting geolocation background...')
-      this.backgroundGeolocation.start();
-    })
+    if (!this.shared_data.enabled_test_battery_mode && !this.shared_data.tour_enabled) {
+      this.localNotifications.schedule({
+        id: 1,
+        text: 'Emergency notification, click to open and insert PIN to disable alert or click again to send emergency immediatly',
+        data: ""
+      });
+      this.backgroundGeolocation.configure(this.configGeolocation).then(() => {
+        console.log('Starting geolocation background...')
+        this.backgroundGeolocation.start();
+      })
+    }
   }
   ngAfterViewInit() {
     console.log(this.shared_data.enabled_test_battery_mode.getValue())
+    if (this.shared_data.tour_enabled) {
+      this.countdown.stop();
+    }
     if (this.shared_data.enabled_test_battery_mode.getValue()) {
       this.details_emergency.status = 'testBattery'
       this.details_emergency.evolution = 'finish'
@@ -60,6 +65,7 @@ export class ShowAlertPage implements OnInit {
   }
   ngOnInit() {
     this.details_emergency.deviceID = this.router.getCurrentNavigation().extras?.state?.deviceID;
+
   }
 
   immediateEmergency() {
