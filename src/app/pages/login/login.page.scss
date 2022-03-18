@@ -3,7 +3,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #000;
+    flex-direction: column;
+    background-color: #fff;
 }
 .button{
     display: flex;
@@ -13,6 +14,7 @@
     padding-left: 15px;
     display: flex;
     align-self: center;
+    color:#000;
 }
 .insideLoginButton{
     display: flex;
