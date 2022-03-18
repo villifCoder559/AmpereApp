@@ -232,7 +232,7 @@ export class SharedDataService {
   readonly MAX_EMERGENCY_CONTACTs = 5;
   readonly MAX_DEVICEs = 2;
   public accessToken;
-  checkPermissionDone=false;
+  checkPermissionAlreadyMake=false;
   localStorage = {}
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
@@ -295,7 +295,7 @@ export class SharedDataService {
         this.tour_enabled=false;
       }
       console.log('ActivateBackground')
-      this.checkPermissionDone=false;
+      this.checkPermissionAlreadyMake=false;
       if (this.enabled_test_battery_mode.getValue())
         this.enabled_test_battery_mode.next(false)
     })
@@ -593,5 +593,86 @@ export class SharedDataService {
       );
     })
   }
-
+  startTour() {
+    this.tour_enabled = true;
+    this.tour.initialize([{
+      anchorId: 'QR',
+      title: 'QR button',
+      content: 'You can open a page where you can see a list of your QRs and scan one of it',
+      enableBackdrop: true,
+      route: 'profile/menu/homepage'
+    }, {
+      anchorId: 'NFC',
+      title: 'NFC button',
+      content: 'You can open a page where you can see a list of your NFC-tags and scan one of it',
+      enableBackdrop: true
+    }, {
+      anchorId: 'Emergency',
+      title: 'Emergency button',
+      content: 'You can send an emergency directly from the app without using the charm',
+      enableBackdrop: true
+    }, {
+      anchorId: 'Profile',
+      title: 'Profile button',
+      content: 'Clicking this button you can modify your personal informations',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'FAQ',
+      title: 'FAQ',
+      content: 'A collection of the most frequantly asked question, so if you have a doubt check it',
+      enableBackdrop: true,
+      route: 'profile/menu/homepage',
+    }, {
+      anchorId: 'Menu',
+      title: 'Menu symbol',
+      content: 'You can visit other sections by clicking it',
+      route: 'profile/menu/homepage',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'show-alert',
+      title: 'AlertPage',
+      content: 'This is the page when you send an emergency alert',
+      route: 'show-alert',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'Immediate',
+      title: 'Immediate button',
+      content: 'Clicking it you can send immidiately the emergency, without waiting 20 seconds',
+      route: 'show-alert',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'Pin',
+      title: 'Pin Boxs',
+      content: 'If you insert the PIN that you chose in registration you will not send the alert',
+      route: 'show-alert',
+      enableBackdrop: true,
+    }, {
+      anchorId: 'test-device',
+      title: 'Devise Page',
+      content: 'Selection this page from menu, you can manage all of yours charms ',
+      route: '/profile/menu/test-device'
+    }, {
+      anchorId: 'Pairing',
+      title: 'Pairing',
+      content: 'In this section you can pair a bluetooth device',
+      enableBackdrop: true,
+      route: '/profile/menu/test-device',
+    }, {
+      anchorId: 'Battery',
+      title: 'Battery Test',
+      content: 'You can check if your charm is still working. Make a test at least once per month ',
+      enableBackdrop: true,
+      route: '/profile/menu/test-device',
+    }])
+    this.tour.start();
+    this.tour.end$.subscribe(() => {
+      this.tour_enabled = false;
+      this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true });
+      this.storage.set('tour', true).then(async () => {
+        this.createToast('Tour ended. Enjoy using our app!')
+        this.enableAllPermission();
+        this.checkPermissionAlreadyMake=true;
+      })
+    })
+  }
 }
