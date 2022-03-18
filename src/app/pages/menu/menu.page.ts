@@ -22,13 +22,13 @@ export class MenuPage implements OnInit {
       icon: 'people',
     },
     {
-      title: 'Webpage',
+      title: 'Ampere',
       url: '/profile/menu/webpage',
       icon: 'earth',
     },
     {
       title: 'Devices Status',
-      url: '/profile/menu/testAlert',
+      url: '/profile/menu/test-device',
       icon: 'phone-portrait',
     },
     {
