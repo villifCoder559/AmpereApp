@@ -35,12 +35,14 @@ import {AndroidPermissions} from '@awesome-cordova-plugins/android-permissions/n
 import {ForegroundService} from '@awesome-cordova-plugins/foreground-service/ngx'
 import {HTTP} from '@awesome-cordova-plugins/http/ngx'
 import { LottieSplashScreen } from '@awesome-cordova-plugins/lottie-splash-screen/ngx';
-
+import { SwiperModule } from 'swiper/angular'
+import { Network } from '@awesome-cordova-plugins/network/ngx'
+import {TourMatMenuModule,TourService} from 'ngx-ui-tour-md-menu'
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,FormsModule,
-            IonicModule.forRoot(), AppRoutingModule,HttpClientModule,MaterialModule,IonicStorageModule.forRoot()
+  imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,FormsModule,SwiperModule,
+            IonicModule.forRoot(),TourMatMenuModule.forRoot() ,AppRoutingModule,HttpClientModule,MaterialModule,IonicStorageModule.forRoot()
             ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     Contacts,
@@ -65,7 +67,10 @@ import { LottieSplashScreen } from '@awesome-cordova-plugins/lottie-splash-scree
     BackgroundFetch,
     Device,
     ForegroundService,
-    LottieSplashScreen
+    LottieSplashScreen,
+    Storage,
+    Network,
+    TourService
   ],
   bootstrap: [AppComponent],
 })
