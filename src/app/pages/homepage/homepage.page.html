@@ -2,19 +2,30 @@
   <mat-toolbar class="toolbar">
     <div class="toolbar_content">
       <ion-buttons slot="start">
-        <ion-menu-button></ion-menu-button>
+        <ion-menu-button tourAnchor="Menu" #menu></ion-menu-button>
       </ion-buttons>
       <span>Homepage</span>
       <div class="fake-icon"></div>
     </div>
   </mat-toolbar>
 </ion-header>
-
+<ng-template #prevButton>
+  <button mat-raised-button>Go back!</button>
+</ng-template>
+<ng-template #nextButton>
+  <button mat-raised-button>Go ahead!</button>
+</ng-template>
+<ng-template #doneButton>
+  <button mat-raised-button>Complete</button>
+</ng-template>
+<ng-template #counter let-step="step" let-total="total">
+  {{ step }} of {{ total }} steps
+</ng-template>
 <ion-content>
   <mat-grid-list cols="2" rowHeight='33%'>
-    <div class="homepage_content">
+    <div class="homepage_content" >
       <mat-grid-tile  [colspan]="1" [rowspan]="1">
-        <button id="QR" mat-raised-button class="buttons" routerLink="/profile/menu/read-qr">
+        <button tourAnchor="QR" mat-raised-button class="buttons" routerLink="/profile/menu/read-qr">
           <div class="homepage_button_content">
             <mat-icon>qr_code_2</mat-icon>
             <h3>QR</h3>
@@ -22,7 +33,7 @@
         </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1">
-        <button mat-raised-button class="buttons" routerLink="/profile/menu/read-nfc">
+        <button tourAnchor="NFC" mat-raised-button class="buttons" routerLink="/profile/menu/read-nfc">
           <div class="homepage_button_content">
             <mat-icon>nfc</mat-icon>
             <h3>NFC</h3>
@@ -30,7 +41,7 @@
         </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="2" [rowspan]="1">
-        <button id="emergency" mat-raised-button class="buttons" (click)="openAlertPage()">
+        <button tourAnchor="Emergency" id="emergency" mat-raised-button class="buttons" (click)="openAlertPage()">
           <div class="homepage_button_content">
             <mat-icon>notifications</mat-icon>
             <h3>Emergency</h3>
@@ -38,7 +49,7 @@
         </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1">
-        <button mat-raised-button class="buttons" routerLink="/profile/menu/profile">
+        <button tourAnchor="Profile" mat-raised-button class="buttons" routerLink="/profile/menu/profile">
           <div class="homepage_button_content">
             <mat-icon>person</mat-icon>
             <h3>Profile</h3>
@@ -46,7 +57,7 @@
         </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" >
-        <button mat-raised-button class="buttons " routerLink="/profile/menu/faq">
+        <button tourAnchor="FAQ" mat-raised-button class="buttons " routerLink="/profile/menu/faq">
           <div class="homepage_button_content">
             <mat-icon>help</mat-icon>
             <h3>FAQ</h3>
@@ -55,8 +66,9 @@
       </mat-grid-tile>
     </div>
   </mat-grid-list>
-  <button mat-raised-button (click)="updateProfile()">updateProfile</button>
-  <button mat-raised-button (click)="checkANDupdateToken()">checkANDupdateToken</button>
+  <button mat-raised-button (click)="startTour()">startTour</button>
+  <!-- <button mat-raised-button (click)="updateProfile()">updateProfile</button>
+  <button mat-raised-button (click)="checkANDupdateToken()">checkANDupdateToken</button> -->
   <!-- <button mat-raised-button (click)="testEqualTo()">testEqualTo</button>
   <button mat-raised-button (click)="askPermission()">askPermission</button> 
   <button mat-raised-button (click)="checkAndroidPermission()">checkAndroidPermission</button>
@@ -64,3 +76,4 @@
   <button mat-raised-button (click)="testDeviceMotionEvent()">testDeviceMotionEvent</button>
   <button mat-raised-button (click)="backgroundGeolocationMauron()">backgroundGeolocationMauron</button> -->
 </ion-content>
+<tour-step-template></tour-step-template>
