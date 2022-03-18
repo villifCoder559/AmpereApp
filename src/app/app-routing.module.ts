@@ -33,7 +33,15 @@ const routes: Routes = [
   {
     path: 'callemergencycontacts',
     loadChildren: () => import('./pages/callemergencycontacts/callemergencycontacts.module').then( m => m.CallemergencycontactsPageModule)
+  },  {
+    path: 'registration-s4c',
+    loadChildren: () => import('./pages/registration-s4c/registration-s4c.module').then( m => m.RegistrationS4cPageModule)
+  },
+  {
+    path: 'tutorial',
+    loadChildren: () => import('./tutorial/tutorial.module').then( m => m.TutorialPageModule)
   }
+
 ];
 @NgModule({
   imports: [
