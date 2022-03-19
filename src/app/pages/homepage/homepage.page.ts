@@ -12,9 +12,6 @@ import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { SendAuthService } from 'src/app/data/send-auth.service';
 import { Storage } from '@ionic/storage-angular'
-import { MdMenuPlacement, TourService } from 'ngx-ui-tour-md-menu'
-import { MenuPositionX } from '@angular/material/menu';
-declare var cordovaHTTP: any;
 
 @Component({
   selector: 'app-homepage',
@@ -24,7 +21,7 @@ declare var cordovaHTTP: any;
 export class HomepagePage implements OnInit {
 
   gps_enable = true;
-  constructor(private tour: TourService, private alertController: AlertController, private storage: Storage, private menu: MenuController, private send: SendAuthService, private authService: AuthenticationService, private http: HttpClient, private s4c: Snap4CityService, private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private localNotifications: LocalNotifications, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient,  private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
   }
   openMenu() {
     this.menu.open();
@@ -35,7 +32,6 @@ export class HomepagePage implements OnInit {
   startTour() {
     this.sharedData.startTour();
   }
-  /**Put in the last step html element (done)="finishTour()" */
   ngAfterViewInit() {
     console.log(this.sharedData.checkPermissionAlreadyMake)
     this.platform.ready().then(() => {
@@ -120,7 +116,6 @@ export class HomepagePage implements OnInit {
     })
   }
   showAlert() {
-    //take bluetooth singal
     this.sharedData.showAlert('APP');
   }
   showLoading() {
@@ -205,8 +200,6 @@ export class HomepagePage implements OnInit {
   }
   /** From API 28 must ask about perimission ACCESS_BACKGROUND_LOCATION (android).
    *  I have to ask for currentPosition for fixing a bug on Samsung devices */
-
-
   enableWatchPosition() {
     this.geolocation.watchPosition().subscribe((data) => {
       console.log(data)
