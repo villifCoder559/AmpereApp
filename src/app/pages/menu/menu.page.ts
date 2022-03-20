@@ -17,12 +17,12 @@ export class MenuPage implements OnInit {
       icon: 'home',
     },
     {
-      title: 'Emergency contacts',
+      title: 'Call contacts',
       url: '/profile/menu/callemergencycontacts',
       icon: 'people',
     },
     {
-      title: 'Ampere',
+      title: 'Ampere Website',
       url: '/profile/menu/webpage',
       icon: 'earth',
     },
