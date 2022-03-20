@@ -30,7 +30,6 @@ import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
     Geolocation,
     AndroidPermissions,
     LocalNotifications,
-    BackgroundMode,
     BackgroundGeolocation
   ]
 })
