@@ -15,23 +15,23 @@
     <mat-expansion-panel>
       <mat-expansion-panel-header [collapsedHeight]="collapsedHeight">
         <mat-panel-title>
-          <span>Can I see the tour of the app?</span>
-        </mat-panel-title>
-      </mat-expansion-panel-header >
-      <p> Certainly, you can click the button below and start a tour.</p>
-      <div class="button">
-        <button mat-raised-button (click)="startTour()">Start a tour</button>
-      </div>
-    </mat-expansion-panel>
-    <mat-expansion-panel>
-      <mat-expansion-panel-header [collapsedHeight]="collapsedHeight">
-        <mat-panel-title>
           <span>What's the aim of this app?</span>
         </mat-panel-title>
       </mat-expansion-panel-header>
       <p> Click the button below and find out for who is designed this app</p>
       <div class="button">
-        <button class="button" mat-raised-button (click)="openTour()">Open tutorial</button>
+        <button class="button" mat-raised-button (click)="openTutorial()">Open tutorial</button>
+      </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header [collapsedHeight]="collapsedHeight">
+        <mat-panel-title>
+          <span>Can I see again the tour of the app?</span>
+        </mat-panel-title>
+      </mat-expansion-panel-header >
+      <p> Certainly, you can click the button below and start a tour.</p>
+      <div class="button">
+        <button mat-raised-button (click)="startTour()">Start a tour</button>
       </div>
     </mat-expansion-panel>
     <mat-expansion-panel>
