@@ -23,8 +23,8 @@
 </ng-template>
 <ion-content>
   <mat-grid-list cols="2" rowHeight='33%'>
-    <div class="homepage_content" >
-      <mat-grid-tile  [colspan]="1" [rowspan]="1">
+    <div class="homepage_content">
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
         <button tourAnchor="QR" mat-raised-button class="buttons" routerLink="/profile/menu/read-qr">
           <div class="homepage_button_content">
             <mat-icon>qr_code_2</mat-icon>
@@ -56,7 +56,7 @@
           </div>
         </button>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1" >
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
         <button tourAnchor="FAQ" mat-raised-button class="buttons " routerLink="/profile/menu/faq">
           <div class="homepage_button_content">
             <mat-icon>help</mat-icon>
@@ -66,6 +66,7 @@
       </mat-grid-tile>
     </div>
   </mat-grid-list>
+  <div class="centered-tour-element" tourAnchor="homepage"></div>
   <button mat-raised-button (click)="startTour()">startTour</button>
   <!-- <button mat-raised-button (click)="updateProfile()">updateProfile</button>
   <button mat-raised-button (click)="checkANDupdateToken()">checkANDupdateToken</button> -->
@@ -76,4 +77,5 @@
   <button mat-raised-button (click)="testDeviceMotionEvent()">testDeviceMotionEvent</button>
   <button mat-raised-button (click)="backgroundGeolocationMauron()">backgroundGeolocationMauron</button> -->
 </ion-content>
-<tour-step-template></tour-step-template>
+<tour-step-template>
+</tour-step-template>
