@@ -2,15 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { AlertController, IonMenuButton, MenuController, Platform } from '@ionic/angular';
 import { AlertEvent, DeviceType, Emergency_Contact, QRNFCEvent, SharedDataService, UserData } from '../../data/shared-data.service'
 import { NGSIv2QUERYService } from '../../data/ngsiv2-query.service'
-import { Snap4CityService } from '../../data/snap4-city.service'
 import { HttpClient } from '@angular/common/http';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { SendAuthService } from 'src/app/data/send-auth.service';
 import { Storage } from '@ionic/storage-angular'
 
 @Component({
@@ -21,7 +18,7 @@ import { Storage } from '@ionic/storage-angular'
 export class HomepagePage implements OnInit {
 
   gps_enable = true;
-  constructor(private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient,  private ngsi: NGSIv2QUERYService, private sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient,  private ngsi: NGSIv2QUERYService, public sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
   }
   openMenu() {
     this.menu.open();
@@ -49,6 +46,7 @@ export class HomepagePage implements OnInit {
     if (!this.sharedData.checkPermissionAlreadyMake)
       this.sharedData.presentLoading('Checking permission...').then(() => {
         this.sharedData.enableAllPermission().then(() => {
+          
           this.sharedData.checkPermissionAlreadyMake = true;
           console.log(this.sharedData.checkPermissionAlreadyMake)
         }, err => console.log(err))
