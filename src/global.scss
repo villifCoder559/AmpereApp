@@ -202,7 +202,29 @@ mat-dialog-container {
     top: 50%;
     /* The anchor should be translated to the left by half of your step width and half height  */
     /* For example, if your tour step has dimensions of 280 × 156 px, you have to translate by (-140px, -78px) */
-    transform: translate(-100px, -68px);
+    transform: translate(-140px, -78px);
+}
+.next mat-icon,.prev mat-icon{
+    height: 100%;
+    display: flex;
+}
+.next span,.prev span{
+    display: flex;
+    align-items: center;
+}
+.prev mat-icon{
+    height: auto;
+}
+.close mat-icon{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    place-items: center;
+}
+button .prev .mat-button-wrapper{
+    display: flex;
+    align-items: center;
 }
 // .backdrop-target{
 //     border-radius: 20%;
