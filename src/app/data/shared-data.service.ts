@@ -4,10 +4,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, LoadingController, Platform, ToastController } from '@ionic/angular';
-import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
+//import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
+import BackgroundMode from 'cordova-plugin-advanced-background-mode';
 // import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
-import { CountdownModule } from 'ngx-countdown';
 import { Storage } from '@ionic/storage-angular'
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
@@ -17,6 +17,7 @@ import { BehaviorSubject } from 'rxjs';
 import { BLE } from '@ionic-native/ble/ngx';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { TourService } from 'ngx-ui-tour-md-menu';
+import { ForegroundService } from '@awesome-cordova-plugins/foreground-service/ngx';
 
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
@@ -226,18 +227,18 @@ export class QRNFCEvent {
 })
 export class SharedDataService {
   /**List of StorageNameType */
-  tour_enabled=false;
+  tour_enabled = false;
   readonly MAX_NFCs = 4;
   readonly MAX_QRs = 4;
   readonly MAX_EMERGENCY_CONTACTs = 5;
   readonly MAX_DEVICEs = 2;
   public accessToken;
-  checkPermissionAlreadyMake=false;
+  checkPermissionAlreadyMake = false;
   localStorage = {}
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   enabled_test_battery_mode = new BehaviorSubject(false);
-  constructor(private tour: TourService,private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private foregroundService:ForegroundService,private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.storage.create();
       console.log('StorageNameType')
@@ -284,21 +285,35 @@ export class SharedDataService {
   }
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
-    //this.backgroundMode.configure({text:'Ampere is working'})
-    this.backgroundMode.enable();
-    this.backgroundMode.disableWebViewOptimizations();
-    this.backgroundMode.disableBatteryOptimizations();
-    //this.backgroundMode.excludeFromTaskList();
-    this.backgroundMode.on('activate').subscribe(() => {
-      if(this.tour.getStatus()!=0){
-        this.tour.end();
-        this.tour_enabled=false;
+    //Background mode from cordova-plugin-advanced-background-mode
+    BackgroundMode.enable();
+    BackgroundMode.disableWebViewOptimizations()
+    BackgroundMode.disableBatteryOptimizations();
+    BackgroundMode.overrideBackButton();
+    BackgroundMode.on('activate',()=>{
+      if (this.tourService.getStatus() != 0) {
+        this.tourService.end();
+        this.tour_enabled = false;
       }
       console.log('ActivateBackground')
-      this.checkPermissionAlreadyMake=false;
+      this.checkPermissionAlreadyMake = false;
       if (this.enabled_test_battery_mode.getValue())
         this.enabled_test_battery_mode.next(false)
     })
+    /*//Plugin background mode from @awesome
+    this.backgroundMode.enable();
+    this.backgroundMode.disableWebViewOptimizations();
+    this.backgroundMode.disableBatteryOptimizations();
+    this.backgroundMode.on('activate').subscribe(() => {
+      if (this.tour.getStatus() != 0) {
+        this.tour.end();
+        this.tour_enabled = false;
+      }
+      console.log('ActivateBackground')
+      this.checkPermissionAlreadyMake = false;
+      if (this.enabled_test_battery_mode.getValue())
+        this.enabled_test_battery_mode.next(false)
+    })*/
   }
   setNameDevice(device, type: StorageNameType, name = '') {
     var app = { id: '', name: '' };
@@ -456,21 +471,25 @@ export class SharedDataService {
     return new Promise((resolve, reject) => {
       this.androidPermissions.checkPermission("android.permission.FOREGROUND_SERVICE").then((enabled) => {
         console.log('ForegroundService')
-        if (!enabled.hasPermission)
+        if (!enabled?.hasPermission)
           this.androidPermissions.requestPermission("android.permission.FOREGROUND_SERVICE").then(() => {
+            console.log('Permission foreground')
+            this.foregroundService.start('Ampere','Detecting charm')
             resolve(true)
-          }, err => reject(err))
-        else
+          }, err => reject(err)).catch(err=>console.log(err))
+        else {
+          this.foregroundService.start('Ampere','Detecting charm')
+          console.log('Permission foreground ' + enabled?.hasPermission)
           resolve(true)
+        }
       }, err => reject(err))
     })
   }
   enableAllPermission() {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
-        this.enableAllBackgroundMode();
         console.log('enableAllPermission')
-        this.askForegroundService().then(()=>{
+        this.askForegroundService().then(() => {
           this.checkLocationEnabled().then(() => {
             this.enableBluetooth().then(() => {
               this.askGeoPermission().then(() => {
@@ -487,7 +506,8 @@ export class SharedDataService {
               }, err => { reject(err) })
             }, err => reject(err))
           }, err => reject(err + '. App can\'t work properly!'))
-        },err=>reject(err))
+        }, err => reject(err))
+        this.enableAllBackgroundMode();
       }, err => reject(err))
     })
   }
@@ -595,7 +615,14 @@ export class SharedDataService {
   }
   startTour() {
     this.tour_enabled = true;
-    this.tour.initialize([{
+    this.tourService.initialize([{
+      anchorId: 'homepage',
+      title: 'Welcome!',
+      content: 'In this tour you will explore the features of this app',
+      nextBtnTitle:'Start',
+      enableBackdrop: true,
+      route: 'profile/menu/homepage'
+    },{
       anchorId: 'QR',
       title: 'QR button',
       content: 'You can open a page where you can see a list of your QRs and scan one of it',
@@ -614,12 +641,12 @@ export class SharedDataService {
     }, {
       anchorId: 'Profile',
       title: 'Profile button',
-      content: 'Clicking this button you can modify your personal informations',
+      content: 'In this section you can modify your personal informations',
       enableBackdrop: true,
     }, {
       anchorId: 'FAQ',
       title: 'FAQ',
-      content: 'A collection of the most frequantly asked question, so if you have a doubt check it',
+      content: 'A collection of the most frequently asked question, so if you have a doubt check it',
       enableBackdrop: true,
       route: 'profile/menu/homepage',
     }, {
@@ -630,13 +657,13 @@ export class SharedDataService {
       enableBackdrop: true,
     }, {
       anchorId: 'show-alert',
-      title: 'AlertPage',
-      content: 'This is the page when you send an emergency alert',
+      title: 'Alert Page',
+      content: 'This is the page shown when you send an emergency alert',
       route: 'show-alert',
       enableBackdrop: true,
     }, {
       anchorId: 'Immediate',
-      title: 'Immediate button',
+      title: 'Fast',
       content: 'Clicking it you can send immidiately the emergency, without waiting 20 seconds',
       route: 'show-alert',
       enableBackdrop: true,
@@ -648,7 +675,7 @@ export class SharedDataService {
       enableBackdrop: true,
     }, {
       anchorId: 'test-device',
-      title: 'Devise Page',
+      title: 'Device Page',
       content: 'Selection this page from menu, you can manage all of yours charms ',
       route: '/profile/menu/test-device'
     }, {
@@ -664,14 +691,14 @@ export class SharedDataService {
       enableBackdrop: true,
       route: '/profile/menu/test-device',
     }])
-    this.tour.start();
-    this.tour.end$.subscribe(() => {
+    this.tourService.start();
+    this.tourService.end$.subscribe(() => {
       this.tour_enabled = false;
       this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true });
       this.storage.set('tour', true).then(async () => {
         this.createToast('Tour ended. Enjoy using our app!')
         this.enableAllPermission();
-        this.checkPermissionAlreadyMake=true;
+        this.checkPermissionAlreadyMake = true;
       })
     })
   }
