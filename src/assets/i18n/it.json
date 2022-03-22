@@ -1,0 +1,345 @@
+{
+  "REGISTARTION": {
+    "toolbar": {
+      "title": "Registrazione"
+    },
+    "form": {
+      "name": "Nome",
+      "email": "Email"
+    },
+    "checkbox": {
+      "terms_of_use": "Accettare i termini di utilizzo",
+      "privacy_policy": "Accetta l'informativa sulla privacy",
+      "cookies_policy": "Accetta la politica dei cookie"
+    },
+    "button": {
+      "registration": "Registrati"
+    }
+  },
+  "LOGIN": {
+    "button": {
+      "login": "Accedi con Snap4city",
+      "signup": "Non sei ancora iscritto? Iscriviti!"
+    }
+  },
+  "HOMEPAGE": {
+    "button": {
+      "emergency": "Emergenza",
+      "profile": "Profilo",
+      "FAQ": "Domande"
+    }
+  },
+  "CALL_CONTACTS": {
+    "toolbar": {
+      "title": "Contatti"
+    },
+    "form": {
+      "name": "Nome",
+      "surname": "Cognome",
+      "phone": "Numero di telefono",
+      "button": {
+        "call": "Chiama"
+      }
+    }
+  },
+  "FAQ": {
+    "0": {
+      "question": "Qual è lo scopo di questa app?",
+      "answer": "Clicca il pulsante qui sotto e scopri per chi è stata progettata questa app",
+      "button": "Aprire il tutorial"
+    },
+    "1": {
+      "question": "Posso rivedere il tour dell'app?",
+      "answer": "Certamente, puoi cliccare sul pulsante qui sotto e iniziare un tour.",
+      "button": "Iniziare un tour"
+    }
+  },
+  "MENU": {
+    "title": {
+      "call": "Contatti",
+      "device_status": "Stato dei dispositivi",
+      "terms_of_use": "Condizioni d'uso",
+      "privacy_policy": "Privacy"
+    }
+  },
+  "NFC": {
+    "toolbar": {
+      "title": "Lettore NFC",
+      "alert": "NFC non è disponibile!"
+    },
+    "card": {
+      "title": "Elenco dei tuoi NFC"
+    }
+  },
+  "QR": {
+    "toolbar": {
+      "title": "Lettore QR"
+    },
+    "card": {
+      "title": "Elenco dei tuoi QR"
+    },
+    "button": {
+      "scan": "Scannerizza il codice"
+    }
+  },
+  "SIGNUP": {
+    "toolbar": {
+      "title": {
+        "auth": "Profilo",
+        "not_auth": "Modulo di registrazione"
+      }
+    },
+    "form": {
+      "title_1": "Informazioni personali",
+      "title_2": "Informazioni mediche",
+      "button": {
+        "next": "Avanti",
+        "back": "Indietro",
+        "register": "Registrarsi",
+        "done": "Fatto"
+      },
+      "name": "Nome",
+      "surname": "Cognome",
+      "nickname": "Soprannome",
+      "email": "Email",
+      "phone": "Numero di telefono",
+      "date_of_birth": "Data di nascita",
+      "gender": {
+        "label": "Sesso",
+        "option": {
+          "male": "Maschio",
+          "female": "Femmina"
+        }
+      },
+      "height": "Altezza",
+      "weight": "Peso",
+      "ethnicity": "Etnia",
+      "hint": "Massimo 200 caratteri",
+      "description": {
+        "label": "Descrizione",
+        "placeholder": "capelli castani, occhi azzurri..."
+      },
+      "purpose": {
+        "label": "Scopo",
+        "placeholder": "Emergenza medica, sicurezza personale,..."
+      },
+      "pin": {
+        "label": "PIN",
+        "tooltip": "Utilizzare per annullare l'emergenza"
+      },
+      "native_language": "Lingua madre",
+      "address": "Indirizzo",
+      "locality": "Località",
+      "city": "Città",
+      "allergies": {
+        "label": "Allergie",
+        "placeholder": "polline, punture di insetti..."
+      },
+      "medications": {
+        "label": "Farmaci"
+      },
+      "disabilities": {
+        "label": "Disabilità",
+        "checkbox": {
+          "vision_impaired": "Vista compromessa",
+          "wheelchair": "Persona su sedia a rotelle"
+        }
+      },
+      "emergency_contact": {
+        "label": "Contatti d'emergenza",
+        "form": {
+          "title": "Contatto d'emergenza",
+          "name": "Nome",
+          "surname": "Cognome",
+          "number": "Numero"
+        },
+        "button": {
+          "add_contact": "Aggiungi contatto"
+        }
+      },
+      "public_emergency_contacts": {
+        "label": "Contatti pubblici di emergenza",
+        "form": {
+          "content": "Desidera contattare i seguenti numeri? (senza responsabilità diretta)",
+          "call_112": "Chiama il 112",
+          "call_115": "Chiama il 115",
+          "call_118": "Chiama il 118"
+        }
+      }
+    }
+  },
+  "TEST-DEVICE": {
+    "toolbar": {
+      "title": "Stato dei dispositivi"
+    },
+    "card": {
+      "pairing": {
+        "title": "Collega dispositivo",
+        "content": "Tieni premuto il tuo gioiello e poi premi il pulsante qui sotto per accoppiarlo con l'app (scorri per cancellare il dispositivo o modificare il nome)"
+      },
+      "battery": {
+        "title": "Test della batteria",
+        "content": "Rimani in questa pagina e tieni il tuo telefono e il gioiello vicino; clicca il pulsante sul gioiello e controlla se l'app invia un avviso di test."
+      }
+    }
+  },
+  "SHARED_VALUES": {
+    "option": {
+      "yes": "Sì",
+      "no": "No"
+    },
+    "modify": "Modifica",
+    "delete": "Elimina"
+  },
+  "SHOW_ALERT": {
+    "button": {
+      "immediate_emergency": "Invia immediatamente Emergenza"
+    },
+    "content": "Attivato accidentalmente? Nessun problema, inserisci il tuo PIN per annullare.<br/><br/>Per inviare un messaggio, lascia scadere il tempo o clicca sul pulsante qui sopra"
+  },
+  "TUTORIAL": {
+    "slide": {
+      "0": {
+        "title": "Benvenuto",
+        "content": "Questa applicazione è per coloro che vogliono sentirsi al sicuro in ogni momento, se sei in difficoltà puoi tenere premuto il bottone sul gioiello per inviare un S.O.S. con la tua posizione"
+      },
+      "1": {
+        "title": "Come funziona",
+        "content": "Durante la registrazione puoi inserire fino a 5 contatti e in caso di emergenza, se hai un abbonamento, l'operatore chiamerà tutti i contatti impostati durante la registrazione.L'operatore può anche chiamare alcuni numeri pubblici di emergenza se lo hai abilitato in fase di registrazione."
+      },
+      "2": {
+        "title": "Altre caratteristiche",
+        "content": "Se di solito si dimentica come prendere una medicina si può chiedere un tag o un QRCode e con una semplice scansione si può vedere nell'app tutta la procedura. In generale puoi personalizzare il codice e vedere quello che vuoi"
+      },
+      "3": {
+        "title": "Pronto per iscriverti?",
+        "content": "Puoi iscriverti alla prova gratuita senza abbonamento, ma ricorda che in questo caso i tuoi avvisi di emergenza saranno respinti!"
+      },
+      "button": "Inizia ad usare l'app"
+    }
+  },
+  "TOUR": {
+    "homepage": {
+      "title": "Benvenuti!",
+      "content": "In questo tour esplorerai le caratteristiche di questa app"
+    },
+    "qr": {
+      "title": "QR",
+      "content": "Puoi aprire una pagina dove puoi vedere un elenco dei tuoi QR e scansionarne uno"
+    },
+    "nfc": {
+      "title": "NFC",
+      "content": "Puoi aprire una pagina dove puoi vedere una lista dei tuoi tag NFC e scansionarne uno"
+    },
+    "emergency": {
+      "title": "Emergenza",
+      "content": "Puoi inviare un'emergenza direttamente dall'app senza usare il fascino"
+    },
+    "profile": {
+      "title": "Profilo",
+      "content": "In questa sezione puoi modificare le tue informazioni personali"
+    },
+    "faq": {
+      "title": "FAQ",
+      "content": "Una raccolta delle domande più frequenti, quindi se hai un dubbio controlla"
+    },
+    "menu": {
+      "title": "Simbolo del menu",
+      "content": "Puoi visitare altre sezioni cliccando su di esso"
+    },
+    "show-alert": {
+      "title": "Pagina degli avvisi",
+      "content": "Questa è la pagina mostrata quando si invia un allarme di emergenza"
+    },
+    "immediate": {
+      "title": "Veloce",
+      "content": "Cliccando su di essa è possibile inviare immediatamente l'emergenza, senza aspettare 20 secondi"
+    },
+    "pin": {
+      "title": "Caselle Pin",
+      "content": "Se inserisci il PIN che hai scelto nella registrazione non invierai l'allarme"
+    },
+    "test-device": {
+      "title": "Pagina del dispositivo",
+      "content": "Selezionando questa pagina dal menu, è possibile gestire tutti i vostri charms "
+    },
+    "pairing": {
+      "title": "Accoppiamento",
+      "content": "In questa sezione è possibile accoppiare un dispositivo bluetooth"
+    },
+    "battery": {
+      "title": "Test della batteria",
+      "content": "Puoi controllare se il tuo charm funziona ancora. Fare un test almeno una volta al mese "
+    },
+    "end": "Il giro è finito. Buon divertimento con la nostra app!"
+  },
+  "ALERT": {
+    "permission_creating_device":"Useremo la localizzazione per una miglior registrazione",
+    "geo_permission": "Questa app ha bisogno dell'accesso alla posizione per tutto il tempo. Consentire in modo che questa applicazione può funzionare correttamente",
+    "internet_permission":"Questa app necessita di connessione internet,attivala!",
+    "foreground_service": "Rilevamento del fascino",
+    "dialer_error": "errore nel lancio del dialer",
+    "internet_connection_fail": "Controlla la tua connessione internet",
+    "error": "Errore ",
+    "enable_nfc": "Abilitare NFC dalle impostazioni",
+    "qr_scan": "QR scansionato con successo",
+    "registration": {
+      "success": "Registrato con successo",
+      "error": "Errore nella registrazione ",
+      "form": {
+        "checkbox": "Devi accettare tutte le regole per registrarti ",
+        "data": "Inserisci un nome e un'email validi",
+        "and": "e"
+      },
+      "wait": "Richiesta di registrazione",
+      "check": "Controlla la tua email con le tue credenziali"
+    },
+    "data_success": "Dati salvati con successo",
+    "data_fail": "Errore. Recupero dei vecchi dati",
+    "limit_upper_contacts": "Puoi registrare al massimo 5 persone!",
+    "limit_lower_contacts": "Aggiungi almeno un contatto",
+    "error_step": "Errore nel numero del passo ",
+    "already_paired": "Hai già accoppiato 2 dispositivi!",
+    "send_emergency": "Invio emergenza...",
+    "send_emergency_succ": "Emergenza inviata con successo",
+    "end_battery_test": "Test della batteria completato con successo",
+    "check_permission": "Controllo dei permessi...",
+    "check_data": "Controllo dei dati...",
+    "get_info_from_server": "Ottenere informazioni dal server",
+    "retrive_info": "Recuperare le informazioni...",
+    "send_data": "Invio dei dati...",
+    "update_data": "Aggiornare i dati...",
+    "create_device": "Creazione del dispositivo ",
+    "ble_scan_err": "La scansione non funziona se il bluetooth è spento",
+    "device_connected_succ": "Collegato correttamente. Smettere di continuare a premere il pulsante",
+    "device_connected_err": "Dispositivo già registrato",
+    "pin_wrong": "Pin sbagliato",
+    "generic_error":"Errore generico",
+    "deleting_device":"Elimino device..."
+  },
+  "DIALOG": {
+    "CONTACT": {
+      "import": "Importare",
+      "save": "Salva"
+    },
+    "IMPORT": {
+      "title": "Elenco contatti",
+      "subtitle": "Trova contatto"
+    },
+    "MODIFY_NAME": {
+      "title": "Modificare il nome",
+      "new_name": "Nuovo nome"
+    },
+    "SAVE": {
+      "title": "Vuoi salvare?"
+    },
+    "BLUETOOTH": {
+      "title": "Elenco dispositivi"
+    },
+    "close": "chiudere",
+    "yes": "Sì",
+    "no": "No"
+  },
+  "TERM_OF_USE": {},
+  "PRIVACY_POLICY": {}
+}

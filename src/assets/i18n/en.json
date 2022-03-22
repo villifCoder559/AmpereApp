@@ -1,0 +1,345 @@
+{
+    "REGISTARTION": {
+        "toolbar": {
+            "title": "Registration"
+        },
+        "form": {
+            "name": "Name",
+            "email": "Email"
+        },
+        "checkbox": {
+            "terms_of_use": "Accept terms of use",
+            "privacy_policy": "Accept privacy policy",
+            "cookies_policy": "Accept cookies policy"
+        },
+        "button": {
+            "registration": "Register"
+        }
+    },
+    "LOGIN": {
+        "button": {
+            "login": "Login with Snap4city",
+            "signup": "Not yet a member? Sign up!"
+        }
+    },
+    "HOMEPAGE": {
+        "button": {
+            "emergency": "Emergency",
+            "profile": "Profile",
+            "FAQ":"FAQ"
+        }
+    },
+    "CALL_CONTACTS": {
+        "toolbar": {
+            "title": "Contacts"
+        },
+        "form": {
+            "name": "Name",
+            "surname": "Surname",
+            "phone": "Phone number",
+            "button": {
+                "call": "Call"
+            }
+        }
+    },
+    "FAQ": {
+        "0": {
+            "question": "What is the aim of this app?",
+            "answer": "Click the button below and find out for who is designed this app",
+            "button": "Open tutorial"
+        },
+        "1": {
+            "question": "Can I see again the tour of the app?",
+            "answer": "Certainly, you can click the button below and start a tour.",
+            "button": "Start a tour"
+        }
+    },
+    "MENU": {
+        "title": {
+            "call": "Call contacts",
+            "device_status": "Devices status",
+            "terms_of_use": "Terms of use",
+            "privacy_policy": "Privacy Policy"
+        }
+    },
+    "NFC": {
+        "toolbar": {
+            "title": "NFC Reader",
+            "alert": "NFC is not available!"
+        },
+        "card": {
+            "title": "List of yours NFCs"
+        }
+    },
+    "QR": {
+        "toolbar": {
+            "title": "QR Reader"
+        },
+        "card": {
+            "title": "List of yours QRs"
+        },
+        "button": {
+            "scan": "Scan code"
+        }
+    },
+    "SIGNUP": {
+        "toolbar": {
+            "title": {
+                "auth": "Profile",
+                "not_auth": "Registration Form"
+            }
+        },
+        "form": {
+            "title_1":"Personal Information",
+            "title_2":"Medical Information",
+            "button": {
+                "next": "Next",
+                "back": "Back",
+                "register": "Registrer",
+                "done": "Done"
+            },
+            "name": "Name",
+            "surname": "Surname",
+            "nickname": "Nickname",
+            "email": "Email",
+            "phone": "Phone number",
+            "date_of_birth": "Date of Birth",
+            "gender": {
+                "label": "Gender",
+                "option": {
+                    "male": "Male",
+                    "female": "Female"
+                }
+            },
+            "height": "Height",
+            "weight": "Weight",
+            "ethnicity": "Ethnicity",
+            "hint":"Max 200 characters",
+            "description": {
+                "label": "Description",
+                "placeholder": "brown hair,blue eyes..."
+            },
+            "purpose": {
+                "label": "Purpose",
+                "placeholder": "Medical Emergency, Personal safety,..."
+            },
+            "pin": {
+                "label": "PIN",
+                "tooltip": "Use to cancel emergency call"
+            },
+            "native_language": "Native language",
+            "address": "Address",
+            "locality": "Locality",
+            "city": "City",
+            "allergies": {
+                "label": "Allergies",
+                "placeholder": "pollen,Insect stings..."
+            },
+            "medications": {
+                "label": "Medications"
+            },
+            "disabilities": {
+                "label": "Disabilities",
+                "checkbox": {
+                    "vision_impaired": "Vision impaired",
+                    "wheelchair": "Wheelchair user"
+                }
+            },
+            "emergency_contact": {
+                "label": "Emergency Contacts",
+                "form": {
+                    "title": "Emergency contact",
+                    "name": "Name",
+                    "surname": "Surname",
+                    "number": "Number"
+                },
+                "button": {
+                    "add_contact": "Add contact"
+                }
+            },
+            "public_emergency_contacts": {
+                "label": "Public Emergency Contacts",
+                "form": {
+                    "content": "Would you like to contact the following numbers? (without direct responsibility)",
+                    "call_112": "Call 112",
+                    "call_115": "Call 115",
+                    "call_118": "Call 118"
+                }
+            }
+        }
+    },
+    "TEST-DEVICE": {
+        "toolbar": {
+            "title": "Devices Status"
+        },
+        "card": {
+            "pairing": {
+                "title": "Pairing",
+                "content": "Keep press your smart jewelry and then press the button below to pair it with the app (swipe to delete device or edit the name)"
+            },
+            "battery": {
+                "title": "Test Battery",
+                "content": "Stay in this page and keep your phone and jewel close; click the button on the jewel and check if the app sends a test alert."
+            }
+        }
+    },
+    "SHARED_VALUES": {
+        "option": {
+            "yes": "Yes",
+            "no": "No"
+        },
+        "modify": "Modify",
+        "delete": "Delete"
+    },
+    "SHOW_ALERT": {
+        "button": {
+            "immediate_emergency": "Send immediatly Emergency"
+        },
+        "content": "Accidentally triggered? No problem,enter your PIN to cancel.<br><br>To send a message, please let the time expire or click the button above"
+    },
+    "TUTORIAL": {
+        "slide": {
+            "0": {
+                "title": "Welcome",
+                "content": "This app is for those who want to feel safe at all times, if you are in trouble you can keep press the charm to send an S.O.S. with your location"
+            },
+            "1": {
+                "title": "How it works",
+                "content": "During the registartion you can insert up to 5 contats and in an emergency case, if you have a subscription, the operator will call all contacts setted during registration, operator can also call some public emergency numbers if you have enabled it in the registration phase."
+            },
+            "2": {
+                "title": "Other features",
+                "content": "If you usually forget how to take a medicine you can ask for a tag or a QRCode and simple scanning it you can see in the app all the procedure. In general you can personalize the code and see what you want"
+            },
+            "3": {
+                "title": "Ready to join?",
+                "content": "You can sign up for free trial without subscription, but remember that in this case your alerts will be rejected!"
+            },
+            "button":"Start using the app"
+        }
+    },
+    "TOUR": {
+        "homepage": {
+            "title": "Welcome!",
+            "content": "In this tour you will explore the features of this app"
+        },
+        "qr": {
+            "title": "QR",
+            "content": "You can open a page where you can see a list of your QRs and scan one of it"
+        },
+        "nfc": {
+            "title": "NFC",
+            "content": "You can open a page where you can see a list of your NFC-tags and scan one of it"
+        },
+        "emergency": {
+            "title": "Emergency",
+            "content": "You can send an emergency directly from the app without using the charm"
+        },
+        "profile": {
+            "title": "Profile",
+            "content": "In this section you can modify your personal informations"
+        },
+        "faq": {
+            "title": "FAQ",
+            "content": "A collection of the most frequently asked question, so if you have a doubt check it"
+        },
+        "menu": {
+            "title": "Menu symbol",
+            "content": "You can visit other sections by clicking it"
+        },
+        "show-alert": {
+            "title": "Alert Page",
+            "content": "This is the page shown when you send an emergency alert"
+        },
+        "immediate": {
+            "title": "Fast",
+            "content": "Clicking it you can send immidiately the emergency, without waiting 20 seconds"
+        },
+        "pin": {
+            "title": "Pin Boxs",
+            "content": "If you insert the PIN that you chose in registration you will not send the alert"
+        },
+        "test-device": {
+            "title": "Device Page",
+            "content": "Selection this page from menu, you can manage all of yours charms "
+        },
+        "pairing": {
+            "title": "Pairing",
+            "content": "In this section you can pair a bluetooth device"
+        },
+        "battery": {
+            "title": "Battery Test",
+            "content": "You can check if your charm is still working. Make a test at least once per month "
+        },
+        "end":"Tour ended. Enjoy using our app!"
+    },
+    "ALERT":{
+        "permission_creating_device":"For a better registration we''ll use the localisation",
+        "geo_permission":"This app needs location access for all the time. Allow it so this app can work properly",
+        "internet_permission":"This app needs internet connection, enable it!",
+        "foreground_service":"Detecting charm",
+        "dialer_error":"error launching dialer",
+        "internet_connection_fail":"Check your internet connection",
+        "error":"Error ",
+        "enable_nfc":"Enable NFC from settings",
+        "qr_scan":"QR scanned succesfully",
+        "registration":{
+            "success":"Succesfully registrated",
+            "error":"Error in registration ",
+            "form":{
+                "checkbox":"You must accept all policy to sign-up ",
+                "data":"Insert valid name and email",
+                "and":"and"
+            },
+            "wait":"Asking for registration",
+            "check":"Check your email with your credentials"
+        },
+        "data_success":"Data saved succesfully",
+        "data_fail":"Error. Recovery old data",
+        "limit_upper_contacts":"You can register max 5 people!",
+        "limit_lower_contacts":"Add at least one contact",
+        "error_step":"Error in step number ",
+        "already_paired":"You have already paired 2 devices!",
+        "send_emergency":"Sending emergency...",
+        "send_emergency_succ":"Emergency sent successfully",
+        "end_battery_test":"Test battery completed succesfully",
+        "check_permission":"Checking permission...",
+        "check_data":"Checking data...",
+        "get_info_from_server":"Getting info from server",
+        "retrive_info":"Retrieving information...",
+        "send_data":"Sending data...",
+        "update_data":"Updating data...",
+        "create_device":"Creating device ",
+        "ble_scan_err":"Scan not working if bluetooth is off",
+        "device_connected_succ":"Properly connected. Stop keep press the button",
+        "device_connected_err":"Device already registred",
+        "pin_wrong":"Pin wrong",
+        "generic_error":"Generic error",
+        "deleting_device":"Deleting device..."
+       },
+    "DIALOG":{
+        "CONTACT":{
+            "import":"Import",
+            "save":"Save"
+        },
+        "IMPORT":{
+            "title":"Contact List",
+            "subtitle":"Find contact"
+        },
+        "MODIFY_NAME":{
+            "title":"Modify Name",
+            "new_name":"New name"
+        },
+        "SAVE":{
+            "title":"Do you want to save?"
+        },
+        "BLUETOOTH":{
+            "title":"Device List"
+        },
+        "close":"close",
+        "yes":"yes",
+        "no":"no"
+    },
+    "TERM_OF_USE": {},
+    "PRIVACY_POLICY": {}
+}
