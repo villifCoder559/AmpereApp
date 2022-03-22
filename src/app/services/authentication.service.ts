@@ -47,7 +47,7 @@ export class AuthenticationService {
                 resolve(true);
               })
               resolve(true)
-            });
+            },err=>reject(err));
         }, (err) => {
           reject(err)
         })
