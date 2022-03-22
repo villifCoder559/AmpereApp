@@ -1,6 +1,6 @@
   <div class="containerDialog">
     <div class="title">
-      <h1 mat-dialog-title style="position: relative; margin: 0;">Devices List</h1>
+      <h1 mat-dialog-title style="position: relative; margin: 0;">{{'DIALOG.BLUETOOTH.title'|translate}}</h1>
     
       <mat-spinner id="matSpinner" [diameter]="30" style="margin-left: 20px;"></mat-spinner>
     </div>
@@ -22,7 +22,7 @@
       </mat-selection-list>
     </div>
     <div mat-dialog-actions>
-      <button mat-button [mat-dialog-close]="">Close</button>
+      <button mat-button [mat-dialog-close]="">{{'DIALOG.close'|translate}}</button>
       <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
     </div>
   </div>

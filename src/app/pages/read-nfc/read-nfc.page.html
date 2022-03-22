@@ -4,12 +4,12 @@
       <button mat-icon-button routerLink="/profile/menu/homepage" class="go_back_button">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <span>NFC Reader</span>
+      <span>{{'NFC.toolbar.title'|translate}}</span>
       <div class="fake-icon"></div>
     </div>
   </mat-toolbar>
   <div *ngIf="!NFC_enable" class="alert-msg">
-    NFC is not available!
+    {{'NFC.toolbar.alert'|translate}}
   </div>
 </ion-header>
 
@@ -18,7 +18,7 @@
     <div class="reader">
       <mat-card appearance="fill" id="bluetooth" class="custom_mat_card">
         <div class="title_list_Code">
-          <mat-card-title>List of yours NFCs</mat-card-title>
+          <mat-card-title>{{'NFC.card.title'|translate}}</mat-card-title>
         </div>
         <div>
           <ion-list *ngFor="let item of this.shared_data.user_data.nfc_code;let i=index;">
@@ -32,7 +32,7 @@
                 <ion-item-option color="primary" (click)="modifyNameDevice(i)" expandable class="bluetooth_item_option">
                   <div class="icon-reader">
                     <ion-icon name="cog" class="trash_icon"></ion-icon>
-                    <p>Modify</p>
+                    <p>{{'NFC.card.modify'|translate}}</p>
                   </div>
                 </ion-item-option>
               </ion-item-options>

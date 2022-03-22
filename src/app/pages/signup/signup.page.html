@@ -12,8 +12,8 @@
           <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
       </ng-template>
-      <span *ngIf="!this.authService.isAuthenticated.getValue()">Registration Form</span>
-      <span *ngIf="this.authService.isAuthenticated.getValue()">Profile</span>
+      <span *ngIf="!this.authService.isAuthenticated.getValue()">{{'SIGNUP.toolbar.title.not_auth'|translate}}</span>
+      <span *ngIf="this.authService.isAuthenticated.getValue()">{{'SIGNUP.toolbar.title.auth'|translate}}</span>
       <ion-buttons class="slot-end" *ngIf="this.authService.isAuthenticated.getValue()">
         <ion-button (click)="save_data()">
           <ion-icon name="save-outline"></ion-icon>
@@ -26,261 +26,218 @@
 <ion-content #content>
   <mat-stepper #stepper [linear]="this.authService.isAuthenticated.getValue()?false:true" orientation="vertical">
     <mat-step [stepControl]="firstFormGroup">
-      <ng-template matStepLabel>Personal Information</ng-template>
+      <ng-template matStepLabel>{{'SIGNUP.form.title_1'|translate}}</ng-template>
       <ng-template matStepContent>
         <form id="personal_information" [formGroup]="firstFormGroup">
           <div class="tablet_view">
             <mat-form-field appearance="fill">
-              <mat-label>Name</mat-label>
-              <input matInput required formControlName="name" placeholder="Name">
+              <mat-label>{{'SIGNUP.form.name'|translate}}</mat-label>
+              <input matInput required formControlName="name" placeholder="{{'SIGNUP.form.name'|translate}}">
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>Surname</mat-label>
-              <input matInput required formControlName="surname" placeholder="Surname">
+              <mat-label>{{'SIGNUP.form.surname'|translate}}</mat-label>
+              <input matInput required formControlName="surname" placeholder="{{'SIGNUP.form.surname'|translate}}">
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>NickName</mat-label>
-              <input matInput required formControlName="nickname" placeholder="Nickname">
+              <mat-label>{{'SIGNUP.form.nickname'|translate}}</mat-label>
+              <input matInput required formControlName="nickname" placeholder="{{'SIGNUP.form.nickname'|translate}}">
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>Email</mat-label>
-              <input matInput type="email" formControlName="email" placeholder="" required>
+              <mat-label>{{'SIGNUP.form.email'|translate}}</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="example@mail.com" required>
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>Phone number</mat-label>
+              <mat-label>{{'SIGNUP.form.phone'|translate}}</mat-label>
               <input matInput type="tel" maxlength="15" minlength="8" required formControlName="phoneNumber"
                 placeholder="">
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>Date of Birth</mat-label>
+              <mat-label>{{'SIGNUP.form.date_of_birth'|translate}}</mat-label>
               <input (input)="checkDate($event)" maxlength="10" matInput type="tel" formControlName="dateofborn"
                 placeholder="yyyy/mm/dd">
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>Gender</mat-label>
+              <mat-label>{{'SIGNUP.form.gender.label'|translate}}</mat-label>
               <mat-select formControlName="gender">
-                <mat-option value="male">Male</mat-option>
-                <mat-option value="female">Female</mat-option>
+                <mat-option value="male">{{'SIGNUP.form.gender.option.male'|translate}}</mat-option>
+                <mat-option value="female">{{'SIGNUP.form.gender.option.female'|translate}}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="fill" id="matcardResize">
-              <mat-label>Height</mat-label>
+              <mat-label>{{'SIGNUP.form.height'|translate}}</mat-label>
               <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'height')"
                 formControlName="height" placeholder="">
               <span matSuffix>cm</span>
             </mat-form-field>
             <mat-form-field appearance="fill" id="matcardResize">
-              <mat-label>Weight</mat-label>
+              <mat-label>{{'SIGNUP.form.weight'|translate}}</mat-label>
               <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'weight')"
                 formControlName="weight" placeholder="">
               <span matSuffix>Kg</span>
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>Ethnicity</mat-label>
+              <mat-label>{{'SIGNUP.form.ethnicity'|translate}}</mat-label>
               <input matInput formControlName="ethnicity" placeholder="">
             </mat-form-field>
-            <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-              <mat-label>Description</mat-label>
-              <textarea #description matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="brown hair,blue eyes..."
+            <mat-form-field appearance="fill" hintLabel="{{'SIGNUP.form.hint'|translate}}">
+              <mat-label>{{'SIGNUP.form.description.label'|translate}}</mat-label>
+              <textarea #description matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="translate.instant('SIGNUP.form.description.placeholder'|translate)"
                 formControlName="description"></textarea>
               <mat-hint align="end">{{description.value?.length || 0}}/200</mat-hint>
             </mat-form-field>
-            <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-              <mat-label>Purpose</mat-label>
-              <textarea #purpose matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
-                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="Medical Emergency, Personal safety,..."
+            <mat-form-field appearance="fill" hintLabel="{{'SIGNUP.form.purpose.label'|translate}}">
+              <mat-label>{{'SIGNUP.form.purpose.label'|translate}}</mat-label>
+              <textarea #purpose matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="translate.instant('SIGNUP.form.purpose.placeholder'|translate)"
                 formControlName="purpose"></textarea>
               <mat-hint align="end">{{purpose.value?.length || 0}}/200</mat-hint>
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>PIN</mat-label>
+              <mat-label>{{'SIGNUP.form.pin.label'|translate}}</mat-label>
               <input type="tel" required (input)="onlyNumbersAllowed($event,'pin')" matInput formControlName="pin"
                 placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()" #tooltip="matTooltip"
-                matTooltip="Use to cancel emergency call">
+                matTooltip="{{'SIGNUP.form.pin.tooltip'|translate}}">
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>Native language</mat-label>
-              <input matInput formControlName="language" placeholder="english,italian..." required>
+              <mat-label>{{'SIGNUP.form.native_language'|translate}}</mat-label>
+              <input matInput formControlName="language" placeholder="english,italiano..." required>
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>Address</mat-label>
+              <mat-label>{{'SIGNUP.form.address'|translate}}</mat-label>
               <input matInput formControlName="address" placeholder="" required>
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>Locality</mat-label>
+              <mat-label>{{'SIGNUP.form.locality'|translate}}</mat-label>
               <input matInput formControlName="locality" placeholder="" required>
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>City</mat-label>
+              <mat-label>{{'SIGNUP.form.city'|translate}}</mat-label>
               <input matInput formControlName="city" placeholder="" required>
             </mat-form-field>
           </div>
           <div class="tablet_view" style="justify-content: center;">
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-button matStepperNext>Next</button>
+            <button mat-button matStepperNext>{{'SIGNUP.form.button.next'|translate}}</button>
           </div>
         </form>
       </ng-template>
     </mat-step>
     <mat-step [stepControl]="secondFormGroup">
-      <ng-template matStepLabel style="display:flex;justify-content: center;">Medical Information</ng-template>
+      <ng-template matStepLabel style="display:flex;justify-content: center;">{{'SIGNUP.form.title_2'|translate}}</ng-template>
       <ng-template matStepContent>
         <form id="medical_information" [formGroup]="secondFormGroup">
           <div class="tablet_view">
-            <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-              <mat-label>Allergies</mat-label>
-              <textarea required #allergies matInput cdkTextareaAutosize hint="Max 200 words"
+            <mat-form-field appearance="fill" hintLabel="{{'SIGNUP.form.hint'|translate}}">
+              <mat-label>{{'SIGNUP.form.allergies.label'|translate}}</mat-label>
+              <textarea required #allergies matInput cdkTextareaAutosize
                 #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4"
-                placeholder="pollen,Insect stings..." formControlName="allergies"></textarea>
+                placeholder="{{'SIGNUP.form.allergies.placeholder'|translate}}" formControlName="allergies"></textarea>
               <mat-hint align="end">{{allergies.value?.length || 0}}/200</mat-hint>
             </mat-form-field>
             <mat-card appearance="fill" id="matcardResize">
-              <mat-card-title>Disabilities</mat-card-title>
-              <mat-checkbox formControlName="visionImpaired">Vision impaired
+              <mat-card-title>{{'SIGNUP.form.disabilities.label'|translate}}</mat-card-title>
+              <mat-checkbox formControlName="visionImpaired">{{'SIGNUP.form.disabilities.checkbox.vision_impaired'|translate}}
               </mat-checkbox><br>
-              <mat-checkbox formControlName="wheelchairUser">Wheelchair user
+              <mat-checkbox formControlName="wheelchairUser">{{'SIGNUP.form.disabilities.checkbox.wheelchair'|translate}}
               </mat-checkbox>
             </mat-card>
-            <mat-form-field appearance="fill" hintLabel="Max 200 characters">
-              <mat-label>Medications</mat-label>
-              <textarea #medications matInput cdkTextareaAutosize hint="Max 200 words" #autosize="cdkTextareaAutosize"
+            <mat-form-field appearance="fill" hintLabel="{{'SIGNUP.form.hint'|translate}}">
+              <mat-label>{{'SIGNUP.form.medications.label'|translate}}</mat-label>
+              <textarea #medications matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize"
                 cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="" formControlName="medications"></textarea>
               <mat-hint align="end">{{medications.value?.length || 0}}/200</mat-hint>
             </mat-form-field>
           </div>
           <div class="tablet_view" style="justify-content: center;">
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-button matStepperNext>Next</button>
+            <button mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
+            <button mat-button matStepperNext>{{'SIGNUP.form.button.next'|translate}}</button>
           </div>
         </form>
       </ng-template>
     </mat-step>
     <mat-step>
-      <ng-template matStepLabel>Emergency Contacts</ng-template>
+      <ng-template matStepLabel>{{'SIGNUP.form.emergency_contact.label'|translate}}</ng-template>
       <ng-template matStepContent>
         <div id="emergency_contacts">
           <div class="tablet_view">
             <mat-card *ngFor="let contact of this.shared_data.user_data.emergency_contacts;let i=index">
               <div class="matCardEmergencyContact">
                 <mat-card-header>
-                  <mat-card-title>Emergency Contact</mat-card-title>
+                  <mat-card-title>{{'SIGNUP.form.emergency_contact.form.title'|translate}}</mat-card-title>
                 </mat-card-header>
                 <mat-form-field appearance="fill">
-                  <mat-label>Name</mat-label>
+                  <mat-label>{{'SIGNUP.form.emergency_contact.form.name'|translate}}</mat-label>
                   <input matInput value="{{contact.name}}" readonly=true>
                 </mat-form-field>
                 <mat-form-field appearance="fill">
-                  <mat-label>Surname</mat-label>
+                  <mat-label>{{'SIGNUP.form.emergency_contact.form.surname'|translate}}</mat-label>
                   <input matInput value='{{contact.surname}}' readonly=true>
                 </mat-form-field>
                 <mat-form-field appearance="fill">
-                  <mat-label>Number</mat-label>
+                  <mat-label>{{'SIGNUP.form.emergency_contact.form.number'|translate}}</mat-label>
                   <input matInput value='{{contact.number}}' readonly=true>
                 </mat-form-field>
                 <div class="container-button">
                   <button style="display: flex;" mat-raised-button
-                    (click)="openDialogEmergencyContact(contact,i)">Modify</button>
+                    (click)="openDialogEmergencyContact(contact,i)">{{'SHARED_VALUES.modify'|translate}}</button>
                   <button style="display: flex;" mat-raised-button color="warn"
-                    (click)="remove_contact(i)">Remove</button>
+                    (click)="remove_contact(i)">{{'SHARED_VALUES.delete'|translate}}</button>
                 </div>
               </div>
             </mat-card>
           </div>
           <div style="justify-content: center; display:flex">
-            <button *ngIf="this.shared_data.user_data.emergency_contacts.length < 5" style="margin: 10px 0 10px;"
-              mat-raised-button (click)="openDialogEmergencyContact(0,-1)">Add Contact</button>
+            <button *ngIf="this.shared_data.user_data.emergency_contacts.length < shared_data.MAX_EMERGENCY_CONTACTs" style="margin: 10px 0 10px;"
+              mat-raised-button (click)="openDialogEmergencyContact(0,-1)">{{'SIGNUP.form.emergency_contact.button.add_contact'|translate}}</button>
           </div>
           <div class="tablet_view" style="justify-content: center;">
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-button (click)="click_next()">Next</button>
+            <button mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
+            <button mat-button (click)="click_next()">{{'SIGNUP.form.button.next'|translate}}</button>
           </div>
         </div>
       </ng-template>
     </mat-step>
 
     <mat-step [stepControl]="fourthFormGroup">
-      <ng-template matStepLabel>Public Emergency Contacts</ng-template>
+      <ng-template matStepLabel>{{'SIGNUP.form.public_emergency_contacts.label'|translate}}</ng-template>
       <ng-template matStepContent>
         <form id="public_contacts" [formGroup]="fourthFormGroup">
           <div class="tablet_view">
             <mat-card appearance="fill" style="width: fit-content;">
               <mat-card-content style="display: flex; flex-direction: column; width: fit-content; align-items: center;">
-                <mat-label>Would you like to contact the following numbers?</mat-label>
-                <mat-label>(without direct responsibility)</mat-label>
+                <mat-label>{{'SIGNUP.form.public_emergency_contacts.form.content'|translate}}</mat-label>
                 <mat-form-field appearance="fill">
-                  <mat-label>Call 112</mat-label>
+                  <mat-label>{{'SIGNUP.form.public_emergency_contacts.form.call_112'|translate}}</mat-label>
                   <mat-select formControlName="call_112" required>
-                    <mat-option [value]=true>Yes</mat-option>
-                    <mat-option [value]=false>No</mat-option>
+                    <mat-option [value]=true>{{'SHARED_VALUES.option.yes'|translate}}</mat-option>
+                    <mat-option [value]=false>{{'SHARED_VALUES.option.no'|translate}}</mat-option>
                   </mat-select>
                 </mat-form-field>
                 <mat-form-field appearance="fill">
-                  <mat-label>Call 115</mat-label>
+                  <mat-label>{{'SIGNUP.form.public_emergency_contacts.form.call_115'|translate}}</mat-label>
                   <mat-select formControlName="call_115" required>
-                    <mat-option [value]=true>Yes</mat-option>
-                    <mat-option [value]=false>No</mat-option>
+                    <mat-option [value]=true>{{'SHARED_VALUES.option.yes'|translate}}</mat-option>
+                    <mat-option [value]=false>{{'SHARED_VALUES.option.no'|translate}}</mat-option>
                   </mat-select>
                 </mat-form-field>
                 <mat-form-field appearance="fill">
-                  <mat-label>Call 118</mat-label>
+                  <mat-label>{{'SIGNUP.form.public_emergency_contacts.form.call_118'|translate}}</mat-label>
                   <mat-select formControlName="call_118" required>
-                    <mat-option [value]=true>Yes</mat-option>
-                    <mat-option [value]=false>No</mat-option>
+                    <mat-option [value]=true>{{'SHARED_VALUES.option.yes'|translate}}</mat-option>
+                    <mat-option [value]=false>{{'SHARED_VALUES.option.no'|translate}}</mat-option>
                   </mat-select>
                 </mat-form-field>
               </mat-card-content>
             </mat-card>
           </div>
           <div class="tablet_view" style="justify-content: center;">
-            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
             <button *ngIf="!this.authService.isAuthenticated.getValue()" mat-button
-              (click)="register_user()">Register</button>
-            <button *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">Done</button>
+              (click)="register_user()">{{'SIGNUP.form.button.register'|translate}}</button>
+            <button *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">{{'SIGNUP.form.button.done'|translate}}</button>
           </div>
         </form>
       </ng-template>
     </mat-step>
-
-    <!-- <mat-step>
-      <ng-template matStepLabel>Smart devices</ng-template>
-      <mat-card appearance="fill" id="bluetooth">
-        <mat-card-title>Pairing</mat-card-title>
-        <mat-card-subtitle>Keep press your smart jewerly and then press the button below to pair it with the app (swipe
-          to
-          delete device)
-        </mat-card-subtitle>
-        <mat-card-content>
-          <button mat-fab color="primary" (click)="openBeaconDialog()">
-            <mat-icon>bluetooth</mat-icon>
-          </button>
-          <ion-list *ngFor="let device of this.shared_data.user_data.paired_devices;let i=index;">
-            <ion-item-sliding *ngIf="device?.id != '-1'" id="slidingItem{{i}}">
-              <ion-item class="ion-no-padding" class="bluetooth_item" id="device{{i}}">
-                <ion-label class="label_bluetooth_item">
-                  <h2>{{this.shared_data?.localStorage[StorageNameType.DEVICES][i]?.name ||
-                    this.shared_data.user_data?.paired_devices[i]}}</h2>
-                </ion-label>
-              </ion-item>
-              <ion-item-options side="end" (ionSwipe)="delete(device,i)" class="bluetooth_item_options">
-                <ion-item-option color="primary" (click)="modifyNameDevice(i)" expandable class="bluetooth_item_option">
-                  <div>
-                    <ion-icon name="cog" class="trash_icon"></ion-icon>
-                    <p>Modify</p>
-                  </div>
-                </ion-item-option>
-                <ion-item-option color="danger" (click)="delete(device,i)" expandable class="bluetooth_item_option">
-                  <div>
-                    <ion-icon name="trash-outline" class="trash_icon"></ion-icon>
-                    <p>Delete</p>
-                  </div>
-                </ion-item-option>
-              </ion-item-options>
-            </ion-item-sliding>
-          </ion-list>
-        </mat-card-content>
-      </mat-card>
-    </mat-step> -->
-
   </mat-stepper>
 </ion-content>

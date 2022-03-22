@@ -6,20 +6,20 @@
           <mat-card-title>Emergency Contact</mat-card-title>
         </mat-card-header>
         <mat-form-field appearance="fill">
-          <mat-label>Name</mat-label>
+          <mat-label>{{'SIGNUP.form.emergency_contact.form.name'|translate}}</mat-label>
           <input matInput maxlength="20" required formControlName="contactName" placeholder="">
         </mat-form-field>
         <mat-form-field appearance="fill">
-          <mat-label>Surname</mat-label>
+          <mat-label>{{'SIGNUP.form.emergency_contact.form.surname'|translate}}</mat-label>
           <input matInput maxlength="20" required formControlName="contactSurname" placeholder="">
         </mat-form-field>
         <mat-form-field appearance="fill">
-          <mat-label>Phone number</mat-label>
+          <mat-label>{{'SIGNUP.form.emergency_contact.form.number'|translate}}</mat-label>
           <input type="tel" matInput maxlength="15" required formControlName="contactNumber" placeholder="">
         </mat-form-field>
         <div class="container-button">
-          <button style="display: flex;" mat-raised-button (click)="openDialogFromContacts()">Import</button>
-          <button style="display: flex;" mat-raised-button (click)="save()">Save</button>
+          <button style="display: flex;" mat-raised-button (click)="openDialogFromContacts()">{{'DIALOG.CONTACT.import'|translate}}</button>
+          <button style="display: flex;" mat-raised-button (click)="save()">{{'DIALOG.CONTACT.save'|translate}}</button>
         </div>
       </div>
     </mat-card>

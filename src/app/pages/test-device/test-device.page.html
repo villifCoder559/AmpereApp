@@ -4,7 +4,7 @@
       <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
-      <span>Devices Status</span>
+      <span>{{'TEST-DEVICE.toolbar.title'|translate}}</span>
       <button mat-icon-button style="font-size: 23px;" (click)="go_to_deviceSettings()">
         <div class="fake-icon"></div>
       </button>
@@ -16,10 +16,8 @@
   <div class="content">
     <!-- <div class="reader"> -->
       <mat-card tourAnchor="Pairing" appearance="fill" id="bluetooth">
-        <mat-card-title class="mat-title">Pairing</mat-card-title>
-        <mat-card-subtitle class="mat-subtitle">Keep press your smart jewerly and then press the button below to pair it with the app (swipe
-          to
-          delete device or edit the name)
+        <mat-card-title class="mat-title">{{'TEST-DEVICE.card.title'|translate}}</mat-card-title>
+        <mat-card-subtitle class="mat-subtitle">{{'TEST-DEVICE.card.pairing.content'|translate}}
         </mat-card-subtitle>
         <mat-card-content>
           <button mat-fab color="primary" (click)="openBeaconDialog()">
@@ -37,13 +35,13 @@
                 <ion-item-option color="primary" (click)="modifyNameDevice(i)" expandable class="bluetooth_item_option">
                   <div>
                     <ion-icon name="cog" class="trash_icon"></ion-icon>
-                    <p>Modify</p>
+                    <p>{{'SHARED_VALUES.modify'|translate}}</p>
                   </div>
                 </ion-item-option>
                 <ion-item-option color="danger" (click)="delete(device,i)" expandable class="bluetooth_item_option">
                   <div>
                     <ion-icon name="trash-outline" class="trash_icon"></ion-icon>
-                    <p>Delete</p>
+                    <p>{{'SHARED_VALUES.delete'|translate}}</p>
                   </div>
                 </ion-item-option>
               </ion-item-options>
@@ -52,16 +50,15 @@
         </mat-card-content>
       </mat-card>
       <div class="div_battery">
-        <button tourAnchor="Battery" mat-raised-button id='batteryButton' (click)="testBattery()">Test Battery</button>
+        <button tourAnchor="Battery" mat-raised-button id='batteryButton' (click)="testBattery()">{{'TEST-DEVICE.card.battery.title'|translate}}</button>
       </div>
       <div style="padding-top: 50px; display: none;" id="testDeviceCard">
         <mat-card style="border-radius: 25px; border: outset">
           <mat-card-title-group style="justify-content: center; padding-top: 10px;">
-            <mat-card-title>Test Battery</mat-card-title>
+            <mat-card-title>{{'TEST-DEVICE.card.battery.title'|translate}}</mat-card-title>
           </mat-card-title-group>
           <mat-card-content style="padding: 10px; font-size: 15px;">
-            Stay in this page and keep your phone and jewel close; click the button on the jewel and check if the app sends a test alert.
-            <!-- Remember to disable the test button, otherwise your alert will not be send in a proper way. -->
+            {{'TEST-DEVICE.card.battery.content'|translate}}
           </mat-card-content>
         </mat-card>
       </div>

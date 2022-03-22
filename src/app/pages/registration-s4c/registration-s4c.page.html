@@ -4,7 +4,7 @@
       <button mat-icon-button routerLink="/login" class="go_back_button">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <span>Registration</span>
+      <span>{{'REGISTRATION.toolbar.title'|translate}}</span>
       <div class="fake-icon"></div>
     </div>
   </mat-toolbar>
@@ -15,23 +15,23 @@
     <form id="registration" [formGroup]="registrationGroup">
       <div class="form">
         <mat-form-field appearance="fill">
-          <mat-label>Name</mat-label>
-          <input matInput required formControlName="name" placeholder="Name">
+          <mat-label>{{'REGISTRATION.form.name'|translate}}</mat-label>
+          <input matInput required formControlName="name" placeholder="{{'REGISTRATION.form.name'|translate}}">
         </mat-form-field>
         <mat-form-field appearance="fill">
-          <mat-label>Email</mat-label>
+          <mat-label>{{'REGISTRATION.form.email'|translate}}</mat-label>
           <input type="email" matInput required formControlName="email" placeholder="example@mail.com">
         </mat-form-field>
       </div>
     </form>
     <div class="list-checkbox">
       <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.termsOfUseCheckbox"></mat-checkbox><a
-        (click)="openPage('https://www.snap4city.org/drupal/legal')">Accept terms of use</a></div>
+        (click)="openPage('https://www.snap4city.org/drupal/legal')">{{'REGISTRATION.checkbox.terms_of_use'|translate}}</a></div>
       <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.privacyPolicyCheckbox"></mat-checkbox><a
-        (click)="openPage('https://www.snap4city.org/drupal/node/49')">Accept privacy policy</a></div>
+        (click)="openPage('https://www.snap4city.org/drupal/node/49')">{{'REGISTRATION.checkbox.privacy_policy'|translate}}</a></div>
       <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.cookiesPolicyCheckbox"></mat-checkbox><a
-        (click)="openPage('https://www.snap4city.org/drupal/node/48')">Accept cookies policy</a></div> 
-      <button class="buttonSIgnIn" mat-raised-button (click)="sendRegistration()">Sign in</button>
+        (click)="openPage('https://www.snap4city.org/drupal/node/48')">{{'REGISTRATION.checkbox.cookies_policy'|translate}}</a></div> 
+      <button class="buttonSIgnIn" mat-raised-button (click)="sendRegistration()">{{'REGISTRATION.button.registration'|translate}}</button>
     </div>
   </div>
 </ion-content>

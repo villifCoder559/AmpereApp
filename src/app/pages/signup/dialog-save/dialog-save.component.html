@@ -1,9 +1,9 @@
 <div class="containerData">
   <div mat-dialog-content>
-    <h1>Do you want to save?</h1>
+    <h1>{{'DIALOG.MODIFY_NAME.title'|translate}}</h1>
   </div>
   <div mat-dialog-actions>
-    <button mat-button (click)="close('yes')" cdkFocusInitial>Yes</button>
-    <button mat-button (click)="close('no')">No</button>
+    <button mat-button (click)="close('yes')" cdkFocusInitial>{{'DIALOG.yes'|translate}}</button>
+    <button mat-button (click)="close('no')">{{'DIALOG.no'|translate}}</button>
   </div>
 </div>

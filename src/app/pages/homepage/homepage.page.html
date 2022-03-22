@@ -9,15 +9,6 @@
     </div>
   </mat-toolbar>
 </ion-header>
-<ng-template #prevButton>
-  <button mat-raised-button>Go back!</button>
-</ng-template>
-<ng-template #nextButton>
-  <button mat-raised-button>Go ahead!</button>
-</ng-template>
-<ng-template #doneButton>
-  <button mat-raised-button>Complete</button>
-</ng-template>
 <ng-template #counter let-step="step" let-total="total">
   {{ step }} of {{ total }} steps
 </ng-template>
@@ -44,7 +35,7 @@
         <button tourAnchor="Emergency" id="emergency" mat-raised-button class="buttons" (click)="openAlertPage()">
           <div class="homepage_button_content">
             <mat-icon>notifications</mat-icon>
-            <h3>Emergency</h3>
+            <h3>{{'HOMEPAGE.button.emergency'|translate}}</h3>
           </div>
         </button>
       </mat-grid-tile>
@@ -52,7 +43,7 @@
         <button tourAnchor="Profile" mat-raised-button class="buttons" routerLink="/profile/menu/profile">
           <div class="homepage_button_content">
             <mat-icon>person</mat-icon>
-            <h3>Profile</h3>
+            <h3>{{'HOMEPAGE.button.profile'|translate}}</h3>
           </div>
         </button>
       </mat-grid-tile>
@@ -60,7 +51,7 @@
         <button tourAnchor="FAQ" mat-raised-button class="buttons " routerLink="/profile/menu/faq">
           <div class="homepage_button_content">
             <mat-icon>help</mat-icon>
-            <h3>FAQ</h3>
+            <h3>{{'HOMEPAGE.button.FAQ'|translate}}</h3>
           </div>
         </button>
       </mat-grid-tile>
