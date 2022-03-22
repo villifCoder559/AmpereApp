@@ -6,7 +6,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule,HttpClient } from '@angular/common/http';
 import {Contacts} from '@ionic-native/contacts'
 import {MaterialModule} from '../app/material-module';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
@@ -39,11 +39,24 @@ import { LottieSplashScreen } from '@awesome-cordova-plugins/lottie-splash-scree
 import { SwiperModule } from 'swiper/angular'
 import { Network } from '@awesome-cordova-plugins/network/ngx'
 import {TourMatMenuModule,TourService} from 'ngx-ui-tour-md-menu'
+import {TranslateModule,TranslateLoader} from '@ngx-translate/core';
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import {LanguageService} from '../app/data/language.service'
+
+export function createTranslateLoader(http:HttpClient){
+  return new TranslateHttpLoader(http,'assets/i18n/',".json");
+}
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,FormsModule,SwiperModule,
-            IonicModule.forRoot(),TourMatMenuModule.forRoot() ,AppRoutingModule,HttpClientModule,MaterialModule,IonicStorageModule.forRoot()
+  imports: [BrowserModule,HttpClientModule, BrowserAnimationsModule,MatFormFieldModule,CountdownModule,LoginPageModule,FormsModule,SwiperModule,
+            TranslateModule.forRoot({
+              loader:{
+                provide:TranslateLoader,
+                useFactory:(createTranslateLoader),
+                deps:[HttpClient]
+              }
+            }),IonicModule.forRoot(),TourMatMenuModule.forRoot() ,AppRoutingModule,HttpClientModule,MaterialModule,IonicStorageModule.forRoot()
             ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     Contacts,
@@ -71,7 +84,8 @@ import {TourMatMenuModule,TourService} from 'ngx-ui-tour-md-menu'
     LottieSplashScreen,
     Storage,
     Network,
-    TourService
+    TourService,
+    LanguageService
   ],
   bootstrap: [AppComponent],
 })
