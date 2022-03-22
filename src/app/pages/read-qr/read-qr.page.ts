@@ -7,6 +7,7 @@ import { ReadingCodeService } from 'src/app/data/reading-code.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogModifyNameComponent } from '../signup/dialog-modify-name/dialog-modify-name.component';
 import { BarcodeScanner } from '@awesome-cordova-plugins/barcode-scanner/ngx';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-read-qr',
@@ -14,20 +15,27 @@ import { BarcodeScanner } from '@awesome-cordova-plugins/barcode-scanner/ngx';
   styleUrls: ['./read-qr.page.scss'],
 })
 export class ReadQRPage implements OnInit {
-  StorageNameType=StorageNameType
+  StorageNameType = StorageNameType
   previewCamera = false;
   qrData = ''
   scannedCode = null;
   title = 'app';
   isOn = false;
-  constructor(private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: BarcodeScanner) {
-    document.addEventListener('ionBackButton', (ev) => {
-      if (this.previewCamera) {
-        console.log('backbutton');
-        this.closePreviewCamera();
-        $("ion-app").show(500);
-      }
-    })
+  eventBackButton;
+  constructor(private translate: TranslateService, private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: BarcodeScanner) {
+    // document.addEventListener('ionBackButton', () => {
+    //   this.backButtonEvent();
+    // })
+  }
+  private backButtonEvent() {
+    // if (this.previewCamera) {
+    //   console.log('backbutton');
+    //   this.closePreviewCamera();
+    //   $("ion-app").show(500);
+    // }
+  }
+  ionViewWillLeave() {
+    //document.removeEventListener('ionBackButton', () => { this.backButtonEvent() })
   }
   closePreviewCamera() {
     // this.previewCamera = false;
@@ -35,27 +43,22 @@ export class ReadQRPage implements OnInit {
     // this.qrScanner.destroy();
   }
   scanCode() {
-    // this.qrScanner.prepare().then((status: QRScannerStatus) => {
-    //   if (status.authorized) {// camera permission was granted
-    //     console.log('scanner ok')
-    //     this.isOn=true;
-    //     $("ion-app").hide(500, () => {
-    //       this.qrScanner.show();
-    //       this.previewCamera = true;
-          this.qrScanner.scan().then((element) => {
-            this.closePreviewCamera();
-            this.changeRef.detectChanges();
-            $("ion-app").show(500);
-            this.shared_data.presentLoading('Getting info from server').then(() => {
-              this.readCode.readURLFromServer(element.text, typeChecking.QR_CODE).then(() => {
-                this.shared_data.createToast('QR scanned succesfully')
-                this.shared_data.dismissLoading();
-              }, err => {
-                this.shared_data.createToast(err?.msg)
-                this.shared_data.dismissLoading();
-              })
-            })
-          },err=>console.log(err));
+
+    this.qrScanner.scan().then((element) => {
+      //this.closePreviewCamera();
+      //this.changeRef.detectChanges();
+      $("ion-app").show(500);
+      if (element != null)
+        this.shared_data.presentLoading(this.translate.instant('ALERT.get_info_from_server')).then(() => {
+          this.readCode.readURLFromServer(element.text, typeChecking.QR_CODE).then(() => {
+            this.shared_data.createToast('ALERT.qr_scan')
+            this.shared_data.dismissLoading();
+          }, err => {
+            this.shared_data.createToast(err?.msg)
+            this.shared_data.dismissLoading();
+          })
+        })
+    }, err => console.log(err));
     //     })
     //   } else if (status.denied) {
     //     this.qrScanner.openSettings()

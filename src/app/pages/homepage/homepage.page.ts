@@ -9,6 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Storage } from '@ionic/storage-angular'
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-homepage',
@@ -18,7 +19,7 @@ import { Storage } from '@ionic/storage-angular'
 export class HomepagePage implements OnInit {
 
   gps_enable = true;
-  constructor(private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient,  private ngsi: NGSIv2QUERYService, public sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private translate:TranslateService,private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient,  private ngsi: NGSIv2QUERYService, public sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
   }
   openMenu() {
     this.menu.open();
@@ -29,7 +30,7 @@ export class HomepagePage implements OnInit {
   startTour() {
     this.sharedData.startTour();
   }
-  ngAfterViewInit() {
+  ionViewDidEnter() {
     console.log(this.sharedData.checkPermissionAlreadyMake)
     this.platform.ready().then(() => {
       this.storage.get('tour').then((value) => {
@@ -44,9 +45,8 @@ export class HomepagePage implements OnInit {
   }
   enableCheckPermission() {
     if (!this.sharedData.checkPermissionAlreadyMake)
-      this.sharedData.presentLoading('Checking permission...').then(() => {
+      this.sharedData.presentLoading(this.translate.instant('ALERT.check_permission')).then(() => {
         this.sharedData.enableAllPermission().then(() => {
-          
           this.sharedData.checkPermissionAlreadyMake = true;
           console.log(this.sharedData.checkPermissionAlreadyMake)
         }, err => console.log(err))

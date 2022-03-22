@@ -6,6 +6,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { BluetoothService } from '../../../data/bluetooth.service'
 import { ChangeDetectorRef } from '@angular/core';
 import { SharedDataService } from 'src/app/data/shared-data.service';
+import { TranslateService } from '@ngx-translate/core';
 
 /* first pair device and then use Ibeacon Library  */
 @Component({
@@ -17,7 +18,7 @@ export class DialogScanBluetoothComponent implements OnInit {
   //bs: any;
   devices = [];
   selectedOptions;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any = '', private sharedData: SharedDataService, private detectChange: ChangeDetectorRef, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any = '', private translate:TranslateService, private detectChange: ChangeDetectorRef, public bluetoothService: BluetoothService, private ble: BLE, private dialogRef: MatDialogRef<DialogScanBluetoothComponent>, private platform: Platform, private ngZone: NgZone) {
     this.platform.ready().then(() => {
       this.scan();
       console.log('scanning...')
@@ -65,7 +66,7 @@ export class DialogScanBluetoothComponent implements OnInit {
       $('#matSpinner' + i).hide();
       this.data = '';
       console.log(err);
-      alert('Error' + err.errorMessage)
+      alert(this.translate.instant('ALERT.error') + err.errorMessage)
     });
   }
 

@@ -6,6 +6,7 @@ import { DialogModifyNameComponent } from '../signup/dialog-modify-name/dialog-m
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { SendAuthService } from 'src/app/data/send-auth.service';
 import { DialogScanBluetoothComponent } from '../signup/dialog-scan-bluetooth/dialog-scan-bluetooth.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-test-device',
@@ -14,7 +15,7 @@ import { DialogScanBluetoothComponent } from '../signup/dialog-scan-bluetooth/di
 })
 export class TestDevicePage implements OnInit {
   StorageNameType = StorageNameType
-  constructor(public sendAuth:SendAuthService,public authService: AuthenticationService,public shared_data: SharedDataService, private router: Router, public dialog: MatDialog,private changeDetection: ChangeDetectorRef) {
+  constructor(private translate:TranslateService,public sendAuth:SendAuthService,public authService: AuthenticationService,public shared_data: SharedDataService, private router: Router, public dialog: MatDialog,private changeDetection: ChangeDetectorRef) {
     if (this.shared_data.enabled_test_battery_mode.observers.length == 0)
       this.shared_data.enabled_test_battery_mode.subscribe(() => {
         $('#batteryButton').css('background-color', !this.shared_data.enabled_test_battery_mode.getValue() ? '#fff' : '#82b74b')
@@ -57,11 +58,11 @@ export class TestDevicePage implements OnInit {
       if (this.authService.isAuthenticated.getValue())
         this.sendAuth.saveUserProfile().then(() => {
           this.shared_data.deleteDeviceFromLocalStorage(el_deleted, StorageNameType.DEVICES);
-          this.shared_data.createToast('Data saved succesfully')
+          this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
         }, err => {
           //alert(err)
           console.log(this.shared_data.user_data)
-          this.shared_data.createToast('Error ' + 'Recovery old data')
+          this.shared_data.createToast(this.translate.instant('ALERT.data_fail'))
           this.shared_data.old_user_data.copyFrom(this.shared_data.user_data)
           this.changeDetection.detectChanges()
         })
@@ -97,24 +98,24 @@ export class TestDevicePage implements OnInit {
       }, err => (console.log(err)));
     }
     else
-      this.shared_data.createToast('You have already paired 2 devices!');
+      this.shared_data.createToast(this.translate.instant('ALERT.already_paired'));
   };
   addPairedDeviceANDregister(device) {
     var indexOf = this.shared_data.user_data.paired_devices.indexOf(device);
     this.shared_data.user_data.paired_devices.push(device);
     console.log(this.shared_data.user_data.paired_devices.length)
     if (indexOf == -1) {
-      alert('Properly connected')
+      alert(this.translate.instant('ALERT.device_connected_succ'))
       if (this.authService.isAuthenticated.getValue())
         this.sendAuth.saveUserProfile().then(() => {
           this.shared_data.setNameDevice(device, device);
-          this.shared_data.createToast('Data saved succesfully')
+          this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
         }, err => {
           alert(err)
-          this.shared_data.createToast('Recovery old data')
+          this.shared_data.createToast(this.translate.instant('ALERT.data_fail'))
         })
     }
     else
-      alert('Device already registred')
+      alert(this.translate.instant('ALERT.device_connected_err'))
   }
 }

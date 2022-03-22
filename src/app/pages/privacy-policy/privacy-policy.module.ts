@@ -8,6 +8,7 @@ import { PrivacyPolicyPageRoutingModule } from './privacy-policy-routing.module'
 
 import { PrivacyPolicyPage } from './privacy-policy.page';
 import { MaterialModule } from '../../material-module'
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { MaterialModule } from '../../material-module'
     FormsModule,
     IonicModule,
     PrivacyPolicyPageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    TranslateModule.forChild()
   ],
   declarations: [PrivacyPolicyPage]
 })

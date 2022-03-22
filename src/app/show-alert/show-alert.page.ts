@@ -7,6 +7,7 @@ import { DeviceMotion, DeviceMotionAccelerationData } from '@awesome-cordova-plu
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
 import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@awesome-cordova-plugins/background-geolocation/ngx';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-show-alert',
@@ -35,7 +36,7 @@ export class ShowAlertPage implements OnInit {
     fastestInterval: 6000,
     activitiesInterval: 1500
   };
-  constructor(private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, public shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
+  constructor(private translate:TranslateService,private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, public shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
     if (!this.shared_data.enabled_test_battery_mode && !this.shared_data.tour_enabled) {
       this.localNotifications.schedule({
         id: 1,
@@ -103,7 +104,7 @@ export class ShowAlertPage implements OnInit {
         ok = false
     }
     if (!ok) {
-      this.presentAlert('PIN wrong', 50).then(() => {
+      this.presentAlert(this.translate.instant('ALERT.pin_wrong'), 50).then(() => {
         for (var i = this.pin.length - 1; i >= 0; i--) {
           (<HTMLInputElement>document.getElementById(i.toString())).value = '';
           if (i == 0)
@@ -133,16 +134,16 @@ export class ShowAlertPage implements OnInit {
     console.log(event)
     if (event.action === 'done') {
       console.log('activateSensors')
-      this.shared_data.createToast('Sending emergency...', 4000);
+      this.shared_data.createToast(this.translate.instant('ALERT.send_emergency'), 4000);
       this.activateSensors().then(() => {
         console.log('sendEmergency')
         this.sendAlert().then(() => {
           console.log('emergencySended')
           this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
           if (!this.shared_data.enabled_test_battery_mode.getValue())
-            this.shared_data.createToast('Emergency sent successfully')
+            this.shared_data.createToast(this.translate.instant('ALERT.send_emergency_succ'))
           else
-            this.shared_data.createToast('Test battery completed succesfully')
+            this.shared_data.createToast(this.translate.instant('ALERT.end_battery_test'))
         }, err => {
           alert(err);
           this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })

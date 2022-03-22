@@ -1,7 +1,7 @@
 import { AuthenticationService } from './../../services/authentication.service';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ToastController } from '@ionic/angular';
+import { PopoverController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { DeviceType, SharedDataService, StorageNameType } from '../../data/shared-data.service'
 import * as Keycloak from 'keycloak-ionic/keycloak';
@@ -10,6 +10,9 @@ import { NGSIv2QUERYService } from 'src/app/data/ngsiv2-query.service';
 import { SendAuthService } from 'src/app/data/send-auth.service';
 import { Storage } from '@ionic/storage-angular';
 import { Network } from '@awesome-cordova-plugins/network/ngx'
+import { LanguagePopoverPage } from './language-popover/language-popover.page';
+import { LanguageService } from 'src/app/data/language.service';
+import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -27,18 +30,35 @@ export class LoginPage implements OnInit {
     private ngsi: NGSIv2QUERYService,
     private sendAuth: SendAuthService,
     private storage: Storage,
-    private network:Network) {}
+    private popoverCtrl: PopoverController,
+    private network: Network,
+    public lng: LanguageService,
+    private translate: TranslateService,
+    private language: LanguageService) {
+     }
 
   ngOnInit() {
-    this.storage.create().then(()=>{
-      this.storage.get('tutorial_read').then((read)=>{
+    //this.language.setInitialAppLanguage().then(()=>console.log('FinishLoad'))
+  }
+  ionViewDidEnter() {
+    console.log('LANGUAGE')
+    console.log(this.lng.selected)
+    this.storage.create().then(() => {
+      this.storage.get('tutorial_read').then((read) => {
         if (read != true)
-        this.router.navigateByUrl('/tutorial', { replaceUrl: true })
+          this.router.navigateByUrl('/tutorial', { replaceUrl: true })
       })
-    },err=>console.log(err))
-    this.network.onDisconnect().subscribe(()=>{
-      alert('This app needs internet connection, enable it!');
+    }, err => console.log(err))
+    this.network.onDisconnect().subscribe(() => {
+      alert(this.translate.instant('ALERT.internet_permission'));
     })
+  }
+  async openLanguagePopover(ev) {
+    const popover = await this.popoverCtrl.create({
+      component: LanguagePopoverPage,
+      event: ev
+    })
+    await popover.present()
   }
   registration() {
     this.router.navigateByUrl('/registration-s4c', { replaceUrl: true })
@@ -48,18 +68,18 @@ export class LoginPage implements OnInit {
   }
   loginTest() {
     this.authService.isAuthenticated.next(true);
-    this.sharedData.user_data.id = 'ampereuser1'
+    this.sharedData.user_data.uuid = 'ampereuser1'
     this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
   }
   async login() {
-    await this.sharedData.presentLoading('Checking data...');
+    await this.sharedData.presentLoading(this.translate.instant('ALERT.check_data'));
     try {
       this.authService.loginSnap4City().then((auth) => {
         if (auth) {
           this.sharedData.accessToken = this.authService.keycloak.token;
           this.authService.keycloak.loadUserProfile().then((data) => {
-            this.sharedData.user_data.id = data.username;
-            this.ngsi.getEntity(this.sharedData.user_data.id + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
+            this.sharedData.user_data.uuid = data.username;
+            this.ngsi.getEntity(this.sharedData.user_data.uuid + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
               this.authService.isAuthenticated.next(true);
               //this.sendAuth.checkAndRequestValidToken();
               console.log('SetUsertValueFromData')
@@ -77,17 +97,23 @@ export class LoginPage implements OnInit {
               })
               console.log('END_ROUTER')
             }, err => {
+              console.log('STATUS')
               console.log(err)
-              if (err.status == '401' || err.status == '404') {
+              if (!err.result) {
                 this.router.navigateByUrl('/signup', { replaceUrl: true })
+                this.sharedData.dismissLoading();
+              }
+              else {
+                alert(this.translate.instant('ALERT.generic_error')+': '+err?.configuration);
                 this.sharedData.dismissLoading();
               }
             })
           }, err => alert(err));
         }
       }, async (err) => {
+        console.log('ERR_SNAP4City')
         console.log(err)
-        alert(err === undefined ? 'Check your internet connection' : err)
+        alert(err === undefined ? this.translate.instant('ALERT.internet_connection_fail') : err)
         await this.sharedData.dismissLoading();
       });
     } catch (e) {

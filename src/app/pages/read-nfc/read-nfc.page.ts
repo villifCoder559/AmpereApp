@@ -6,6 +6,7 @@ import { ReadingCodeService } from 'src/app/data/reading-code.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogModifyNameComponent } from '../signup/dialog-modify-name/dialog-modify-name.component';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-read-nfc',
@@ -18,7 +19,7 @@ export class ReadNFCPage implements OnInit {
   NFC_data = '';
   NFC_enable = false;
   scannedCode = null;
-  constructor(private router:Router,private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private nfc: NFC, private platform: Platform) {
+  constructor(private translate:TranslateService,private router:Router,private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private nfc: NFC, private platform: Platform) {
     console.log(this.shared_data.user_data)
     console.log(this.shared_data.localStorage)
   }
@@ -26,9 +27,9 @@ export class ReadNFCPage implements OnInit {
     this.nfc.enabled().then(() => {
       this.NFC_enable = true;
     }, err => {
-      this.shared_data.createToast('Error :' + err);
+      this.shared_data.createToast(this.translate.instant('ALERT.error') + err);
       if (err != 'NO_NFC'){
-        alert('Enable NFC from settings')
+        alert(this.translate.instant('ALERT.enable_nfc'))
         this.nfc.showSettings().then((result) => {
           this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
           console.log(result)
@@ -44,9 +45,9 @@ export class ReadNFCPage implements OnInit {
         tag => {
           var text = this.nfc.bytesToString(tag.ndefMessage[0].payload).substring(3);
           console.log(text);
-          this.shared_data.presentLoading('Getting info from server').then(() => {
+          this.shared_data.presentLoading(this.translate.instant('ALERT.get_info_from_server')).then(() => {
             this.readCode.readURLFromServer(text, typeChecking.NFC_CODE).then(() => {
-              this.shared_data.createToast('QR scanned succesfully')
+              this.shared_data.createToast(this.translate.instant('ALERT.qr_scan'))
               this.shared_data.dismissLoading();
             }, err => {
               this.shared_data.createToast(err?.msg)
@@ -54,7 +55,7 @@ export class ReadNFCPage implements OnInit {
             })
           })
         },
-        err => this.shared_data.createToast('Error reading tag: ' + err)
+        err => this.shared_data.createToast(this.translate.instant('ALERT.error') + err)
       );
     }
   }

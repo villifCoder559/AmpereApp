@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent } from '@angular/router';
 import { MenuController } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
 import { SharedDataService, UserData } from 'src/app/data/shared-data.service';
 import { AuthenticationService } from '../../services/authentication.service';
 
@@ -12,38 +13,38 @@ import { AuthenticationService } from '../../services/authentication.service';
 export class MenuPage implements OnInit {
   pages = [
     {
-      title: 'Homepage',
+      title: "Homepage",
       url: '/profile/menu/homepage',
       icon: 'home',
     },
     {
-      title: 'Call contacts',
+      title: this.translate.instant('MENU.title.call'),
       url: '/profile/menu/callemergencycontacts',
       icon: 'people',
     },
     {
-      title: 'Ampere Website',
+      title: 'Ampere',
       url: '/profile/menu/webpage',
       icon: 'earth',
     },
     {
-      title: 'Devices Status',
+      title: this.translate.instant('MENU.title.device_status'),
       url: '/profile/menu/test-device',
       icon: 'phone-portrait',
     },
     {
-      title: 'Term of Use',
+      title: this.translate.instant('MENU.title.terms_of_use'),
       url: '/profile/menu/termOfUse',
       icon: 'document',
     },
     {
-      title: 'Privacy Policy',
+      title: this.translate.instant('MENU.title.privacy_policy'),
       url: '/profile/menu/privacyPolicy',
       icon: 'document',
     }
   ]
   selectedPath = ''
-  constructor(private ctrlMenu: MenuController, private router: Router, private authService: AuthenticationService, public shared_data: SharedDataService) {
+  constructor(private translate:TranslateService,private ctrlMenu: MenuController, private router: Router, private authService: AuthenticationService, public shared_data: SharedDataService) {
     console.log('costruttore')
     this.router.events.subscribe((event: RouterEvent) => {
       this.selectedPath = event.url;

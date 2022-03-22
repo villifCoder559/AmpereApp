@@ -4,6 +4,7 @@ import { SpecialCharValidator } from '../signup/signup.page';
 import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx'
 import { Router } from '@angular/router';
 import { SharedDataService } from '../../data/shared-data.service'
+import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-registration-s4c',
   templateUrl: './registration-s4c.page.html',
@@ -20,7 +21,7 @@ export class RegistrationS4cPage implements OnInit {
     privacyPolicyCheckbox: false,
     cookiesPolicyCheckbox: false
   }
-  constructor(private sharedData: SharedDataService, private _formBuilder: FormBuilder, private inAppBrowser: InAppBrowser, private router: Router) { }
+  constructor(private translate:TranslateService,private sharedData: SharedDataService, private _formBuilder: FormBuilder, private inAppBrowser: InAppBrowser, private router: Router) { }
 
   ngOnInit() {
   }
@@ -53,7 +54,7 @@ export class RegistrationS4cPage implements OnInit {
     var form = this.validForm();
     console.log(form)
     if (checkbox && form)
-    this.sharedData.presentLoading('Asking for registration').then(()=>{
+    this.sharedData.presentLoading(this.translate.instant('ALERT.registration.wait')).then(()=>{
       $.ajax({
         url: "https://www.snap4city.org/drupal/api/user/register",
         method: "POST",
@@ -73,14 +74,14 @@ export class RegistrationS4cPage implements OnInit {
           }
         }),
         success: (data) => {
-          alert('Check your email with your credentials')
-          this.sharedData.createToast('Successfully registred')
+          alert(this.translate.instant('ALERT.check'))
+          this.sharedData.createToast(this.translate.instant('ALERT.registration.success'))
           console.log('SUCCESS_REGISTATION')
           this.router.navigateByUrl('/login', { replaceUrl: true })
           console.log(data);
         },
         error: (err) => {
-          this.sharedData.createToast('Error in registration')
+          this.sharedData.createToast(this.translate.instant('ALERT.registration.error'))
           console.log('ERROR_REGISTRATION')
           console.log(err)
         },
@@ -92,11 +93,11 @@ export class RegistrationS4cPage implements OnInit {
     else {
       var txt = '';
       if (!checkbox)
-        txt = ('You must accept all policy to sign-up ')
+        txt = this.translate.instant('ALERT.registration.form.checkbox ')
       if (!form) {
-        var app = 'Insert valid name and email'
+        var app = this.translate.instant('ALERT.registration.form.data')
         if (txt !== '')
-          txt += ' and ' + app.toLowerCase();
+          txt += this.translate.instant('ALERT.registration.form.and') + app.toLowerCase();
         else
           txt = app;
       }
