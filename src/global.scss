@@ -226,6 +226,16 @@ button .prev .mat-button-wrapper{
     display: flex;
     align-items: center;
 }
+ion-popover{
+    // ion-backdrop{
+    // opacity: 0.5 !important;
+    // }
+    .popover-wrapper{
+    .popover-content{
+        width: auto;
+    }
+  }
+}
 // .backdrop-target{
 //     border-radius: 20%;
 // }
