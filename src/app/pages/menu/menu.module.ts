@@ -9,6 +9,7 @@ import { MenuPageRoutingModule } from './menu-routing.module';
 import { MenuPage } from './menu.page';
 import { Routes } from '@angular/router';
 import { MaterialModule } from '../../material-module'
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
@@ -17,7 +18,9 @@ import { MaterialModule } from '../../material-module'
     FormsModule,
     IonicModule,
     MenuPageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    TranslateModule.forChild()
+
   ],
   declarations: [MenuPage]
 })

@@ -7,6 +7,7 @@ import { ReactiveFormsModule} from '@angular/forms';
 
 import { RegistrationS4cPageRoutingModule } from './registration-s4c-routing.module';
 import { RegistrationS4cPage } from './registration-s4c.page';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { RegistrationS4cPage } from './registration-s4c.page';
     IonicModule,
     RegistrationS4cPageRoutingModule,
     MaterialModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslateModule.forChild()
   ],
   declarations: [RegistrationS4cPage]
 })

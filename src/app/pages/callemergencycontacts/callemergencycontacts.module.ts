@@ -7,6 +7,8 @@ import { CallemergencycontactsPageRoutingModule } from './callemergencycontacts-
 import { CallemergencycontactsPage } from './callemergencycontacts.page';
 import { MaterialModule } from '../../material-module'
 import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx'
+import { TranslateModule } from '@ngx-translate/core';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -14,7 +16,8 @@ import { CallNumber } from '@awesome-cordova-plugins/call-number/ngx'
     IonicModule,
     MaterialModule,
     ReactiveFormsModule,
-    CallemergencycontactsPageRoutingModule
+    CallemergencycontactsPageRoutingModule,
+    TranslateModule.forChild()
   ],
   declarations: [CallemergencycontactsPage],
   providers:[CallNumber]

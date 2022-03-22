@@ -8,6 +8,7 @@ import { ReadNFCPageRoutingModule } from './read-nfc-routing.module';
 import { NFC,Ndef } from '@ionic-native/nfc/ngx'
 import { ReadNFCPage } from './read-nfc.page';
 import { MaterialModule } from '../../material-module'
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { MaterialModule } from '../../material-module'
     FormsModule,
     IonicModule,
     ReadNFCPageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    TranslateModule.forChild()
   ],
   declarations: [ReadNFCPage],
   providers: [NFC,Ndef]

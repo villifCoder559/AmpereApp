@@ -8,6 +8,7 @@ import { ReadQRPageRoutingModule } from './read-qr-routing.module';
 import { ReadQRPage } from './read-qr.page';
 import { MaterialModule } from '../../material-module'
 import { BarcodeScanner } from '@awesome-cordova-plugins/barcode-scanner/ngx';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { BarcodeScanner } from '@awesome-cordova-plugins/barcode-scanner/ngx';
     FormsModule,
     IonicModule,
     ReadQRPageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    TranslateModule.forChild()
   ],
   declarations: [ReadQRPage],
   providers:[BarcodeScanner,InAppBrowser]

@@ -15,6 +15,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 import { BackgroundGeolocation} from '@awesome-cordova-plugins/background-geolocation/ngx'
 import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
+import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
@@ -22,7 +23,8 @@ import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
     IonicModule,
     HomepagePageRoutingModule,
     MaterialModule,
-    TourMatMenuModule
+    TourMatMenuModule,
+    TranslateModule.forChild()
   ],
   declarations: [HomepagePage],
   providers: [

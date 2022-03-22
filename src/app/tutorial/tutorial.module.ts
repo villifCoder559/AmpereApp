@@ -8,6 +8,7 @@ import { TutorialPageRoutingModule } from './tutorial-routing.module';
 
 import { TutorialPage } from './tutorial.page';
 import { SwiperModule } from 'swiper/angular'
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -16,7 +17,9 @@ import { SwiperModule } from 'swiper/angular'
     IonicModule,
     TutorialPageRoutingModule,
     SwiperModule,
-    MaterialModule
+    MaterialModule,
+    TranslateModule.forChild()
+
   ],
   declarations: [TutorialPage]
 })

@@ -15,6 +15,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
 import { NativeAudio } from '@ionic-native/native-audio/ngx'
 import { BackgroundGeolocation} from '@awesome-cordova-plugins/background-geolocation/ngx'
 import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -24,7 +25,9 @@ import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
     ShowAlertPageRoutingModule,
     MaterialModule,
     CountdownModule,
-    TourMatMenuModule
+    TourMatMenuModule,
+    TranslateModule.forChild()
+
   ],
   declarations: [ShowAlertPage],
   providers: [

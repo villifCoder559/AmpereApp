@@ -8,6 +8,7 @@ import { TermOfUsePageRoutingModule } from './term-of-use-routing.module';
 
 import { TermOfUsePage } from './term-of-use.page';
 import { MaterialModule } from '../../material-module'
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -15,7 +16,9 @@ import { MaterialModule } from '../../material-module'
     FormsModule,
     IonicModule,
     TermOfUsePageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    TranslateModule.forChild()
+
   ],
   declarations: [TermOfUsePage]
 })

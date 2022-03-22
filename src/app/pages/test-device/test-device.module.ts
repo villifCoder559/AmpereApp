@@ -9,6 +9,7 @@ import { TestDevicePageRoutingModule } from './test-device-routing.module';
 import { TestDevicePage } from './test-device.page';
 import { MaterialModule } from '../../material-module'
 import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
+import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
@@ -16,7 +17,9 @@ import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
     IonicModule,
     TestDevicePageRoutingModule,
     MaterialModule,
-    TourMatMenuModule
+    TourMatMenuModule,
+    TranslateModule.forChild()
+
   ],
   declarations: [TestDevicePage]
 })

@@ -8,13 +8,15 @@ import { FaqPageRoutingModule } from './faq-routing.module';
 
 import { FaqPage } from './faq.page';
 import { MaterialModule } from '../../material-module'
+import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
     FaqPageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    TranslateModule.forChild()
   ],
   declarations: [FaqPage]
 })
