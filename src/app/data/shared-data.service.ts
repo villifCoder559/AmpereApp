@@ -18,6 +18,7 @@ import { BLE } from '@ionic-native/ble/ngx';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { TourService } from 'ngx-ui-tour-md-menu';
 import { ForegroundService } from '@awesome-cordova-plugins/foreground-service/ngx';
+import { TranslateService } from '@ngx-translate/core';
 
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
@@ -76,7 +77,7 @@ export class StorageName {
   name: any = ''
 }
 export class UserData {
-  id: string = ''
+  uuid: string = ''
   name: string = '';
   surname: string = ''
   nickname: string = ''
@@ -238,7 +239,7 @@ export class SharedDataService {
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   enabled_test_battery_mode = new BehaviorSubject(false);
-  constructor(private foregroundService:ForegroundService,private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private translate:TranslateService,private foregroundService:ForegroundService,private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.storage.create();
       console.log('StorageNameType')
@@ -350,7 +351,7 @@ export class SharedDataService {
   setUserValueFromData(data) {
     Object.keys(this.user_data).forEach((element) => {
       switch (element) {
-        case 'id': case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
+        case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
           break;
         case 'dateObserved': {
           this.user_data[element] = new Date().toISOString();
@@ -406,7 +407,7 @@ export class SharedDataService {
     var newUser = {}
     Object.keys(this.user_data).forEach((field_name) => {
       switch (field_name) {
-        case 'id': { break; }
+        //case 'id': { break; }
         case 'dateObserved': {
           newUser[field_name] = { value: new Date().toISOString() }
           break;
@@ -542,7 +543,7 @@ export class SharedDataService {
     return new Promise((resolve, reject) => {
       console.log(this.device.version)
       if (parseInt(this.device.version) >= 10) {
-        alert('This app needs location access for all the time. Allow it so this app can work properly')
+        alert(this.translate.instant('ALERT.geo_permission'))
         this.androidPermissions.requestPermissions([
           "android.permission.ACCESS_BACKGROUND_LOCATION",
           "android.permission.ACCESS_COARSE_LOCATION",
@@ -696,7 +697,7 @@ export class SharedDataService {
       this.tour_enabled = false;
       this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true });
       this.storage.set('tour', true).then(async () => {
-        this.createToast('Tour ended. Enjoy using our app!')
+        this.createToast(this.translate.instant('TOUR.end'))
         this.enableAllPermission();
         this.checkPermissionAlreadyMake = true;
       })

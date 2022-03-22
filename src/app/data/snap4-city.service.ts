@@ -9,9 +9,9 @@ export class Snap4CityService {
   constructor(private shared_data: SharedDataService, private authService: AuthenticationService) {
   }
   //Firstly i create the device then I insert the value when event's fired 
-  deleteDevice(type: DeviceType) {
+  deleteDevice(type: DeviceType,name='ampereuser') {
     return new Promise((resolve, reject) => {
-      var device_id = this.shared_data.user_data.id + type;
+      var device_id = name+this.shared_data.user_data.uuid + type;
       $.ajax({
         url: "https://iotdirectory.snap4city.org/api/device.php",
         data: {
@@ -37,13 +37,13 @@ export class Snap4CityService {
       })
     })
   }
-  createDevice(type: DeviceType,lat = 42, long = 12, name = '', broker = 'orionAMPERE-UNIFI') {
+  createDevice(type: DeviceType,lat = 42, long = 12, name = 'ampereuser', broker = 'orionAMPERE-UNIFI') {
     return new Promise((resolve, reject) => {
       console.log('CREATION')
       console.log(type)
       var attr = this.getAttributesPayload(type);
       console.log(attr)
-      var device_id = this.shared_data.user_data.id + type + name;
+      var device_id = name+this.shared_data.user_data.uuid + type;
       console.log('NAME')
       console.log(device_id)
       $.ajax({
@@ -190,9 +190,9 @@ export class Snap4CityService {
     console.log(this.shared_data.user_data)
     Object.keys(this.shared_data.user_data).forEach((field_name) => {
       switch (field_name) {
-        case 'id': {
-          break;
-        }
+        // case 'id': {
+        //   break;
+        // }
         case 'dateObserved': {
           newUser.push(this.createField('dateObserved'))
           break;

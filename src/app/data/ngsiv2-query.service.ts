@@ -21,10 +21,10 @@ export class NGSIv2QUERYService {
   sendQRNFCEvent(qrnfc_event: QRNFCEvent, name = '') {
     return new Promise((resolve, reject) => {
       this.checkANDupdateToken().then(() => {
-        var id = this.shared_data.user_data.id;
+        var device_id = name+this.shared_data.user_data.uuid + DeviceType.QR_NFC_EVENT;
         var attrs: any = this.s4c.getEventPayload(false, qrnfc_event);
         $.ajax({
-          url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + id + DeviceType.QR_NFC_EVENT + name + "/attrs?elementid=" + id + DeviceType.QR_NFC_EVENT + name + "&type=" + DeviceType.QR_NFC_EVENT,
+          url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + device_id+"/attrs?elementid=" + device_id + "&type=" + DeviceType.QR_NFC_EVENT,
           headers: {
             'Authorization': 'Bearer ' + this.shared_data.accessToken,
             'Content-Type': 'application/json'
@@ -60,7 +60,7 @@ export class NGSIv2QUERYService {
         this.shared_data.user_data.dateObserved = new Date().toISOString();
         var data = this.s4c.getUserIDPayload(false);
         console.log('Send data ' + data)
-        var device_id = this.shared_data.user_data.id + DeviceType.PROFILE;
+        var device_id = 'ampereuser'+this.shared_data.user_data.uuid + DeviceType.PROFILE;
         console.log(data)
         $.ajax({
           url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + device_id + "/attrs?elementid=" + device_id + "&type=" + DeviceType.PROFILE,
@@ -85,13 +85,13 @@ export class NGSIv2QUERYService {
   sendAlertEvent(details_emergency: AlertEvent) {
     return new Promise((resolve, reject) => {
       this.checkANDupdateToken().then(() => {
-        var username = this.shared_data.user_data.id;
+        var username = this.shared_data.user_data.uuid;
         var attr = this.s4c.getEventPayload(false, details_emergency);
         console.log('TOKEN')
         console.log(this.shared_data.accessToken)
-        //attr.dateObserved=new Date().toISOString();
+        var device_id = 'ampereuser'+this.shared_data.user_data.uuid + DeviceType.ALERT_EVENT;
         $.ajax({
-          url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + username + DeviceType.ALERT_EVENT + "/attrs?elementid=" + username + DeviceType.ALERT_EVENT + "&type=" + DeviceType.ALERT_EVENT,
+          url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + device_id + "/attrs?elementid=" + device_id + "&type=" + DeviceType.ALERT_EVENT,
           headers: {
             'Authorization': 'Bearer ' + this.shared_data.accessToken,
             'Content-Type': 'application/json'
@@ -118,10 +118,10 @@ export class NGSIv2QUERYService {
   updateBackgroundEntity(attrs, type: DeviceType) {
     return new Promise((resolve, reject) => {
       this.checkANDupdateToken().then(() => {
-        var id = this.shared_data.user_data.id;
+        var device_id = 'ampereuser'+this.shared_data.user_data.uuid + type;
         var JSONdetails = JSON.stringify(attrs);
         console.log(JSONdetails)
-        var url = "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + id + type + "/attrs?elementid=" + id + type + "&type=" + type
+        var url = "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + device_id+ "/attrs?elementid=" + device_id + "&type=" + type
         cordovaHTTP.patch(url, attrs, {
           'Authorization': 'Bearer ' + this.shared_data.accessToken,
           'Content-Type': 'application/json'

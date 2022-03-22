@@ -49,7 +49,7 @@ export class ReadingCodeService {
   }
   private getListFromServer(type: typeChecking.NFC_CODE | typeChecking.QR_CODE) {
     return new Promise((resolve, reject) => {
-      this.NGSIv2Query.getEntity(this.sharedData.user_data.id + DeviceType.PROFILE, DeviceType.PROFILE).then((data) => {
+      this.NGSIv2Query.getEntity(this.sharedData.user_data.uuid + DeviceType.PROFILE, DeviceType.PROFILE).then((data) => {
         this.fillListCode(data, type);
         resolve(true);
       }, err => reject(err))
