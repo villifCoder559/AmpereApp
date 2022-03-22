@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AlertEvent, SharedDataService } from './shared-data.service';
 import { AuthenticationService } from '../services/authentication.service'
 import { NGSIv2QUERYService } from './ngsiv2-query.service';
+import { TranslateService } from '@ngx-translate/core';
 /** save data
  * DD:31:A4:AD:A3:05
  */
@@ -17,7 +18,7 @@ import { NGSIv2QUERYService } from './ngsiv2-query.service';
 })
 export class BluetoothService {
   detectedValue = new BehaviorSubject(null);
-  constructor(private authService: AuthenticationService, private ble: BLE, private ibeacon: IBeacon, private shared_data: SharedDataService) {
+  constructor(private translate:TranslateService,private authService: AuthenticationService, private ble: BLE, private ibeacon: IBeacon, private shared_data: SharedDataService) {
   }
   /*52414449-5553-4e45-5457-4f524b53434f*/
   stopScan() {
@@ -30,7 +31,7 @@ export class BluetoothService {
         , (err) => {
           this.ble.enable().then(() => { },
             (err) => {
-              alert('Scan not working if bluetooth is off');
+              alert(this.translate.instant('ALERT.ble_scan_err'));
               reject(err)
             })
         }).then(() => {
