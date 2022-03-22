@@ -1,0 +1,10 @@
+<mat-action-list class="list">
+    <button mat-button *ngFor="let lng of languages" (click)="select(lng)" details="false">
+      <div class="inside-button">
+        <img src="assets/flags/{{lng.img}}.svg">
+        <div>
+          {{lng.text}}
+        </div>
+      </div>
+    </button>
+</mat-action-list>

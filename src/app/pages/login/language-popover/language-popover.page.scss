@@ -1,0 +1,19 @@
+.container-item{
+    display: flex;
+    flex-direction: column;
+    width: 80px;
+}
+img{
+    width: 40px;
+    height: 30px;
+    padding-right: 8px;
+}
+.inside-button{
+    display: flex;
+    flex-direction: row;
+    margin: 3px 0px;
+    align-items: center;
+}
+.list{
+ display: contents;
+}
