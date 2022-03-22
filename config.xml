@@ -18,7 +18,7 @@
     <preference name="SplashShowOnlyFirstTime" value="false" />
     <preference name="SplashScreen" value="none" />
     <preference name="LottieAnimationLocation" value="www/assets/images/splashScreen.json" />
-    <preference name="LottieAutoHideSplashScreen" value="true" />
+    <preference name="LottieAutoHideSplashScreen" value="false" />
     <preference name="LottieFullScreen" value="true" />
     <preference name="LottieLoopAnimation" value="true" />
     <preference name="LottieBackgroundColor" value="#fff" />
