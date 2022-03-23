@@ -46,8 +46,8 @@ export class HomepagePage implements OnInit {
   enableCheckPermission() {
     if (!this.sharedData.checkPermissionAlreadyMake)
       this.sharedData.presentLoading(this.translate.instant('ALERT.check_permission')).then(() => {
+        this.sharedData.checkPermissionAlreadyMake = true;
         this.sharedData.enableAllPermission().then(() => {
-          this.sharedData.checkPermissionAlreadyMake = true;
           console.log(this.sharedData.checkPermissionAlreadyMake)
         }, err => console.log(err))
       }, err => console.log(err))

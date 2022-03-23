@@ -239,7 +239,7 @@ export class SharedDataService {
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   enabled_test_battery_mode = new BehaviorSubject(false);
-  constructor(private translate:TranslateService,private foregroundService:ForegroundService,private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private translate: TranslateService, private foregroundService: ForegroundService, private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.storage.create();
       console.log('StorageNameType')
@@ -291,7 +291,7 @@ export class SharedDataService {
     BackgroundMode.disableWebViewOptimizations()
     BackgroundMode.disableBatteryOptimizations();
     BackgroundMode.overrideBackButton();
-    BackgroundMode.on('activate',()=>{
+    BackgroundMode.on('activate', () => {
       if (this.tourService.getStatus() != 0) {
         this.tourService.end();
         this.tour_enabled = false;
@@ -323,12 +323,13 @@ export class SharedDataService {
     var check = true;
     if (this.localStorage[type] === null)
       this.localStorage[type] = []
-    this.localStorage[type].forEach(element => {
-      if (element.id === device) {
-        element.name = name;
-        check = false;
-      }
-    })
+    if (this.localStorage[type].length != 0)
+      this.localStorage[type].forEach(element => {
+        if (element.id === device) {
+          element.name = name;
+          check = false;
+        }
+      })
     if (check)
       this.localStorage[type].push(app)
     this.storage.set(type, this.localStorage[type])
@@ -349,6 +350,7 @@ export class SharedDataService {
     })
   }
   setUserValueFromData(data) {
+    console.log(data)
     Object.keys(this.user_data).forEach((element) => {
       switch (element) {
         case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
@@ -475,11 +477,11 @@ export class SharedDataService {
         if (!enabled?.hasPermission)
           this.androidPermissions.requestPermission("android.permission.FOREGROUND_SERVICE").then(() => {
             console.log('Permission foreground')
-            this.foregroundService.start('Ampere','Detecting charm')
+            this.foregroundService.start('Ampere', 'Detecting charm')
             resolve(true)
-          }, err => reject(err)).catch(err=>console.log(err))
+          }, err => reject(err)).catch(err => console.log(err))
         else {
-          this.foregroundService.start('Ampere','Detecting charm')
+          this.foregroundService.start('Ampere', 'Detecting charm')
           console.log('Permission foreground ' + enabled?.hasPermission)
           resolve(true)
         }
@@ -490,7 +492,7 @@ export class SharedDataService {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
         console.log('enableAllPermission')
-        this.askForegroundService().then(() => {
+       // this.askForegroundService().then(() => {
           this.checkLocationEnabled().then(() => {
             this.enableBluetooth().then(() => {
               this.askGeoPermission().then(() => {
@@ -507,7 +509,7 @@ export class SharedDataService {
               }, err => { reject(err) })
             }, err => reject(err))
           }, err => reject(err + '. App can\'t work properly!'))
-        }, err => reject(err))
+        //}, err => reject(err))
         this.enableAllBackgroundMode();
       }, err => reject(err))
     })
@@ -620,10 +622,10 @@ export class SharedDataService {
       anchorId: 'homepage',
       title: 'Welcome!',
       content: 'In this tour you will explore the features of this app',
-      nextBtnTitle:'Start',
+      nextBtnTitle: 'Start',
       enableBackdrop: true,
       route: 'profile/menu/homepage'
-    },{
+    }, {
       anchorId: 'QR',
       title: 'QR button',
       content: 'You can open a page where you can see a list of your QRs and scan one of it',
