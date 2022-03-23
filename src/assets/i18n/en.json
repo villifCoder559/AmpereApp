@@ -1,5 +1,5 @@
 {
-    "REGISTARTION": {
+    "REGISTRATION": {
         "toolbar": {
             "title": "Registration"
         },
@@ -57,7 +57,7 @@
     "MENU": {
         "title": {
             "call": "Call contacts",
-            "device_status": "Devices status",
+            "device_status": "Jewel pairing",
             "terms_of_use": "Terms of use",
             "privacy_policy": "Privacy Policy"
         }
@@ -315,7 +315,8 @@
         "device_connected_err":"Device already registred",
         "pin_wrong":"Pin wrong",
         "generic_error":"Generic error",
-        "deleting_device":"Deleting device..."
+        "deleting_device":"Deleting device...",
+        "fixing_problems":"Fixing wrong number of devices..."
        },
     "DIALOG":{
         "CONTACT":{

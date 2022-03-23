@@ -1,5 +1,5 @@
 {
-  "REGISTARTION": {
+  "REGISTRATION": {
     "toolbar": {
       "title": "Registrazione"
     },
@@ -8,7 +8,7 @@
       "email": "Email"
     },
     "checkbox": {
-      "terms_of_use": "Accettare i termini di utilizzo",
+      "terms_of_use": "Accetta i termini di utilizzo",
       "privacy_policy": "Accetta l'informativa sulla privacy",
       "cookies_policy": "Accetta la politica dei cookie"
     },
@@ -57,7 +57,7 @@
   "MENU": {
     "title": {
       "call": "Contatti",
-      "device_status": "Stato dei dispositivi",
+      "device_status": "Abbina gioiello",
       "terms_of_use": "Condizioni d'uso",
       "privacy_policy": "Privacy"
     }
@@ -315,7 +315,9 @@
     "device_connected_err": "Dispositivo già registrato",
     "pin_wrong": "Pin sbagliato",
     "generic_error":"Errore generico",
-    "deleting_device":"Elimino device..."
+    "deleting_device":"Elimino device...",
+    "fixing_problems":"Correggo numero errato di devices..."
+
   },
   "DIALOG": {
     "CONTACT": {
