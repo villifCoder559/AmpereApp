@@ -13,6 +13,8 @@ import { Network } from '@awesome-cordova-plugins/network/ngx'
 import { LanguagePopoverPage } from './language-popover/language-popover.page';
 import { LanguageService } from 'src/app/data/language.service';
 import { TranslateService } from '@ngx-translate/core';
+import { Snap4CityService } from 'src/app/data/snap4-city.service';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -34,8 +36,8 @@ export class LoginPage implements OnInit {
     private network: Network,
     public lng: LanguageService,
     private translate: TranslateService,
-    private language: LanguageService) {
-     }
+    private s4c: Snap4CityService) {
+  }
 
   ngOnInit() {
     //this.language.setInitialAppLanguage().then(()=>console.log('FinishLoad'))
@@ -78,35 +80,51 @@ export class LoginPage implements OnInit {
         if (auth) {
           this.sharedData.accessToken = this.authService.keycloak.token;
           this.authService.keycloak.loadUserProfile().then((data) => {
-            this.sharedData.user_data.uuid = data.username;
-            this.ngsi.getEntity(this.sharedData.user_data.uuid + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
-              this.authService.isAuthenticated.next(true);
-              //this.sendAuth.checkAndRequestValidToken();
-              console.log('SetUsertValueFromData')
-              this.sharedData.setUserValueFromData(data)
-              console.log('ENABLE_ALL_BEACON')
-              this.bluetoothService.enableAllBeaconFromSnap4City();
-              console.log('END_ENABLE_BEACON')
-              console.log('Start_Sendig_Valid_Status')
-              this.sendAuth.startSendingValidStatus()
-              Object.keys(this.sharedData.localStorage).forEach((element: StorageNameType) => {
-                this.sharedData.getNameDevices(element);
-              })
-              this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true }).then(() => {
-                this.sharedData.dismissLoading();
-              })
-              console.log('END_ROUTER')
-            }, err => {
-              console.log('STATUS')
-              console.log(err)
-              if (!err.result) {
-                this.router.navigateByUrl('/signup', { replaceUrl: true })
-                this.sharedData.dismissLoading();
+            //this.sharedData.user_data.uuid = data.username;
+            console.log('Getting devices....')
+            this.ngsi.getOwnDevices().then((devices: any) => {
+              console.log('GET_OWN_DEVICES')
+              console.log(devices);
+              if (devices.length == 3) {
+                var index = devices.findIndex((item) => item.model == DeviceType.PROFILE)
+                console.log(index)
+                this.ngsi.getEntity(devices[index].id, DeviceType.PROFILE).then((data) => {
+                  this.authService.isAuthenticated.next(true);
+                  console.log('SetUsertValueFromData')
+                  this.sharedData.setUserValueFromData(data);
+                  console.log('ENABLE_ALL_BEACON')
+                  this.bluetoothService.enableAllBeaconFromSnap4City();
+                  console.log('END_ENABLE_BEACON')
+                  console.log('Start_Sendig_Valid_Status')
+                  this.sendAuth.startSendingValidStatus()
+                  Object.keys(this.sharedData.localStorage).forEach((element: StorageNameType) => {
+                    this.sharedData.getNameDevices(element);
+                  })
+                  this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true }).then(() => {
+                    this.sharedData.dismissLoading();
+                  })
+                  console.log('END_ROUTER')
+                }, err => alert(err))
               }
               else {
-                alert(this.translate.instant('ALERT.generic_error')+': '+err?.configuration);
-                this.sharedData.dismissLoading();
+                if (devices.length == 0 || devices == null) {
+                  this.router.navigateByUrl('/signup', { replaceUrl: true })
+                  this.sharedData.dismissLoading();
+                }
+                else {
+                  this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems'))
+                  let count = 1;
+                  devices.forEach(element => {
+                    this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems') +' '+ (count++) + '/' + devices.length)
+                    this.s4c.deleteDevice(element.id).catch(() => { alert(this.translate.instant('ALERT.general_error')); this.sharedData.dismissLoading() })
+                  });
+                  this.sharedData.dismissLoading();
+                }
               }
+            }, err => {
+              console.log(err)
+              alert(this.translate.instant('ALERT.generic_error') + ': ' + err?.configuration);
+              this.sharedData.dismissLoading();
             })
           }, err => alert(err));
         }
