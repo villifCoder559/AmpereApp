@@ -29,25 +29,20 @@ export class AuthenticationService {
         adapter: 'cordova'
       }).catch(err => reject(err))
         .then((autentication) => {
-          if (autentication) {
-            this.keycloak.loadUserProfile().then((info: any) => {
-              console.log('token ' + this.keycloak.token)
-              console.log(info)
-              resolve(true);
-            }, err => reject(err))
-          }
-          else
+          if (!autentication){
             this.keycloak.login({ scope: 'offline_access' }).then(() => {
               console.log('authenticated!');
               console.log(this.keycloak)
               this.keycloak.loadUserProfile().then((info: any) => {
-                //this.shareData.user_data.id = info.username;
                 console.log('token ' + this.keycloak.token)
                 console.log(info)
                 resolve(true);
               })
               resolve(true)
-            },err=>reject(err));
+            }, err => reject(err));
+          }
+          else
+            resolve(true)
         }, (err) => {
           reject(err)
         })

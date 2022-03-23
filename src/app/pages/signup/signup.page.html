@@ -101,7 +101,11 @@
             </mat-form-field>
             <mat-form-field appearance="fill">
               <mat-label>{{'SIGNUP.form.native_language'|translate}}</mat-label>
-              <input matInput formControlName="language" placeholder="english,italiano..." required>
+              <mat-select formControlName="language" required>
+                <mat-option value="Italiano">Italiano</mat-option>
+                <mat-option value="English">English</mat-option>
+                <mat-option value="Other">Other</mat-option>
+              </mat-select>
             </mat-form-field>
             <mat-form-field appearance="fill">
               <mat-label>{{'SIGNUP.form.address'|translate}}</mat-label>

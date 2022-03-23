@@ -51,7 +51,7 @@ export class SignupPage implements OnInit {
     phoneNumber: ['', Validators.compose([SpecialCharValidator.specialCharValidator, Validators.required, Validators.pattern('[- +()0-9]+')])],
     dateofborn: ['', Validators.compose([SpecialCharValidator.specialCharValidator, DateValidator.dateVaidator])],
     gender: [''],
-    language: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
+    language: ['',Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     address: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     locality: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     city: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
@@ -105,7 +105,7 @@ export class SignupPage implements OnInit {
         }, 350);
       }
       this.shared_data.presentLoading(this.translate.instant('ALERT.retrive_info')).then(() => {
-        this.NGSIv2QUERY.getEntity(this.shared_data.user_data.uuid + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
+        this.NGSIv2QUERY.getEntity('ampereuser'+this.shared_data.user_data.uuid + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
           this.authService.isAuthenticated.next(true);
           this.shared_data.user_data.paired_devices = [];
           this.shared_data.user_data.qr_code = [];
@@ -128,7 +128,9 @@ export class SignupPage implements OnInit {
     }
     else{
       alert(this.translate.instant('ALERT.permission_creating_device'));
-      this.getPosition();
+      this.shared_data.checkLocationEnabled().then(()=>{
+        this.getPosition();
+      },err=>console.log(err))
     }
   }
   checkDate(ev) {
@@ -378,6 +380,7 @@ export class SignupPage implements OnInit {
   }
   lat = 43.7;
   lon = 11.2;
+
   register_user() {
     var error = this.getUserFromFormGroup();
     if (!error) {
