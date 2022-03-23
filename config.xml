@@ -26,8 +26,8 @@
     <preference name="GradlePluginKotlinEnabled" value="true" />
     <preference name="GradlePluginKotlinCodeStyle" value="official" />
     <preference name="GradlePluginKotlinVersion" value="1.3.50" />
-    <preference name="com.unarin.cordova.beacon.android.altbeacon.ForegroundBetweenScanPeriod" value="2200" />
-    <preference name="com.unarin.cordova.beacon.android.altbeacon.ForegroundScanPeriod" value="0" />
+    <preference name="com.unarin.cordova.beacon.android.altbeacon.ForegroundBetweenScanPeriod" value="100" />
+    <preference name="com.unarin.cordova.beacon.android.altbeacon.ForegroundScanPeriod" value="6000" />
     <platform name="android">
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
             <application android:networkSecurityConfig="@xml/network_security_config" />
