@@ -42,7 +42,13 @@ ion-button{
   font: 400 17px/12px Roboto, "Helvetica Neue", sans-serif;
 
 }
-
+.mat-title{
+  text-align-last: center;
+  padding: 10px 0px;
+}
+.mat-subtitle{
+  padding: 5px 15px;
+}
 // .toolbar{
 //     background-color: #3F51B5;
 //     color: white;
