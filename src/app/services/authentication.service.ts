@@ -33,11 +33,11 @@ export class AuthenticationService {
             this.keycloak.login({ scope: 'offline_access' }).then(() => {
               console.log('authenticated!');
               console.log(this.keycloak)
-              this.keycloak.loadUserProfile().then((info: any) => {
-                console.log('token ' + this.keycloak.token)
-                console.log(info)
-                resolve(true);
-              })
+              // this.keycloak.loadUserProfile().then((info: any) => {
+              //   console.log('token ' + this.keycloak.token)
+              //   console.log(info)
+              //   resolve(true);
+              // })
               resolve(true)
             }, err => reject(err));
           }
