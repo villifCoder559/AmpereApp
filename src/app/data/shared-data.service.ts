@@ -19,6 +19,7 @@ import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { TourService } from 'ngx-ui-tour-md-menu';
 import { ForegroundService } from '@awesome-cordova-plugins/foreground-service/ngx';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthenticationService } from '../services/authentication.service';
 
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
@@ -239,7 +240,7 @@ export class SharedDataService {
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   enabled_test_battery_mode = new BehaviorSubject(false);
-  constructor(private translate: TranslateService, private foregroundService: ForegroundService, private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private authService: AuthenticationService, private translate: TranslateService, private foregroundService: ForegroundService, private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       this.storage.create();
       console.log('StorageNameType')
@@ -300,6 +301,8 @@ export class SharedDataService {
       this.checkPermissionAlreadyMake = false;
       if (this.enabled_test_battery_mode.getValue())
         this.enabled_test_battery_mode.next(false)
+      if (!this.authService.isAuthenticated.getValue())
+        BackgroundMode.disable();
     })
     /*//Plugin background mode from @awesome
     this.backgroundMode.enable();
@@ -492,23 +495,22 @@ export class SharedDataService {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
         console.log('enableAllPermission')
-       // this.askForegroundService().then(() => {
-          this.checkLocationEnabled().then(() => {
-            this.enableBluetooth().then(() => {
-              this.askGeoPermission().then(() => {
-                //this.enableAllBackgroundMode();
-                console.log('ASK_PERMISSION')
-                this.localNotifications.hasPermission().then(result => {
-                  if (!result.valueOf())
-                    this.localNotifications.requestPermission().then(() => {
-                      resolve(true)
-                    }).catch(err => reject(err))
-                  else
+        // this.askForegroundService().then(() => {
+        this.checkLocationEnabled().then(() => {
+          this.enableBluetooth().then(() => {
+            this.askGeoPermission().then(() => {
+              console.log('ASK_PERMISSION')
+              this.localNotifications.hasPermission().then(result => {
+                if (!result.valueOf())
+                  this.localNotifications.requestPermission().then(() => {
                     resolve(true)
-                }, (err) => reject(err))
-              }, err => { reject(err) })
-            }, err => reject(err))
-          }, err => reject(err + '. App can\'t work properly!'))
+                  }).catch(err => reject(err))
+                else
+                  resolve(true)
+              }, (err) => reject(err))
+            }, err => { reject(err) })
+          }, err => reject(err))
+        }, err => reject(err + '. App can\'t work properly!'))
         //}, err => reject(err))
         this.enableAllBackgroundMode();
       }, err => reject(err))
@@ -620,77 +622,95 @@ export class SharedDataService {
     this.tour_enabled = true;
     this.tourService.initialize([{
       anchorId: 'homepage',
-      title: 'Welcome!',
-      content: 'In this tour you will explore the features of this app',
-      nextBtnTitle: 'Start',
+      title: this.translate.instant('TOUR.homepage.title'),
+      content: this.translate.instant('TOUR.homepage.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.start'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true,
       route: 'profile/menu/homepage'
     }, {
       anchorId: 'QR',
-      title: 'QR button',
-      content: 'You can open a page where you can see a list of your QRs and scan one of it',
+      title: this.translate.instant('TOUR.qr.title'),
+      content: this.translate.instant('TOUR.qr.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true,
       route: 'profile/menu/homepage'
     }, {
       anchorId: 'NFC',
-      title: 'NFC button',
-      content: 'You can open a page where you can see a list of your NFC-tags and scan one of it',
+      title: this.translate.instant('TOUR.nfc.title'),
+      content: this.translate.instant('TOUR.nfc.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true
     }, {
       anchorId: 'Emergency',
-      title: 'Emergency button',
-      content: 'You can send an emergency directly from the app without using the charm',
+      title: this.translate.instant('TOUR.nfc.title'),
+      content: this.translate.instant('TOUR.nfc.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true
     }, {
       anchorId: 'Profile',
-      title: 'Profile button',
-      content: 'In this section you can modify your personal informations',
+      title: this.translate.instant('TOUR.profile.title'),
+      content: this.translate.instant('TOUR.profile.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true,
     }, {
       anchorId: 'FAQ',
-      title: 'FAQ',
-      content: 'A collection of the most frequently asked question, so if you have a doubt check it',
+      title: this.translate.instant('TOUR.faq.title'),
+      content: this.translate.instant('TOUR.faq.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true,
       route: 'profile/menu/homepage',
     }, {
       anchorId: 'Menu',
-      title: 'Menu symbol',
-      content: 'You can visit other sections by clicking it',
+      title: this.translate.instant('TOUR.menu.title'),
+      content: this.translate.instant('TOUR.menu.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       route: 'profile/menu/homepage',
       enableBackdrop: true,
     }, {
       anchorId: 'show-alert',
-      title: 'Alert Page',
-      content: 'This is the page shown when you send an emergency alert',
+      title: this.translate.instant('TOUR.show-alert.title'),
+      content: this.translate.instant('TOUR.show-alert.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       route: 'show-alert',
       enableBackdrop: true,
     }, {
       anchorId: 'Immediate',
-      title: 'Fast',
-      content: 'Clicking it you can send immidiately the emergency, without waiting 20 seconds',
+      title: this.translate.instant('TOUR.immediate.title'),
+      content: this.translate.instant('TOUR.immediate.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       route: 'show-alert',
       enableBackdrop: true,
     }, {
       anchorId: 'Pin',
-      title: 'Pin Boxs',
-      content: 'If you insert the PIN that you chose in registration you will not send the alert',
+      title: this.translate.instant('TOUR.pin.title'),
+      content: this.translate.instant('TOUR.pin.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       route: 'show-alert',
       enableBackdrop: true,
     }, {
       anchorId: 'test-device',
-      title: 'Device Page',
-      content: 'Selection this page from menu, you can manage all of yours charms ',
+      title: this.translate.instant('TOUR.test-device.title'),
+      content: this.translate.instant('TOUR.test-device.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       route: '/profile/menu/test-device'
-    }, {
-      anchorId: 'Pairing',
-      title: 'Pairing',
-      content: 'In this section you can pair a bluetooth device',
-      enableBackdrop: true,
-      route: '/profile/menu/test-device',
-    }, {
+    },
+    {
       anchorId: 'Battery',
-      title: 'Battery Test',
-      content: 'You can check if your charm is still working. Make a test at least once per month ',
+      title: this.translate.instant('TOUR.battery.title'),
+      content: this.translate.instant('TOUR.battery.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.end'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true,
       route: '/profile/menu/test-device',
     }])

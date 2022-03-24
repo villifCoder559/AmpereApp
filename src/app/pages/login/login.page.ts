@@ -70,7 +70,7 @@ export class LoginPage implements OnInit {
   }
   loginTest() {
     this.authService.isAuthenticated.next(true);
-    this.sharedData.user_data.uuid = 'ampereuser1'
+    this.sharedData.user_data.uuid = '30d0ed45-69d0-4305-85d3-87c54cd88cdc'
     this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
   }
   async login() {
@@ -115,7 +115,7 @@ export class LoginPage implements OnInit {
                   this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems'))
                   let count = 1;
                   devices.forEach(element => {
-                    this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems') +' '+ (count++) + '/' + devices.length)
+                    this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems') + ' ' + (count++) + '/' + devices.length)
                     this.s4c.deleteDevice(element.id).catch(() => { alert(this.translate.instant('ALERT.general_error')); this.sharedData.dismissLoading() })
                   });
                   this.sharedData.dismissLoading();
@@ -131,7 +131,8 @@ export class LoginPage implements OnInit {
       }, async (err) => {
         console.log('ERR_SNAP4City')
         console.log(err)
-        alert(err === undefined ? this.translate.instant('ALERT.internet_connection_fail') : err)
+        if (err != 'closed_by_user')
+          alert(err === undefined ? this.translate.instant('ALERT.internet_connection_fail') : err)
         await this.sharedData.dismissLoading();
       });
     } catch (e) {

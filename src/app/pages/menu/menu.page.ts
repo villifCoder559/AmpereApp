@@ -30,7 +30,7 @@ export class MenuPage implements OnInit {
     {
       title: this.translate.instant('MENU.title.device_status'),
       url: '/profile/menu/test-device',
-      icon: 'phone-portrait',
+      icon: 'battery-full',
     },
     {
       title: this.translate.instant('MENU.title.terms_of_use'),

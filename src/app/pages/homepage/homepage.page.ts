@@ -19,7 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 export class HomepagePage implements OnInit {
 
   gps_enable = true;
-  constructor(private translate:TranslateService,private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient,  private ngsi: NGSIv2QUERYService, public sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private translate: TranslateService, private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient, private ngsi: NGSIv2QUERYService, public sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
   }
   openMenu() {
     this.menu.open();
@@ -34,14 +34,14 @@ export class HomepagePage implements OnInit {
     console.log(this.sharedData.checkPermissionAlreadyMake)
     this.platform.ready().then(() => {
       this.storage.get('tour').then((value) => {
-        if (!value && !this.sharedData.tour_enabled) 
+        if (!value && !this.sharedData.tour_enabled)
           this.startTour();
         else {
           this.sharedData.tour_enabled = false;
           this.enableCheckPermission();
         }
-      })
-    })
+      },err=>{this.sharedData.dismissLoading().catch()})
+    },err=>this.sharedData.dismissLoading().catch())
   }
   enableCheckPermission() {
     if (!this.sharedData.checkPermissionAlreadyMake)
@@ -49,7 +49,8 @@ export class HomepagePage implements OnInit {
         this.sharedData.checkPermissionAlreadyMake = true;
         this.sharedData.enableAllPermission().then(() => {
           console.log(this.sharedData.checkPermissionAlreadyMake)
-        }, err => console.log(err))
+          this.sharedData.dismissLoading().catch((err) => console.log(err))
+        }, err => { console.log(err); this.sharedData.dismissLoading().catch(err => console.log(err)) })
       }, err => console.log(err))
   }
   enableGPS() {

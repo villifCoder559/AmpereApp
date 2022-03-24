@@ -10,7 +10,7 @@ import BackgroundFetch from "cordova-plugin-background-fetch";
   providedIn: 'root'
 })
 export class SendAuthService {
-  constructor(private platform: Platform, private localNotifications: LocalNotifications, private shared_data: SharedDataService, private ngsi: NGSIv2QUERYService, private authService: AuthenticationService) { }
+  constructor(private platform: Platform, private localNotifications: LocalNotifications, private ngsi: NGSIv2QUERYService, private authService: AuthenticationService) { }
 
   private async onDeviceReady() {
     // Your BackgroundFetch event handler.
@@ -20,7 +20,7 @@ export class SendAuthService {
       var date = new Date().toISOString();
       console.log(date)
       if (this.authService.isAuthenticated) {
-        this.ngsi.updateBackgroundEntity({ "status": { "value": this.shared_data.user_data.status }, "dateObserved": { "value": date } }, DeviceType.PROFILE).catch((err) => console.log(err))
+        this.ngsi.updateBackgroundEntity({ "status": { "value": 'active' }, "dateObserved": { "value": date } }, DeviceType.PROFILE).catch((err) => console.log(err))
       }
       else {
         console.log('Stop BACKGROUND_FETCH')
