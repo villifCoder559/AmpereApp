@@ -57,7 +57,7 @@
     "MENU": {
         "title": {
             "call": "Call contacts",
-            "device_status": "Jewel pairing",
+            "device_status": "Jewel battery",
             "terms_of_use": "Terms of use",
             "privacy_policy": "Privacy Policy"
         }
@@ -165,6 +165,10 @@
                     "call_115": "Call 115",
                     "call_118": "Call 118"
                 }
+            },
+            "pairing": {
+                "title": "Pairing",
+                "content": "Keep press your smart jewelry and then press the button below to pair it with the app (swipe to delete device or edit the name)"
             }
         }
     },
@@ -173,10 +177,6 @@
             "title": "Devices Status"
         },
         "card": {
-            "pairing": {
-                "title": "Pairing",
-                "content": "Keep press your smart jewelry and then press the button below to pair it with the app (swipe to delete device or edit the name)"
-            },
             "battery": {
                 "title": "Test Battery",
                 "content": "Stay in this page and keep your phone and jewel close; click the button on the jewel and check if the app sends a test alert."
@@ -252,7 +252,7 @@
             "content": "This is the page shown when you send an emergency alert"
         },
         "immediate": {
-            "title": "Fast",
+            "title": "Fast!",
             "content": "Clicking it you can send immidiately the emergency, without waiting 20 seconds"
         },
         "pin": {
@@ -261,17 +261,19 @@
         },
         "test-device": {
             "title": "Device Page",
-            "content": "Selection this page from menu, you can manage all of yours charms "
-        },
-        "pairing": {
-            "title": "Pairing",
-            "content": "In this section you can pair a bluetooth device"
+            "content": "Selection this page from menu, you can test the barrery of your jewel"
         },
         "battery": {
             "title": "Battery Test",
-            "content": "You can check if your charm is still working. Make a test at least once per month "
+            "content": "Click this button and check the battery. We suggest to test it at least once per month"
         },
-        "end":"Tour ended. Enjoy using our app!"
+        "end":"Tour ended. Enjoy using our app!",
+        "button":{
+            "next":"Next",
+            "previous":"Previous",
+            "start":"Start",
+            "end":"End"
+        }
     },
     "ALERT":{
         "permission_creating_device":"For a better registration we''ll use the localisation",

@@ -57,7 +57,7 @@
   "MENU": {
     "title": {
       "call": "Contatti",
-      "device_status": "Abbina gioiello",
+      "device_status": "Batteria gioiello",
       "terms_of_use": "Condizioni d'uso",
       "privacy_policy": "Privacy"
     }
@@ -114,7 +114,7 @@
       "height": "Altezza",
       "weight": "Peso",
       "ethnicity": "Etnia",
-      "hint": "Massimo 200 caratteri",
+      "hint": "Max 200 caratteri",
       "description": {
         "label": "Descrizione",
         "placeholder": "capelli castani, occhi azzurri..."
@@ -165,6 +165,10 @@
           "call_115": "Chiama il 115",
           "call_118": "Chiama il 118"
         }
+      },
+      "pairing": {
+        "title": "Collega dispositivo",
+        "content": "Tieni premuto il tuo gioiello e poi premi il pulsante qui sotto per accoppiarlo con l'app (scorri per cancellare il dispositivo o modificare il nome)"
       }
     }
   },
@@ -172,16 +176,10 @@
     "toolbar": {
       "title": "Stato dei dispositivi"
     },
-    "card": {
-      "pairing": {
-        "title": "Collega dispositivo",
-        "content": "Tieni premuto il tuo gioiello e poi premi il pulsante qui sotto per accoppiarlo con l'app (scorri per cancellare il dispositivo o modificare il nome)"
-      },
       "battery": {
         "title": "Test della batteria",
         "content": "Rimani in questa pagina e tieni il tuo telefono e il gioiello vicino; clicca il pulsante sul gioiello e controlla se l'app invia un avviso di test."
       }
-    }
   },
   "SHARED_VALUES": {
     "option": {
@@ -240,7 +238,7 @@
       "content": "In questa sezione puoi modificare le tue informazioni personali"
     },
     "faq": {
-      "title": "FAQ",
+      "title": "Domande",
       "content": "Una raccolta delle domande più frequenti, quindi se hai un dubbio controlla"
     },
     "menu": {
@@ -252,8 +250,8 @@
       "content": "Questa è la pagina mostrata quando si invia un allarme di emergenza"
     },
     "immediate": {
-      "title": "Veloce",
-      "content": "Cliccando su di essa è possibile inviare immediatamente l'emergenza, senza aspettare 20 secondi"
+      "title": "Veloce!",
+      "content": "Cliccando su di esso è possibile inviare immediatamente l'emergenza, senza aspettare 20 secondi"
     },
     "pin": {
       "title": "Caselle Pin",
@@ -261,17 +259,19 @@
     },
     "test-device": {
       "title": "Pagina del dispositivo",
-      "content": "Selezionando questa pagina dal menu, è possibile gestire tutti i vostri charms "
-    },
-    "pairing": {
-      "title": "Accoppiamento",
-      "content": "In questa sezione è possibile accoppiare un dispositivo bluetooth"
+      "content": "Selezionando questa pagina dal menu, è possibile testare la batteria del gioiello "
     },
     "battery": {
       "title": "Test della batteria",
-      "content": "Puoi controllare se il tuo charm funziona ancora. Fare un test almeno una volta al mese "
+      "content": "Cliccando il bottone puoi testare la batteria. Fallo almeno una volta al mese "
     },
-    "end": "Il giro è finito. Buon divertimento con la nostra app!"
+    "end": "Il tour è finito. Buon divertimento con la nostra app!",
+    "button":{
+      "next":"Avanti",
+      "previous":"Indietro",
+      "start":"Inizia",
+      "end":"Fine"
+  }
   },
   "ALERT": {
     "permission_creating_device":"Useremo la localizzazione per una miglior registrazione",
