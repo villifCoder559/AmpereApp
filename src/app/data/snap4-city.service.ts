@@ -9,9 +9,6 @@ export class Snap4CityService {
   constructor(private shared_data: SharedDataService, private authService: AuthenticationService) {
   }
   //Firstly i create the device then I insert the value when event's fired 
-  detectUUID() {
-
-  }
   deleteDevice(type: DeviceType, name = 'ampereuser') {
     return new Promise((resolve, reject) => {
       var device_id;
