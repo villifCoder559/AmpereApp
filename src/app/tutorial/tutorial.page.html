@@ -2,10 +2,16 @@
   <swiper #swiper>
     <ng-template swiperSlide>
       <div class="content-slide">
+        <div class="close">
+          <button style="font-size: 45px;" mat-button (click)="goToLoginPage()"><ion-icon name="close"></ion-icon></button>
+        </div>
         <img class="image" src="assets/images/icon_app.png" />
         <h1>{{'TUTORIAL.slide.0.title'|translate}}</h1>
         <h3>{{'TUTORIAL.slide.0.content'|translate}}
         </h3>
+      </div>
+      <div class="buttons_tutorial">
+        <button mat-button (click)="next()">{{'SIGNUP.form.button.next'|translate}}</button>
       </div>
     </ng-template>
     <ng-template swiperSlide>
@@ -15,6 +21,10 @@
         <h3>{{'TUTORIAL.slide.1.content'|translate}}
         </h3>
       </div>
+      <div class="buttons_tutorial">
+        <button mat-button (click)="back()">{{'SIGNUP.form.button.back'|translate}}</button>
+        <button mat-button (click)="next()">{{'SIGNUP.form.button.next'|translate}}</button>
+      </div>
     </ng-template>
     <ng-template swiperSlide>
       <div class="content-slide">
@@ -22,6 +32,10 @@
         <h1>{{'TUTORIAL.slide.2.title'|translate}}</h1>
         <h3>{{'TUTORIAL.slide.2.content'|translate}}
         </h3>
+      </div>
+      <div class="buttons_tutorial">
+        <button mat-button (click)="back()">{{'SIGNUP.form.button.back'|translate}}</button>
+        <button mat-button (click)="next()">{{'SIGNUP.form.button.next'|translate}}</button>
       </div>
     </ng-template>
     <ng-template swiperSlide>
@@ -31,7 +45,10 @@
         <h3>{{'TUTORIAL.slide.3.content'|translate}}
         </h3>
       </div>
-      <button mat-raised-button (click)="goToLoginPage()">{{'TUTORIAL.slide.button'|translate}}</button>
+      <div class="buttons_tutorial">
+        <button mat-button (click)="back()">{{'SIGNUP.form.button.back'|translate}}</button>
+        <button mat-raised-button (click)="goToLoginPage()">{{'TUTORIAL.slide.button'|translate}}</button>
+      </div>
     </ng-template>
   </swiper>
 </ion-content>
