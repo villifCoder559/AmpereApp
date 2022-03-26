@@ -38,7 +38,8 @@ export class SignupPage implements OnInit {
   countNumberContactsDone = 0;
   psw_editable = false;
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
-  @ViewChild('tooltip') tooltip: MatTooltip;
+  @ViewChild('tooltip_pin') tooltip_pin: MatTooltip;
+  @ViewChild('tooltip_allergies') tooltip_allergies: MatTooltip;
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
 
@@ -48,17 +49,17 @@ export class SignupPage implements OnInit {
     name: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     surname: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     nickname: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
-    email: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator, Validators.email])],
+    //email: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator, Validators.email])],
     phoneNumber: ['', Validators.compose([SpecialCharValidator.specialCharValidator, Validators.required, Validators.pattern('[- +()0-9]+')])],
     dateofborn: ['', Validators.compose([SpecialCharValidator.specialCharValidator, DateValidator.dateVaidator])],
     gender: [''],
-    language: ['',Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
+    language: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     address: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     locality: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     city: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     height: ['', Validators.compose([Validators.maxLength(3), Validators.pattern("^[0-9]*$")])],
     weight: ['', Validators.compose([Validators.maxLength(3), Validators.pattern("^[0-9]*$")])],
-    ethnicity: ['', Validators.compose([Validators.maxLength(15), SpecialCharValidator.specialCharValidator])],
+    ethnicity: [''],
     description: ['', Validators.compose([Validators.maxLength(200), SpecialCharValidator.specialCharValidator])],
     purpose: ['', Validators.compose([Validators.maxLength(200), SpecialCharValidator.specialCharValidator])],
     pin: ['', Validators.compose([Validators.minLength(4), Validators.maxLength(4), Validators.pattern("^[0-9]*$")])]
@@ -70,12 +71,12 @@ export class SignupPage implements OnInit {
     wheelchairUser: false
   });
   fourthFormGroup = this._formBuilder.group({
-    call_112: [Validators.required],
-    call_115: [Validators.required],
-    call_118: [Validators.required]
+    call_112: [null, Validators.required],
+    call_115: [null, Validators.required],
+    call_118: [null, Validators.required]
   });
   readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.fourthFormGroup]
-  constructor(public sendAuth:SendAuthService,private translate: TranslateService, public authService: AuthenticationService, private geoLocation: Geolocation, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(public sendAuth: SendAuthService, private translate: TranslateService, public authService: AuthenticationService, private geoLocation: Geolocation, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     console.log('From signup')
     console.log(this.shared_data.user_data)
   }
@@ -95,6 +96,7 @@ export class SignupPage implements OnInit {
       return 5;
   }
   ngOnInit() {
+    console.log(this.shared_data.user_data.email)
     if (this.authService.isAuthenticated.getValue()) {
       var index = this.router.getCurrentNavigation().extras?.state?.page;
       if (index !== undefined) {
@@ -106,7 +108,7 @@ export class SignupPage implements OnInit {
         }, 350);
       }
       this.shared_data.presentLoading(this.translate.instant('ALERT.retrive_info')).then(() => {
-        this.NGSIv2QUERY.getEntity('ampereuser'+this.shared_data.user_data.uuid + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
+        this.NGSIv2QUERY.getEntity('ampereuser' + this.shared_data.user_data.uuid + DeviceType.PROFILE, DeviceType.PROFILE).then((data: any) => {
           this.authService.isAuthenticated.next(true);
           this.shared_data.user_data.paired_devices = [];
           this.shared_data.user_data.qr_code = [];
@@ -127,11 +129,11 @@ export class SignupPage implements OnInit {
         })
       })
     }
-    else{
+    else {
       alert(this.translate.instant('ALERT.permission_creating_device'));
-      this.shared_data.checkLocationEnabled().then(()=>{
+      this.shared_data.checkLocationEnabled().then(() => {
         this.getPosition();
-      },err=>console.log(err))
+      }, err => console.log(err))
     }
   }
   checkDate(ev) {
@@ -257,14 +259,21 @@ export class SignupPage implements OnInit {
 
   }
   click_next() {
+    console.log(this.shared_data.user_data.emergency_contacts.length)
     if (this.shared_data.user_data.emergency_contacts.length > 0)
       this.stepper.next()
     else
       this.shared_data.createToast(this.translate.instant('ALERT.limit_lower_contacts'));
   }
-  show_tooltip() {
-    this.tooltip.show();
-    interval(4000).subscribe(() => { this.tooltip.hide(); })
+  show_tooltip(name) {
+    var tooltip = this.tooltip_pin;
+    console.log(name=='pin')
+    if (name == 'pin')
+      tooltip = this.tooltip_pin;
+    else
+      tooltip = this.tooltip_allergies;
+    tooltip.show();
+    interval(4000).subscribe(() => { tooltip.hide(); })
   }
   getUserFromFormGroup() {
     var error = this.findErrorsAllFormsGroup()
@@ -272,7 +281,7 @@ export class SignupPage implements OnInit {
       Object.keys(this.shared_data.user_data).forEach((element) => {
         console.log(element)
         switch (element) {
-          case 'uuid': case 'dateObserved': case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
+          case 'uuid': case 'email': case 'dateObserved': case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
             break;
           case 'allergies': case 'medications': {
             this.shared_data.user_data[element] = this.secondFormGroup.get(element)?.value;
@@ -312,7 +321,7 @@ export class SignupPage implements OnInit {
     console.log('FormGroupFromUser')
     Object.keys(this.shared_data.user_data).forEach((element) => {
       switch (element) {
-        case 'uuid': case 'dateObserved': case 'emergency_contacts': case 'paired_devices': case 'qr_code': case 'nfc_code': case 'status':
+        case 'uuid': case 'email': case 'dateObserved': case 'emergency_contacts': case 'paired_devices': case 'qr_code': case 'nfc_code': case 'status':
           break;
         case 'allergies': case 'medications': {
           this.secondFormGroup.get(element).setValue(this.shared_data.user_data[element])
@@ -402,11 +411,14 @@ export class SignupPage implements OnInit {
                 this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true })
               }, err => {
                 alert(this.translate.instant('ALERT.error') + err.msg);
-                this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device')+' 1/3')
+                this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device') + ' 1/3')
+                // this.snap4CityService.deleteDevice(DeviceType.PROFILE).catch((err)=>console.log(err))
+                // this.snap4CityService.deleteDevice(DeviceType.ALERT_EVENT).catch((err)=>console.log(err))
+                // this.snap4CityService.deleteDevice(DeviceType.QR_NFC_EVENT).catch((err)=>console.log(err))
                 this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
-                  this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device')+' 2/3')
+                  this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device') + ' 2/3')
                   this.snap4CityService.deleteDevice(DeviceType.ALERT_EVENT).then(() => {
-                    this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device')+' 3/3')
+                    this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device') + ' 3/3')
                     this.snap4CityService.deleteDevice(DeviceType.QR_NFC_EVENT).then(() => {
                       this.shared_data.dismissLoading();
                     }, err => { alert('ERROR_DELETING_QRNFCEVENT. ' + err.msg); this.shared_data.dismissLoading() })
@@ -415,9 +427,9 @@ export class SignupPage implements OnInit {
               })
             }, err => {
               alert(this.translate.instant('ALERT.error') + err.msg);
-              this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device')+' 1/2')
+              this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device') + ' 1/2')
               this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
-                this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device')+' 2/2')
+                this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device') + ' 2/2')
                 this.snap4CityService.deleteDevice(DeviceType.ALERT_EVENT).then(() => {
                   this.shared_data.dismissLoading();
                 }, err => { alert('ERROR_DELETING_ALERTEVENT. ' + err.msg); this.shared_data.dismissLoading() })
@@ -425,7 +437,7 @@ export class SignupPage implements OnInit {
             })
           }, (err) => {
             alert(this.translate.instant('ALERT.error') + err.msg);
-            this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device')+' 1/1')
+            this.shared_data.setTextLoading(this.translate.instant('ALERT.deleting_device') + ' 1/1')
             this.snap4CityService.deleteDevice(DeviceType.PROFILE).then(() => {
               this.shared_data.dismissLoading();
             }, err => { alert('ERROR_DELETING_PROFILE. ' + err.msg); this.shared_data.dismissLoading() })
