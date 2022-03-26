@@ -70,7 +70,7 @@ export class LoginPage implements OnInit {
   }
   loginTest() {
     this.authService.isAuthenticated.next(true);
-    this.sharedData.user_data.uuid = '30d0ed45-69d0-4305-85d3-87c54cd88cdc'
+    this.sharedData.user_data.uuid = '10802ebe-06b9-4c74-9141-f3b48dbc37e8'
     this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
   }
   async login() {
@@ -81,6 +81,9 @@ export class LoginPage implements OnInit {
           this.sharedData.accessToken = this.authService.keycloak.token;
           this.authService.keycloak.loadUserProfile().then((data) => {
             //this.sharedData.user_data.uuid = data.username;
+            console.log('EMAIL')
+            this.sharedData.user_data.email=data.email;
+            console.log(this.sharedData.user_data.email);
             console.log('Getting devices....')
             this.ngsi.getOwnDevices().then((devices: any) => {
               console.log('GET_OWN_DEVICES')
@@ -88,6 +91,9 @@ export class LoginPage implements OnInit {
               if (devices.length == 3) {
                 var index = devices.findIndex((item) => item.model == DeviceType.PROFILE)
                 console.log(index)
+                this.sharedData.user_data.uuid=devices[index].id.substring(10,10+36) //ampereuser=11 chars
+                console.log('UUID')
+                console.log(this.sharedData.user_data.uuid)
                 this.ngsi.getEntity(devices[index].id, DeviceType.PROFILE).then((data) => {
                   this.authService.isAuthenticated.next(true);
                   console.log('SetUsertValueFromData')
@@ -116,9 +122,8 @@ export class LoginPage implements OnInit {
                   let count = 1;
                   devices.forEach(element => {
                     this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems') + ' ' + (count++) + '/' + devices.length)
-                    this.s4c.deleteDevice(element.id).catch(() => { alert(this.translate.instant('ALERT.general_error')); this.sharedData.dismissLoading() })
+                    this.s4c.deleteDevice(element.devicetype,element.id).catch(() => { alert(this.translate.instant('ALERT.general_error')); }).finally(()=>this.sharedData.dismissLoading().catch(err=>console.log(err)));
                   });
-                  this.sharedData.dismissLoading();
                 }
               }
             }, err => {
