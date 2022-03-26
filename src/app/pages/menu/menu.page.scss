@@ -1,10 +1,18 @@
 .active-item{
     font-weight: bold;
-    color: var((--ion-color-primary));
+    color: #000;
 }
 ion-list{
     padding-bottom: 0px;
 }
 .toolbar-title{
     text-align: center;
+}
+ion-icon{
+    color: #fff;
+}
+ion-header{
+    text-align: center;
+    --ion-background-color:#25288A;
+    --ion-text-color:#fff;
 }

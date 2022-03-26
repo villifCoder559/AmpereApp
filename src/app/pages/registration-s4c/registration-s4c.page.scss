@@ -6,7 +6,7 @@
 }
 .content{
     height:100%;
-    background-color: #fff;
+    // background-color: #fff;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -22,7 +22,7 @@
 }
 .row{
     flex-direction: row;
-    padding: 5px;
+    margin: 5px;
 }
 mat-checkbox{
     padding-right: 10px;

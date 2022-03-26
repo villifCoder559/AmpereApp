@@ -27,12 +27,78 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import 'swiper/css';
 ion-content{
-    --ion-background-color:#fff;
-    --ion-text-color:#000;
-    --ion-item-background:#fff;
+    --ion-background-color:#25288A;
+    --ion-text-color:#fff;
+    --ion-item-background:#4472C4;
 }
+ion-content .mat-raised-button{
+    background-color: #4472C4;
+    color: #fff;
+}
+// .mat-step{
+//     background-color: #25288A;
+//     color: #FAFAFA;
+//   }
 button .mat-button-wrapper{
     display: contents;
+}
+// #content mat-form-field{
+//     background-color: #4472C4;
+//     padding-bottom: 0px;
+// }
+#signup {
+    ion-content{
+        --ion-background-color:#25288A;
+    }
+    mat-stepper{
+        background-color: #25288A;
+    }
+    .mat-form-field-appearance-fill .mat-form-field-flex{
+        background-color: #4472C4;
+    }
+    input,.mat-step-label,.mat-form-field-label,span,textarea,.mat-hint{
+        color: #fff;
+    }
+    .container-button{
+        span{
+            color: #000;
+        }
+    }
+    #emergency_contacts{
+        .mat-form-field-appearance-fill .mat-form-field-flex {
+            background-color: rgba(0,0,0,.04);;
+        }
+        input,.mat-step-label,.mat-form-field-label,span,textarea,.mat-hint{
+            color: #000;
+        }
+    }
+    #medical_information{
+        span{
+            color: #000;
+        }
+        button span{
+            color: #fff;
+        }
+    }
+    .btt_add_contact{
+        span{
+            color: #000;
+        }
+    }
+}
+#registration{
+    input,.mat-step-label,.mat-form-field-label,span,textarea,.mat-hint{
+        color: #fff;
+    }
+    .mat-form-field-flex{
+        background: #4472C4;
+        color: #fff;
+    }
+}
+#registration_page{
+    .mat-checkbox-layout{
+        background-color: #fff;
+    }
 }
 .alert-msg{
     text-align: center;
@@ -50,7 +116,7 @@ h2,h3,p{
     margin: 0px !important
 }
 .toolbar{
-    background-color: #3F51B5;
+    background-color: #25288A;
     color: white;
     justify-content: space-between;
     display: flex;
@@ -173,6 +239,8 @@ ngx-qrcode{
     flex-direction: column;
 }
 .scannerCode{
+    display: flex;
+    justify-content: center;
     margin-top: 30px;
 }
 .content{

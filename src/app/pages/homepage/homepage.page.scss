@@ -1,3 +1,17 @@
+.second_row{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 25%;
+    align-items: center;
+}
+.first_row{
+    display: flex;
+    justify-content: center;
+    font-size: 35vw;
+    height: 75%;
+    align-items: center;
+}
 .homepage_content{
     display: flex;
     justify-content: space-evenly;
@@ -28,12 +42,17 @@
     display: flex;
     flex-direction: column;
 }
+.toolbar_button_content .mat-icon{
+    display: flex;
+    font-size: inherit;
+}
 .buttons{
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24vw;
-    
+    height: fit-content;
+    padding: 0px;
 }
 .button_bottom{
     width: 98%;
@@ -44,10 +63,16 @@
 }
 #emergency{
     background: #FF0000;
-    color: #000;
+    //color: #000;
     border-style: solid;
-    height: fit-content;
+    width: 260px;
+    height: 260px;
+    border-radius: 100%;
+    .mat-icon{
+        font-size: 230px;
+    }
 }
+
 .mat-icon{
     font-size: 24vw;
     display: inherit;

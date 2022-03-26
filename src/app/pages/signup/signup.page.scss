@@ -1,6 +1,13 @@
 ion-content input{
   color:#000;
 }
+textarea,form span{
+  color: #000;
+}
+ion-content .mat-raised-button{
+  background-color: #fff;
+  color: #000;
+}
 .go_back_button{
   display: flex;
   justify-content: center;
@@ -9,7 +16,9 @@ ion-content input{
 .example-stepper {
     margin-top: 8px;
   }
-  
+#content{
+  color: #000;
+}
 .mat-form-field {
   margin-top: 16px;
 }
@@ -95,8 +104,8 @@ mat-form-field{
 }
 .field{
   display: flex;
-  
 }
+
 @media screen and(min-width: 800px) { 
   .tablet_view{
     justify-content: space-around;
