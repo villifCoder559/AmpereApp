@@ -6,7 +6,7 @@
       </ion-buttons>
       <span>{{'MENU.title.device_status'|translate}}</span>
       <button mat-icon-button style="font-size: 23px;" (click)="go_to_deviceSettings()">
-        <div class="fake-icon"></div>
+        <ion-icon name="settings"></ion-icon>
       </button>
     </div>
   </mat-toolbar>
@@ -16,15 +16,15 @@
   <div class="content">
     <!-- <div class="reader"> -->
       <div class="div_battery">
-        <button tourAnchor="Battery" mat-raised-button id='batteryButton' (click)="testBattery()">{{'TEST-DEVICE.card.battery.title'|translate}}</button>
+        <button tourAnchor="Battery" mat-raised-button id='batteryButton' (click)="testBattery()">{{'TEST-DEVICE.battery.title'|translate}}</button>
       </div>
       <div style="padding-top: 50px; display: none;" id="testDeviceCard">
         <mat-card style="border-radius: 25px; border: outset">
           <mat-card-title-group style="justify-content: center; padding-top: 10px;">
-            <mat-card-title>{{'TEST-DEVICE.card.battery.title'|translate}}</mat-card-title>
+            <mat-card-title>{{'TEST-DEVICE.battery.title'|translate}}</mat-card-title>
           </mat-card-title-group>
           <mat-card-content style="padding: 10px; font-size: 15px;">
-            {{'TEST-DEVICE.card.battery.content'|translate}}
+            {{'TEST-DEVICE.battery.content'|translate}}
           </mat-card-content>
         </mat-card>
       </div>

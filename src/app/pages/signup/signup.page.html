@@ -23,7 +23,7 @@
     </div>
   </mat-toolbar>
 </ion-header>
-<ion-content #content>
+<ion-content #content id="signup">
   <mat-stepper #stepper [linear]="this.authService.isAuthenticated.getValue()?false:true" orientation="vertical">
     <mat-step [stepControl]="firstFormGroup">
       <ng-template matStepLabel>{{'SIGNUP.form.title_1'|translate}}</ng-template>
@@ -42,10 +42,10 @@
               <mat-label>{{'SIGNUP.form.nickname'|translate}}</mat-label>
               <input matInput required formControlName="nickname" placeholder="{{'SIGNUP.form.nickname'|translate}}">
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <!-- <mat-form-field appearance="fill">
               <mat-label>{{'SIGNUP.form.email'|translate}}</mat-label>
               <input matInput type="email" formControlName="email" placeholder="example@mail.com" required>
-            </mat-form-field>
+            </mat-form-field> -->
             <mat-form-field appearance="fill">
               <mat-label>{{'SIGNUP.form.phone'|translate}}</mat-label>
               <input matInput type="tel" maxlength="15" minlength="8" required formControlName="phoneNumber"
@@ -76,27 +76,32 @@
               <span matSuffix>Kg</span>
             </mat-form-field>
             <mat-form-field appearance="fill">
-              <mat-label>{{'SIGNUP.form.ethnicity'|translate}}</mat-label>
-              <input matInput formControlName="ethnicity" placeholder="">
+              <mat-label>{{'SIGNUP.form.ethnicity.label'|translate}}</mat-label>
+              <mat-select formControlName="ethnicity">
+                <mat-option [value]="0">{{'SIGNUP.form.ethnicity.option.european'|translate}}</mat-option>
+                <mat-option [value]="1">{{'SIGNUP.form.ethnicity.option.asian'|translate}}</mat-option>
+                <mat-option [value]="2">{{'SIGNUP.form.ethnicity.option.african'|translate}}</mat-option>
+                <mat-option [value]="3">{{'SIGNUP.form.ethnicity.option.american'|translate}}</mat-option>
+              </mat-select>
             </mat-form-field>
             <mat-form-field appearance="fill" hintLabel="{{'SIGNUP.form.hint'|translate}}">
               <mat-label>{{'SIGNUP.form.description.label'|translate}}</mat-label>
               <textarea #description matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize"
-                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="translate.instant('SIGNUP.form.description.placeholder'|translate)"
+                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="{{'SIGNUP.form.description.placeholder'|translate}}"
                 formControlName="description"></textarea>
               <mat-hint align="end">{{description.value?.length || 0}}/200</mat-hint>
             </mat-form-field>
-            <mat-form-field appearance="fill" hintLabel="{{'SIGNUP.form.purpose.label'|translate}}">
+            <mat-form-field appearance="fill" hintLabel="{{'SIGNUP.form.hint'|translate}}">
               <mat-label>{{'SIGNUP.form.purpose.label'|translate}}</mat-label>
               <textarea #purpose matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize"
-                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="translate.instant('SIGNUP.form.purpose.placeholder'|translate)"
+                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" placeholder="{{'SIGNUP.form.purpose.placeholder'|translate}}"
                 formControlName="purpose"></textarea>
               <mat-hint align="end">{{purpose.value?.length || 0}}/200</mat-hint>
             </mat-form-field>
             <mat-form-field appearance="fill">
               <mat-label>{{'SIGNUP.form.pin.label'|translate}}</mat-label>
               <input type="tel" required (input)="onlyNumbersAllowed($event,'pin')" matInput formControlName="pin"
-                placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip()" #tooltip="matTooltip"
+                placeholder="1234" minlength="4" maxlength="4" (click)="show_tooltip('pin')" #tooltip_pin="matTooltip"
                 matTooltip="{{'SIGNUP.form.pin.tooltip'|translate}}">
             </mat-form-field>
             <mat-form-field appearance="fill">
@@ -135,10 +140,11 @@
               <mat-label>{{'SIGNUP.form.allergies.label'|translate}}</mat-label>
               <textarea required #allergies matInput cdkTextareaAutosize
                 #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4"
-                placeholder="{{'SIGNUP.form.allergies.placeholder'|translate}}" formControlName="allergies"></textarea>
+                placeholder="{{'SIGNUP.form.allergies.placeholder'|translate}}" formControlName="allergies" matTooltip="{{'SIGNUP.form.allergies.tooltip'|translate}}" 
+                (click)="show_tooltip('allergies')" #tooltip_allergies="matTooltip"></textarea>
               <mat-hint align="end">{{allergies.value?.length || 0}}/200</mat-hint>
             </mat-form-field>
-            <mat-card appearance="fill" id="matcardResize">
+            <mat-card appearance="fill" style="max-width: 250px;margin-top:15px">
               <mat-card-title>{{'SIGNUP.form.disabilities.label'|translate}}</mat-card-title>
               <mat-checkbox formControlName="visionImpaired">{{'SIGNUP.form.disabilities.checkbox.vision_impaired'|translate}}
               </mat-checkbox><br>
@@ -159,7 +165,7 @@
         </form>
       </ng-template>
     </mat-step>
-    <mat-step>
+    <mat-step [completed]="stepper.linear && this.shared_data.user_data.emergency_contacts.length>0?true:false">
       <ng-template matStepLabel>{{'SIGNUP.form.emergency_contact.label'|translate}}</ng-template>
       <ng-template matStepContent>
         <div id="emergency_contacts">
@@ -182,16 +188,16 @@
                   <input matInput value='{{contact.number}}' readonly=true>
                 </mat-form-field>
                 <div class="container-button">
-                  <button style="display: flex;" mat-raised-button
+                  <button style="display: flex; color:black" mat-raised-button
                     (click)="openDialogEmergencyContact(contact,i)">{{'SHARED_VALUES.modify'|translate}}</button>
-                  <button style="display: flex;" mat-raised-button color="warn"
+                  <button style="display: flex; background-color: red;" mat-raised-button color="warn"
                     (click)="remove_contact(i)">{{'SHARED_VALUES.delete'|translate}}</button>
                 </div>
               </div>
             </mat-card>
           </div>
           <div style="justify-content: center; display:flex">
-            <button *ngIf="this.shared_data.user_data.emergency_contacts.length < shared_data.MAX_EMERGENCY_CONTACTs" style="margin: 10px 0 10px;"
+            <button class="btt_add_contact" *ngIf="this.shared_data.user_data.emergency_contacts.length < shared_data.MAX_EMERGENCY_CONTACTs" style="margin: 10px 0 10px;"
               mat-raised-button (click)="openDialogEmergencyContact(0,-1)">{{'SIGNUP.form.emergency_contact.button.add_contact'|translate}}</button>
           </div>
           <div class="tablet_view" style="justify-content: center;">
@@ -202,7 +208,7 @@
       </ng-template>
     </mat-step>
 
-    <mat-step [stepControl]="fourthFormGroup">
+    <mat-step [stepControl]="fourthFormGroup" >
       <ng-template matStepLabel>{{'SIGNUP.form.public_emergency_contacts.label'|translate}}</ng-template>
       <ng-template matStepContent>
         <form id="public_contacts" [formGroup]="fourthFormGroup">
@@ -236,9 +242,7 @@
           </div>
           <div class="tablet_view" style="justify-content: center;">
             <button mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
-            <button *ngIf="!this.authService.isAuthenticated.getValue()" mat-button
-              (click)="register_user()">{{'SIGNUP.form.button.register'|translate}}</button>
-            <button *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">{{'SIGNUP.form.button.done'|translate}}</button>
+            <button mat-button matStepperNext>{{'SIGNUP.form.button.next'|translate}}</button>
           </div>
         </form>
       </ng-template>
@@ -282,6 +286,12 @@
             </ion-list>
           </mat-card-content>
         </mat-card>
+        <div class="tablet_view" style="justify-content: center;">
+          <button mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
+          <button *ngIf="!this.authService.isAuthenticated.getValue()" mat-button
+            (click)="register_user()">{{'SIGNUP.form.button.register'|translate}}</button>
+          <button *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">{{'SIGNUP.form.button.done'|translate}}</button>
+        </div>
       </ng-template>
     </mat-step>
     
