@@ -20,7 +20,8 @@
     "button": {
       "login": "Accedi con Snap4city",
       "signup": "Non sei ancora iscritto? Iscriviti!"
-    }
+    },
+    "language":"Lingua"
   },
   "HOMEPAGE": {
     "button": {
@@ -113,7 +114,15 @@
       },
       "height": "Altezza",
       "weight": "Peso",
-      "ethnicity": "Etnia",
+      "ethnicity": {
+        "label":"Etnia",
+        "option":{
+          "european":"Europea",
+          "asian":"Asiatica",
+          "african":"Africana",
+          "american":"Americana"
+      }
+      },
       "hint": "Max 200 caratteri",
       "description": {
         "label": "Descrizione",
@@ -133,7 +142,8 @@
       "city": "Città",
       "allergies": {
         "label": "Allergie",
-        "placeholder": "polline, punture di insetti..."
+        "placeholder": "Cortisone, punture di insetti...",
+        "tooltip":"Se non presenti scrivi No"
       },
       "medications": {
         "label": "Farmaci"
@@ -284,7 +294,7 @@
     "enable_nfc": "Abilitare NFC dalle impostazioni",
     "qr_scan": "QR scansionato con successo",
     "registration": {
-      "success": "Registrato con successo",
+      "success": "Registrato con successo. Controlla la tua email e finalizza la registrazione, quindi torna nell'app e accedi",
       "error": "Errore nella registrazione ",
       "form": {
         "checkbox": "Devi accettare tutte le regole per registrarti ",
@@ -306,7 +316,7 @@
     "check_permission": "Controllo dei permessi...",
     "check_data": "Controllo dei dati...",
     "get_info_from_server": "Ottenere informazioni dal server",
-    "retrive_info": "Recuperare le informazioni...",
+    "retrive_info": "Recupero le informazioni...",
     "send_data": "Invio dei dati...",
     "update_data": "Aggiornare i dati...",
     "create_device": "Creazione del dispositivo ",

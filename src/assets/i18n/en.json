@@ -20,13 +20,15 @@
         "button": {
             "login": "Login with Snap4city",
             "signup": "Not yet a member? Sign up!"
-        }
+        },
+        "language":"Language"
+        
     },
     "HOMEPAGE": {
         "button": {
             "emergency": "Emergency",
             "profile": "Profile",
-            "FAQ":"FAQ"
+            "FAQ": "FAQ"
         }
     },
     "CALL_CONTACTS": {
@@ -90,12 +92,12 @@
             }
         },
         "form": {
-            "title_1":"Personal Information",
-            "title_2":"Medical Information",
+            "title_1": "Personal Information",
+            "title_2": "Medical Information",
             "button": {
                 "next": "Next",
                 "back": "Back",
-                "register": "Registrer",
+                "register": "Register",
                 "done": "Done"
             },
             "name": "Name",
@@ -113,8 +115,16 @@
             },
             "height": "Height",
             "weight": "Weight",
-            "ethnicity": "Ethnicity",
-            "hint":"Max 200 characters",
+            "ethnicity": {
+                "label":"Ethnicity",
+                "option":{
+                    "european":"European",
+                    "asian":"Asian",
+                    "african":"African",
+                    "american":"American"
+                }
+            },
+            "hint": "Max 200 characters",
             "description": {
                 "label": "Description",
                 "placeholder": "brown hair,blue eyes..."
@@ -133,7 +143,8 @@
             "city": "City",
             "allergies": {
                 "label": "Allergies",
-                "placeholder": "pollen,Insect stings..."
+                "placeholder": "Cortisone,insect stings...",
+                "tooltip":"If not present write No"
             },
             "medications": {
                 "label": "Medications"
@@ -176,11 +187,9 @@
         "toolbar": {
             "title": "Devices Status"
         },
-        "card": {
-            "battery": {
-                "title": "Test Battery",
-                "content": "Stay in this page and keep your phone and jewel close; click the button on the jewel and check if the app sends a test alert."
-            }
+        "battery": {
+            "title": "Test Battery",
+            "content": "Stay in this page and keep your phone and jewel close; click the button on the jewel and check if the app sends a test alert."
         }
     },
     "SHARED_VALUES": {
@@ -215,7 +224,7 @@
                 "title": "Ready to join?",
                 "content": "You can sign up for free trial without subscription, but remember that in this case your alerts will be rejected!"
             },
-            "button":"Start using the app"
+            "button": "Start using the app"
         }
     },
     "TOUR": {
@@ -253,7 +262,7 @@
         },
         "immediate": {
             "title": "Fast!",
-            "content": "Clicking it you can send immidiately the emergency, without waiting 20 seconds"
+            "content": "Clicking it you can send immediately the emergency, without waiting 20 seconds"
         },
         "pin": {
             "title": "Pin Boxs",
@@ -267,81 +276,81 @@
             "title": "Battery Test",
             "content": "Click this button and check the battery. We suggest to test it at least once per month"
         },
-        "end":"Tour ended. Enjoy using our app!",
-        "button":{
-            "next":"Next",
-            "previous":"Previous",
-            "start":"Start",
-            "end":"End"
+        "end": "Tour ended. Enjoy using our app!",
+        "button": {
+            "next": "Next",
+            "previous": "Previous",
+            "start": "Start",
+            "end": "End"
         }
     },
-    "ALERT":{
-        "permission_creating_device":"For a better registration we''ll use the localisation",
-        "geo_permission":"This app needs location access for all the time. Allow it so this app can work properly",
-        "internet_permission":"This app needs internet connection, enable it!",
-        "foreground_service":"Detecting charm",
-        "dialer_error":"error launching dialer",
-        "internet_connection_fail":"Check your internet connection",
-        "error":"Error ",
-        "enable_nfc":"Enable NFC from settings",
-        "qr_scan":"QR scanned succesfully",
-        "registration":{
-            "success":"Succesfully registrated",
-            "error":"Error in registration ",
-            "form":{
-                "checkbox":"You must accept all policy to sign-up ",
-                "data":"Insert valid name and email",
-                "and":"and"
+    "ALERT": {
+        "permission_creating_device": "For a better registration we'll use the location",
+        "geo_permission": "This app needs location access for all the time. Allow it so this app can work properly",
+        "internet_permission": "This app needs internet connection, enable it!",
+        "foreground_service": "Detecting charm",
+        "dialer_error": "error launching dialer",
+        "internet_connection_fail": "Check your internet connection",
+        "error": "Error ",
+        "enable_nfc": "Enable NFC from settings",
+        "qr_scan": "QR scanned successfully",
+        "registration": {
+            "success": "successfully registered. Check your email and finalize the registration, then back in the app and login",
+            "error": "Error in registration ",
+            "form": {
+                "checkbox": "You must accept all policy to sign-up ",
+                "data": "Insert valid name and email",
+                "and": "and"
             },
-            "wait":"Asking for registration",
-            "check":"Check your email with your credentials"
+            "wait": "Asking for registration",
+            "check": "Check your email with your credentials"
         },
-        "data_success":"Data saved succesfully",
-        "data_fail":"Error. Recovery old data",
-        "limit_upper_contacts":"You can register max 5 people!",
-        "limit_lower_contacts":"Add at least one contact",
-        "error_step":"Error in step number ",
-        "already_paired":"You have already paired 2 devices!",
-        "send_emergency":"Sending emergency...",
-        "send_emergency_succ":"Emergency sent successfully",
-        "end_battery_test":"Test battery completed succesfully",
-        "check_permission":"Checking permission...",
-        "check_data":"Checking data...",
-        "get_info_from_server":"Getting info from server",
-        "retrive_info":"Retrieving information...",
-        "send_data":"Sending data...",
-        "update_data":"Updating data...",
-        "create_device":"Creating device ",
-        "ble_scan_err":"Scan not working if bluetooth is off",
-        "device_connected_succ":"Properly connected. Stop keep press the button",
-        "device_connected_err":"Device already registred",
-        "pin_wrong":"Pin wrong",
-        "generic_error":"Generic error",
-        "deleting_device":"Deleting device...",
-        "fixing_problems":"Fixing wrong number of devices..."
-       },
-    "DIALOG":{
-        "CONTACT":{
-            "import":"Import",
-            "save":"Save"
+        "data_success": "Data saved successfully",
+        "data_fail": "Error. Recovery old data",
+        "limit_upper_contacts": "You can register max 5 people!",
+        "limit_lower_contacts": "Add at least one contact",
+        "error_step": "Error in step number ",
+        "already_paired": "You have already paired 2 devices!",
+        "send_emergency": "Sending emergency...",
+        "send_emergency_succ": "Emergency sent successfully",
+        "end_battery_test": "Test battery completed successfully",
+        "check_permission": "Checking permission...",
+        "check_data": "Checking data...",
+        "get_info_from_server": "Getting info from server",
+        "retrive_info": "Retrieving information...",
+        "send_data": "Sending data...",
+        "update_data": "Updating data...",
+        "create_device": "Creating device ",
+        "ble_scan_err": "Scan not working if bluetooth is off",
+        "device_connected_succ": "Properly connected. Stop keep press the button",
+        "device_connected_err": "Device already registred",
+        "pin_wrong": "Pin wrong",
+        "generic_error": "Generic error",
+        "deleting_device": "Deleting device...",
+        "fixing_problems": "Fixing wrong number of devices..."
+    },
+    "DIALOG": {
+        "CONTACT": {
+            "import": "Import",
+            "save": "Save"
         },
-        "IMPORT":{
-            "title":"Contact List",
-            "subtitle":"Find contact"
+        "IMPORT": {
+            "title": "Contact List",
+            "subtitle": "Find contact"
         },
-        "MODIFY_NAME":{
-            "title":"Modify Name",
-            "new_name":"New name"
+        "MODIFY_NAME": {
+            "title": "Modify Name",
+            "new_name": "New name"
         },
-        "SAVE":{
-            "title":"Do you want to save?"
+        "SAVE": {
+            "title": "Do you want to save?"
         },
-        "BLUETOOTH":{
-            "title":"Device List"
+        "BLUETOOTH": {
+            "title": "Device List"
         },
-        "close":"close",
-        "yes":"yes",
-        "no":"no"
+        "close": "close",
+        "yes": "yes",
+        "no": "no"
     },
     "TERM_OF_USE": {},
     "PRIVACY_POLICY": {}
