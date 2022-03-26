@@ -356,7 +356,7 @@ export class SharedDataService {
     console.log(data)
     Object.keys(this.user_data).forEach((element) => {
       switch (element) {
-        case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
+        case'paired_devices':case'uuid': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
           break;
         case 'dateObserved': {
           this.user_data[element] = new Date().toISOString();
@@ -412,7 +412,7 @@ export class SharedDataService {
     var newUser = {}
     Object.keys(this.user_data).forEach((field_name) => {
       switch (field_name) {
-        //case 'id': { break; }
+        // case 'uuid': { break; }
         case 'dateObserved': {
           newUser[field_name] = { value: new Date().toISOString() }
           break;
@@ -496,7 +496,7 @@ export class SharedDataService {
       this.platform.ready().then(() => {
         console.log('enableAllPermission')
         // this.askForegroundService().then(() => {
-        this.checkLocationEnabled().then(() => {
+        this.checkLocationEnabled().then((result) => {
           this.enableBluetooth().then(() => {
             this.askGeoPermission().then(() => {
               console.log('ASK_PERMISSION')
@@ -568,7 +568,7 @@ export class SharedDataService {
         () => {
           resolve(true)
         }, error => {
-          alert(JSON.stringify(error))
+          //alert(JSON.stringify(error))
           reject(false)
         })
     })
@@ -608,7 +608,7 @@ export class SharedDataService {
             this.locationAccPermission().then(() => {
               console.log('requestPermissionDone')
               resolve(true)
-            });
+            },err=>reject(false));
           }
         },
         error => {
@@ -645,8 +645,8 @@ export class SharedDataService {
       enableBackdrop: true
     }, {
       anchorId: 'Emergency',
-      title: this.translate.instant('TOUR.nfc.title'),
-      content: this.translate.instant('TOUR.nfc.content'),
+      title: this.translate.instant('TOUR.emergency.title'),
+      content: this.translate.instant('TOUR.emergency.content'),
       nextBtnTitle: this.translate.instant('TOUR.button.next'),
       prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true
