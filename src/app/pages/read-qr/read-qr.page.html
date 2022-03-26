@@ -16,7 +16,7 @@
 <ion-content #content>
   <div class="content">
     <div class="reader">
-      <mat-card appearance="fill" id="bluetooth" class="custom_mat_card">
+      <mat-card appearance="fill" id="card" class="custom_mat_card">
         <div class="title_list_Code">
           <mat-card-title>{{'QR.card.title'|translate}}</mat-card-title>
         </div>
@@ -41,11 +41,11 @@
           </ion-list>
         </div>
       </mat-card>
-      <img src="assets/images/qr-reader.gif" alt="qr-reader" />
+      <img style="border-radius: 10px;" src="assets/images/qr-reader.gif" alt="qr-reader" />
       <div class="scannerCode">
-        <ion-button expand="full" (click)="scanCode()">
+        <button class="btc" mat-button expand="full" (click)="scanCode()">
           {{'QR.button.scan'|translate}}
-        </ion-button>
+        </button>
       </div>
     </div>
   </div>
