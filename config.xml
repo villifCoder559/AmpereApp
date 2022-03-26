@@ -14,14 +14,11 @@
     <preference name="ScrollEnabled" value="false" />
     <preference name="BackupWebStorage" value="none" />
     <preference name="SplashMaintainAspectRatio" value="true" />
-    <preference name="FadeSplashScreenDuration" value="300" />
+    <preference name="FadeSplashScreenDuration" value="0" />
+    <preference name="SplashScreenBackgroundColor" value="25288A" />
     <preference name="SplashShowOnlyFirstTime" value="false" />
-    <preference name="SplashScreen" value="none" />
-    <preference name="LottieAnimationLocation" value="www/assets/images/splashScreen.json" />
-    <preference name="LottieAutoHideSplashScreen" value="false" />
-    <preference name="LottieFullScreen" value="true" />
-    <preference name="LottieLoopAnimation" value="true" />
-    <preference name="LottieBackgroundColor" value="#fff" />
+    <preference name="SplashScreen" value="screen" />
+    <preference name="splashScreenDelay" value="5000" />
     <preference name="AndroidXEnabled" value="true" />
     <preference name="GradlePluginKotlinEnabled" value="true" />
     <preference name="GradlePluginKotlinCodeStyle" value="official" />
