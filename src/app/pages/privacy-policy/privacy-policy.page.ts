@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-privacy-policy',
@@ -6,8 +7,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./privacy-policy.page.scss'],
 })
 export class PrivacyPolicyPage implements OnInit {
+  urlSafe: any;
 
-  constructor() { }
+  constructor(public sanitizier: DomSanitizer) {
+    this.urlSafe=this.sanitizier.bypassSecurityTrustResourceUrl('https://www.snap4city.org/49');
+  }
 
   ngOnInit() {
   }
