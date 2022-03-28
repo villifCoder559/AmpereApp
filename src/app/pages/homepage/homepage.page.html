@@ -4,7 +4,11 @@
 <ng-template #counter let-step="step" let-total="total">
   {{ step }} of {{ total }} steps
 </ng-template>
+
 <ion-content>
+  <div class="status">
+    <h2>{{'HOMEPAGE.status.label'|translate}}: {{'HOMEPAGE.status.'+this.sharedData.user_data.status|translate}}</h2>
+  </div>
   <div class="homepage_content">
     <div class="first_row">
       <button tourAnchor="Emergency" id="emergency" mat-raised-button class="buttons" (click)="openAlertPage()">
