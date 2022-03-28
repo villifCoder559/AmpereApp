@@ -21,26 +21,26 @@ export class ReadingCodeService {
       var json_id = this.parseText(scanned_text)
       console.log(json_id)
       this.getListFromServer(type).then(() => {
-        if (this.checkIDValidityNFCorQR(type, json_id['deviceID'])) {
-          this.NGSIv2Query.getEntity(json_id['deviceID'], DeviceType.DICTIONARY, json_id['broker']).then((response: any) => {
+        //if (this.checkIDValidityNFCorQR(type, json_id['deviceID'])) {
+          this.NGSIv2Query.getEntity('ampereuser'+this.sharedData.user_data.uuid+DeviceType.DICTIONARY, DeviceType.DICTIONARY, json_id['broker']).then((response: any) => {
             console.log(response)
-            console.log(event)
             this.geolocation.getCurrentPosition().then((position) => {
-              var action: string = response.identifier.value;
-              var event = new QRNFCEvent(type == typeChecking.QR_CODE ? 'QR' : 'NFC', response.identifier.value, action,position.coords.latitude,position.coords.longitude);
+              console.log(position)
+              var url: string = response[json_id['deviceID']].value;
+              var event = new QRNFCEvent(type == typeChecking.QR_CODE ? 'QR' : 'NFC', response.identifier.value, url,position.coords.latitude,position.coords.longitude);
               this.NGSIv2Query.sendQRNFCEvent(event).then(() => {
-                console.log(action);
-                this.iab.create('https://' + action, '_blank', { hideurlbar: 'yes' })
+                console.log(url);
+                this.iab.create('https://' + url, '_blank', { hideurlbar: 'yes' })
                 resolve(true);
               }, err => reject(err))
             })
           }, (err) => {
             reject(err);
-          })
-        }
-        else {
-          reject({ msg: 'Permission denied' })
-        }
+          }).catch(err=>reject({msg:'Timeout'}))
+        //}
+        // else {
+        //   reject({ msg: 'Permission denied' })
+        // }
       }, err => {
         console.log(err)
         reject(err)

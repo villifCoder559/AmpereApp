@@ -23,16 +23,16 @@ import { AuthenticationService } from '../services/authentication.service';
 
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
-// @NgModule({
-//   imports: [
-//     CommonModule,
-//     FormsModule,
-//     IonicModule,
-//     CountdownModule
-//   ],
-//   providers: [
-//     NativeAudio, BackgroundMode]
-// })
+  // @NgModule({
+  //   imports: [
+  //     CommonModule,
+  //     FormsModule,
+  //     IonicModule,
+  //     CountdownModule
+  //   ],
+  //   providers: [
+  //     NativeAudio, BackgroundMode]
+  // })
 export class NFCCode {
   id: number = -1;
 }
@@ -57,10 +57,7 @@ export class Emergency_Contact {
 export enum typeChecking {
   NFC_CODE = 'nfc_code',
   QR_CODE = 'qr_code',
-  EMERGENCY_CONTACTS = 'emergency_contacts',
-  DISABILITIES = 'disabilities',
-  PUB_EMERGENCY_CONTACTS = 'public_emergency_contacts',
-  PAIRED_DEVICES = 'paired_devices'
+
 }
 export enum DeviceType {
   ALERT_EVENT = 'AmpereEvent',
@@ -73,10 +70,7 @@ export enum StorageNameType {
   NFC_CODE = 'nfc_code',
   DEVICES = 'paired_devices'
 }
-export class StorageName {
-  id: any = ''
-  name: any = ''
-}
+
 export class UserData {
   uuid: string = ''
   name: string = '';
@@ -105,7 +99,7 @@ export class UserData {
   paired_devices = []
   qr_code = []
   nfc_code = []
-  status = 'active'
+  status = 'not_active'
   constructor() { }
   copyFrom(data: UserData) {
     this.emergency_contacts = [];
@@ -242,6 +236,9 @@ export class SharedDataService {
   enabled_test_battery_mode = new BehaviorSubject(false);
   constructor(private authService: AuthenticationService, private translate: TranslateService, private foregroundService: ForegroundService, private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
+      window.addEventListener('offline', () => {
+        alert(this.translate.instant('ALERT.internet_permission'));
+      })
       this.storage.create();
       console.log('StorageNameType')
       Object.keys(StorageNameType).forEach(element => {
@@ -356,7 +353,7 @@ export class SharedDataService {
     console.log(data)
     Object.keys(this.user_data).forEach((element) => {
       switch (element) {
-        case'paired_devices':case'uuid': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
+        case 'paired_devices': case 'uuid': case 'emergency_contacts': case 'nfc_code': case 'qr_code':
           break;
         case 'dateObserved': {
           this.user_data[element] = new Date().toISOString();
@@ -495,22 +492,22 @@ export class SharedDataService {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
         console.log('enableAllPermission')
-        // this.askForegroundService().then(() => {
-        this.checkLocationEnabled().then((result) => {
-          this.enableBluetooth().then(() => {
-            this.askGeoPermission().then(() => {
-              console.log('ASK_PERMISSION')
-              this.localNotifications.hasPermission().then(result => {
-                if (!result.valueOf())
-                  this.localNotifications.requestPermission().then(() => {
+        //this.askForegroundService().then(() => {
+          this.checkLocationEnabled().then((result) => {
+            this.enableBluetooth().then(() => {
+              this.askGeoPermission().then(() => {
+                console.log('ASK_PERMISSION')
+                this.localNotifications.hasPermission().then(result => {
+                  if (!result.valueOf())
+                    this.localNotifications.requestPermission().then(() => {
+                      resolve(true)
+                    }).catch(err => reject(err))
+                  else
                     resolve(true)
-                  }).catch(err => reject(err))
-                else
-                  resolve(true)
-              }, (err) => reject(err))
-            }, err => { reject(err) })
-          }, err => reject(err))
-        }, err => reject(err + '. App can\'t work properly!'))
+                }, (err) => reject(err))
+              }, err => { reject(err) })
+            }, err => reject(err))
+          }, err => reject(err + '. App can\'t work properly!'))
         //}, err => reject(err))
         this.enableAllBackgroundMode();
       }, err => reject(err))
@@ -608,7 +605,7 @@ export class SharedDataService {
             this.locationAccPermission().then(() => {
               console.log('requestPermissionDone')
               resolve(true)
-            },err=>reject(false));
+            }, err => reject(false));
           }
         },
         error => {
@@ -617,6 +614,9 @@ export class SharedDataService {
         }
       );
     })
+  }
+  moveAppToForeground() {
+    BackgroundMode.moveToForeground();
   }
   startTour() {
     this.tour_enabled = true;
@@ -634,8 +634,7 @@ export class SharedDataService {
       content: this.translate.instant('TOUR.qr.content'),
       nextBtnTitle: this.translate.instant('TOUR.button.next'),
       prevBtnTitle: this.translate.instant('TOUR.button.previous'),
-      enableBackdrop: true,
-      route: 'profile/menu/homepage'
+      enableBackdrop: true
     }, {
       anchorId: 'NFC',
       title: this.translate.instant('TOUR.nfc.title'),
@@ -715,13 +714,15 @@ export class SharedDataService {
       route: '/profile/menu/test-device',
     }])
     this.tourService.start();
-    this.tourService.end$.subscribe(() => {
+    var end = this.tourService.end$.subscribe(() => {
+      console.log('END')
       this.tour_enabled = false;
       this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true });
       this.storage.set('tour', true).then(async () => {
         this.createToast(this.translate.instant('TOUR.end'))
         this.enableAllPermission();
         this.checkPermissionAlreadyMake = true;
+        end.unsubscribe()
       })
     })
   }
