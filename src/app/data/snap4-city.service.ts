@@ -12,10 +12,7 @@ export class Snap4CityService {
   deleteDevice(type: DeviceType, name = 'ampereuser') {
     return new Promise((resolve, reject) => {
       var device_id;
-      if (name == 'ampereuser')
-        device_id = name + this.shared_data.user_data.uuid + type;
-      else
-        device_id = name;
+      device_id = name + this.shared_data.user_data.uuid + type;
       console.log(device_id)
       $.ajax({
         url: "https://iotdirectory.snap4city.org/api/device.php",
@@ -81,7 +78,7 @@ export class Snap4CityService {
         success: (mydata) => {
           console.log(mydata)
           if (mydata?.status != 'ko') {
-            this.delegateModel(device_id,k1,k2).then(() => {
+            this.delegateModel(device_id, k1, k2).then(() => {
               resolve(mydata)
             }, err => reject(err))
           }
@@ -98,7 +95,7 @@ export class Snap4CityService {
       })
     })
   }
-  private delegateModel(device_id,k1,k2) {
+  private delegateModel(device_id, k1, k2) {
     return new Promise((resolve, reject) => {
       console.log(k1);
       console.log(k2);
@@ -269,7 +266,7 @@ export class Snap4CityService {
   //   })
   //   return newEvent;
   // }
-  getEventPayload(createModel, event: QRNFCEvent | AlertEvent) {
+  getEventPayload(createModel: boolean, event: QRNFCEvent | AlertEvent) {
     var newQRNFCEvent;
     if (createModel)
       newQRNFCEvent = this.createModelEvent(event);
