@@ -10,17 +10,16 @@ export class AuthGuardService implements CanActivate {
   constructor(private authService: AuthenticationService, private router: Router) { }
   canActivate(route: ActivatedRouteSnapshot): boolean {
     if (this.authService.isAuthenticated.observers.length == 0)
-      this.activateSubscription();
+      this.authenticationSubscription();
     if (this.authService.isAuthenticated.getValue())
       return true;
     else {
-      console.log('Token expired')
       this.router.navigateByUrl("", { replaceUrl: true }).then(() => {
         return false
       }, (err) => { return false })
     }
   }
-  activateSubscription() {
+  authenticationSubscription() {
     this.authService.isAuthenticated.subscribe(() => {
       console.log('subs triggered')
       if (!this.authService.isAuthenticated.getValue())
