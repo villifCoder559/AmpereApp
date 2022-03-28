@@ -24,7 +24,7 @@ export class ShowAlertPage implements OnInit {
     formatDate: ({ date }) => `${date / 1000}`,
   };
   watchAccelerationFunction;
-  offSensorsInterval = 30000 //milliseconds
+  offSensorsInterval = 300000 //milliseconds
   checkingPositionInterval = null;
   configGeolocation: BackgroundGeolocationConfig = {
     desiredAccuracy: 10,
@@ -33,15 +33,25 @@ export class ShowAlertPage implements OnInit {
     debug: true, //  enable this hear sounds for background-geolocation life-cycle.
     stopOnTerminate: true, // enable this to clear background location settings when the app terminates
     interval: 3000,
-    fastestInterval: 6000,
+    fastestInterval: 4000,
     activitiesInterval: 1500
   };
-  constructor(private translate:TranslateService,private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, public shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
+  constructor(private translate: TranslateService, private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, public shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
     if (!this.shared_data.enabled_test_battery_mode && !this.shared_data.tour_enabled) {
+      this.localNotifications.addActions('fast-pin', [
+        { id: 'fast', title: this.translate.instant('ALERT.send_emergency_now') },
+        { id: 'pin', title: this.translate.instant('ALERT.false_alarm') }])
+      this.localNotifications.on('fast').subscribe(()=>{
+        this.immediateEmergency();
+      })
+      this.localNotifications.on('pin').subscribe(()=>{
+        this.shared_data.moveAppToForeground();
+      })
       this.localNotifications.schedule({
         id: 1,
-        text: 'Emergency notification, click to open and insert PIN to disable alert or click again to send emergency immediatly',
-        data: ""
+        text: 'Emergency notification, click to open and insert PIN to disable alert or click the button to send emergency immediatly',
+        data: "",
+        actions:'fast-pin'
       });
       this.backgroundGeolocation.configure(this.configGeolocation).then(() => {
         console.log('Starting geolocation background...')
@@ -56,7 +66,7 @@ export class ShowAlertPage implements OnInit {
     }
     if (this.shared_data.enabled_test_battery_mode.getValue()) {
       this.details_emergency.status = 'testBattery'
-      this.details_emergency.evolution = 'finish'
+      this.details_emergency.evolution = 'end'
       this.shared_data.enabled_test_battery_mode.next(false);
       this.countdown.left = 0;
       for (let i = 0; i < this.pin.length; i++)
@@ -172,8 +182,11 @@ export class ShowAlertPage implements OnInit {
       console.log('getCurrentPosition')
     })
   }
+  timeout_position;
   private timeoutStopCheckPosition() {
-    setTimeout(() => {
+    if (this.timeout_position != null)
+      clearTimeout(this.timeout_position)
+    this.timeout_position = setTimeout(() => {
       clearInterval(this.checkingPositionInterval);
       this.backgroundGeolocation.stop().catch(err => console.log(err))
     }, this.offSensorsInterval)
@@ -215,13 +228,16 @@ export class ShowAlertPage implements OnInit {
       })
     })
   }
+  timeout_watch_acceleration;
   private activateSensors() {
     return new Promise((resolve) => {
       console.log('GETPOSITION')
       this.getPosition().then(() => {
         console.log('GETACCELERATION')
         this.getAcceleration().then(() => {
-          setTimeout(() => {
+          if (this.timeout_watch_acceleration != null)
+            clearTimeout(this.timeout_watch_acceleration);
+          this.timeout_watch_acceleration = setTimeout(() => {
             this.watchAccelerationFunction.unsubscribe();
           }, this.offSensorsInterval)
           console.log('resolve')
