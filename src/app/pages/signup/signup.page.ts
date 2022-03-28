@@ -42,7 +42,7 @@ export class SignupPage implements OnInit {
   @ViewChild('tooltip_allergies') tooltip_allergies: MatTooltip;
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
-
+  
   //add native-langauage field
   //fix dimension when resize the screen
   firstFormGroup = this._formBuilder.group({
@@ -518,7 +518,7 @@ export class SignupPage implements OnInit {
       console.log(this.shared_data.user_data.paired_devices)
       //this.bluetoothservice.disableRegion(deviceDeleted)
       if (this.authService.isAuthenticated.getValue())
-        this.sendAuth.saveUserProfile().then(() => {
+        this.NGSIv2QUERY.sendUserProfile().then(() => {
           this.shared_data.deleteDeviceFromLocalStorage(el_deleted, StorageNameType.DEVICES);
           this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
         }, err => {
@@ -559,7 +559,7 @@ export class SignupPage implements OnInit {
     if (indexOf == -1) {
       alert(this.translate.instant('ALERT.device_connected_succ'))
       if (this.authService.isAuthenticated.getValue())
-        this.sendAuth.saveUserProfile().then(() => {
+        this.NGSIv2QUERY.sendUserProfile().then(() => {
           this.shared_data.setNameDevice(device, device);
           this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
         }, err => {
