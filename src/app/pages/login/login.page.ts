@@ -51,9 +51,6 @@ export class LoginPage implements OnInit {
           this.router.navigateByUrl('/tutorial', { replaceUrl: true })
       })
     }, err => console.log(err))
-    this.network.onDisconnect().subscribe(() => {
-      alert(this.translate.instant('ALERT.internet_permission'));
-    })
   }
   async openLanguagePopover(ev) {
     const popover = await this.popoverCtrl.create({
@@ -63,93 +60,94 @@ export class LoginPage implements OnInit {
     await popover.present()
   }
   registration() {
-    this.router.navigateByUrl('/registration-s4c', { replaceUrl: true })
+    if (window.navigator.onLine)
+      this.router.navigateByUrl('/registration-s4c', { replaceUrl: true })
+    else
+      alert(this.translate.instant('ALERT.internet_permission'));
   }
   openTutorial() {
     this.router.navigateByUrl('/tutorial', { replaceUrl: true })
   }
   loginTest() {
     this.authService.isAuthenticated.next(true);
-    this.sharedData.user_data.uuid = '10802ebe-06b9-4c74-9141-f3b48dbc37e8'
+    this.sharedData.user_data.uuid = '615da79d-f33b-4e2e-95d3-c85aac6aaec6'
     this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
   }
   async login() {
-    await this.sharedData.presentLoading(this.translate.instant('ALERT.check_data'));
-    try {
-      this.authService.loginSnap4City().then((auth) => {
-        if (auth) {
-          this.sharedData.accessToken = this.authService.keycloak.token;
-          this.authService.keycloak.loadUserProfile().then((data) => {
-            //this.sharedData.user_data.uuid = data.username;
-            console.log('EMAIL')
-            this.sharedData.user_data.email=data.email;
-            console.log(this.sharedData.user_data.email);
-            console.log('Getting devices....')
-            this.ngsi.getOwnDevices().then((devices: any) => {
-              console.log('GET_OWN_DEVICES')
-              console.log(devices);
-              if (devices.length == 3) {
-                var index = devices.findIndex((item) => item.model == DeviceType.PROFILE)
-                console.log(index)
-                this.sharedData.user_data.uuid=devices[index].id.substring(10,10+36) //ampereuser=11 chars
-                console.log('UUID')
-                console.log(this.sharedData.user_data.uuid)
-                this.ngsi.getEntity(devices[index].id, DeviceType.PROFILE).then((data) => {
-                  this.authService.isAuthenticated.next(true);
-                  console.log('SetUsertValueFromData')
-                  this.sharedData.setUserValueFromData(data);
-                  console.log('ENABLE_ALL_BEACON')
-                  this.bluetoothService.enableAllBeaconFromSnap4City();
-                  console.log('END_ENABLE_BEACON')
-                  console.log('Start_Sendig_Valid_Status')
-                  this.sendAuth.startSendingValidStatus()
-                  Object.keys(this.sharedData.localStorage).forEach((element: StorageNameType) => {
-                    this.sharedData.getNameDevices(element);
-                  })
-                  this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true }).then(() => {
-                    this.sharedData.dismissLoading();
-                  })
-                  console.log('END_ROUTER')
-                }, err => alert(err))
-              }
-              else {
-                if (devices.length == 0 || devices == null) {
+    if (window.navigator.onLine) {
+      await this.sharedData.presentLoading(this.translate.instant('ALERT.check_data'));
+      try {
+        this.authService.loginSnap4City().then(async (auth) => {
+          if (auth) {
+            this.sharedData.accessToken = this.authService.keycloak.token;
+            await this.authService.keycloak.loadUserProfile().then(async (data) => {
+              //this.sharedData.user_data.uuid = data.username;
+              console.log('EMAIL')
+              this.sharedData.user_data.email = data.email;
+              console.log(this.sharedData.user_data.email);
+              console.log('Getting devices....')
+              await this.ngsi.getOwnDevices().then(async (devices: any) => {
+                let index_profile = devices.findIndex((item) => item.model == DeviceType.PROFILE)
+                this.sharedData.user_data.uuid = devices[index_profile].id.substring(10, 10 + 36) //ampereuser=11 chars
+                console.log('GET_OWN_DEVICES')
+                console.log(devices);
+                if (index_profile != -1) {
+                  let index_check = devices.findIndex((item) => item.model == DeviceType.ALERT_EVENT)
+                  if (index_check == -1) {
+                    this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems'))
+                    await this.s4c.createDevice(DeviceType.ALERT_EVENT)
+                    this.sharedData.setTextLoading(this.translate.instant('ALERT.check_data'))
+                  }
+                  index_check = devices.findIndex((item) => item.model == DeviceType.QR_NFC_EVENT)
+                  if (index_check == -1) {
+                    this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems'))
+                    await this.s4c.createDevice(DeviceType.QR_NFC_EVENT)
+                    this.sharedData.setTextLoading(this.translate.instant('ALERT.check_data'))
+                  }
+                  console.log(index_profile)
+                  console.log(this.sharedData.user_data.uuid)
+                  this.ngsi.getEntity(devices[index_profile].id, DeviceType.PROFILE).then((data) => {
+                    this.authService.isAuthenticated.next(true);
+                    console.log('SetUsertValueFromData')
+                    this.sharedData.setUserValueFromData(data);
+                    console.log('ENABLE_ALL_BEACON')
+                    this.bluetoothService.enableAllBeaconFromSnap4City();
+                    console.log('END_ENABLE_BEACON')
+                    console.log('Start_Sendig_Valid_Status')
+                    this.sendAuth.startSendingStatus()
+                    Object.keys(this.sharedData.localStorage).forEach((element: StorageNameType) => {
+                      this.sharedData.getNameDevices(element);
+                    })
+                    this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true }).then(() => {
+                      this.sharedData.dismissLoading();
+                    })
+                    console.log('END_ROUTER')
+                  }, err => alert(err))
+                }
+                else {
                   this.router.navigateByUrl('/signup', { replaceUrl: true })
                   this.sharedData.dismissLoading();
                 }
-                else {
-                  this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems'))
-                  let count = 1;
-                  devices.forEach(element => {
-                    this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems') + ' ' + (count++) + '/' + devices.length)
-                    this.s4c.deleteDevice(element.devicetype,element.id).catch(() => { alert(this.translate.instant('ALERT.general_error')); }).finally(()=>this.sharedData.dismissLoading().catch(err=>console.log(err)));
-                  });
-                }
-              }
-            }, err => {
-              console.log(err)
-              alert(this.translate.instant('ALERT.generic_error') + ': ' + err?.configuration);
-              this.sharedData.dismissLoading();
-            })
-          }, err => alert(err));
-        }
-      }, async (err) => {
-        console.log('ERR_SNAP4City')
-        console.log(err)
-        if (err != 'closed_by_user')
-          alert(err === undefined ? this.translate.instant('ALERT.internet_connection_fail') : err)
+              }, err => {
+                console.log(err)
+                alert(this.translate.instant('ALERT.generic_error') + ': ' + err?.configuration);
+                this.sharedData.dismissLoading();
+              })
+            }, err => alert(err));
+          }
+        }, async (err) => {
+          console.log('ERR_SNAP4City')
+          console.log(err)
+          if (err != 'closed_by_user')
+            alert(err === undefined ? this.translate.instant('ALERT.internet_connection_fail') : err)
+          await this.sharedData.dismissLoading();
+        });
+      } catch (e) {
         await this.sharedData.dismissLoading();
-      });
-    } catch (e) {
-      await this.sharedData.dismissLoading();
-      alert((e as Error).message)
+        alert((e as Error).message)
+      }
     }
-  }
-  async show_toast(txt) {
-    let toast = this.toastCtrl.create({
-      header: txt,
-      duration: 2500
-    })
-      ; (await toast).present();
+    else
+      alert(this.translate.instant('ALERT.internet_permission'));
   }
 }
