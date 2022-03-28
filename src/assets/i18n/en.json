@@ -29,6 +29,11 @@
             "emergency": "Emergency",
             "profile": "Profile",
             "FAQ": "FAQ"
+        },
+        "status":{
+            "label":"User status",
+            "active":"Active",
+            "not_active":"Not active"
         }
     },
     "CALL_CONTACTS": {
@@ -54,6 +59,10 @@
             "question": "Can I see again the tour of the app?",
             "answer": "Certainly, you can click the button below and start a tour.",
             "button": "Start a tour"
+        },
+        "2":{
+            "question":"What doest user status mean?",
+            "answer":"It describes your subscription, if you have a subscription you will see the status 'active' otherwise 'not active'. Remember if your status is 'not active' your emergency alert will be ignored by operator!"
         }
     },
     "MENU": {
@@ -179,7 +188,7 @@
             },
             "pairing": {
                 "title": "Pairing",
-                "content": "Keep press your smart jewelry and then press the button below to pair it with the app (swipe to delete device or edit the name)"
+                "content": "Keep press your smart jewelry and then press the button below to pair it with the app by clicking the label called AMPERE (swipe to delete device or edit the name). If you are in in an emergency situation you can keep press the jewel for at least 4 seconds and send an emergency"
             }
         }
     },
@@ -204,7 +213,7 @@
         "button": {
             "immediate_emergency": "Send immediatly Emergency"
         },
-        "content": "Accidentally triggered? No problem,enter your PIN to cancel.<br><br>To send a message, please let the time expire or click the button above"
+        "content": "Accidentally triggered? No problem,enter your PIN to cancel. To send a message, please let the time expire or click the button above"
     },
     "TUTORIAL": {
         "slide": {
@@ -234,11 +243,11 @@
         },
         "qr": {
             "title": "QR",
-            "content": "You can open a page where you can see a list of your QRs and scan one of it"
+            "content": "You can open a page where you can see a list of your QRs provided by snap4city and scan one of it"
         },
         "nfc": {
             "title": "NFC",
-            "content": "You can open a page where you can see a list of your NFC-tags and scan one of it"
+            "content": "You can open a page where you can see a list of your NFC-tags provided by snap4city and scan one of it"
         },
         "emergency": {
             "title": "Emergency",
@@ -297,6 +306,7 @@
         "registration": {
             "success": "successfully registered. Check your email and finalize the registration, then back in the app and login",
             "error": "Error in registration ",
+            "user_already_present":"The e-mail is already registered. Log in with span4city",
             "form": {
                 "checkbox": "You must accept all policy to sign-up ",
                 "data": "Insert valid name and email",
@@ -319,6 +329,8 @@
         "get_info_from_server": "Getting info from server",
         "retrive_info": "Retrieving information...",
         "send_data": "Sending data...",
+        "send_emergency_now":"Fast",
+        "false_alarm":"False alarm",
         "update_data": "Updating data...",
         "create_device": "Creating device ",
         "ble_scan_err": "Scan not working if bluetooth is off",
@@ -327,7 +339,8 @@
         "pin_wrong": "Pin wrong",
         "generic_error": "Generic error",
         "deleting_device": "Deleting device...",
-        "fixing_problems": "Fixing wrong number of devices..."
+        "fixing_problems": "Fixing wrong number of devices...",
+        "retrive_status":"Error retrive status"
     },
     "DIALOG": {
         "CONTACT": {

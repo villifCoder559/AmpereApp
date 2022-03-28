@@ -28,7 +28,12 @@
       "emergency": "Emergenza",
       "profile": "Profilo",
       "FAQ": "Domande"
-    }
+    },
+    "status":{
+      "label":"Stato utente",
+      "active":"Attivo",
+      "not_active":"Non attivo"
+  }
   },
   "CALL_CONTACTS": {
     "toolbar": {
@@ -53,7 +58,11 @@
       "question": "Posso rivedere il tour dell'app?",
       "answer": "Certamente, puoi cliccare sul pulsante qui sotto e iniziare un tour.",
       "button": "Iniziare un tour"
-    }
+    },
+    "2":{
+      "question":"Cosa indica lo stato utente?",
+      "answer":"Descrive il tuo abbonamento, se hai un abbonamento vedrai lo stato 'attivo' altrimenti 'non attivo'. Ricorda se il tuo stato è 'non attivo', il tuo avviso di emergenza verrà ignorato dall'operatore!"
+  }
   },
   "MENU": {
     "title": {
@@ -178,7 +187,7 @@
       },
       "pairing": {
         "title": "Collega dispositivo",
-        "content": "Tieni premuto il tuo gioiello e poi premi il pulsante qui sotto per accoppiarlo con l'app (scorri per cancellare il dispositivo o modificare il nome)"
+        "content": "Tieni premuto il tuo gioiello e poi premi il pulsante qui sotto per accoppiarlo con l'app cliccando l'etichetta con scritto AMPERE (scorri per cancellare il dispositivo o modificare il nome). Se sei nei guai tieni pemuto il bottone sul gioiello per almeno 4 secondi così invierai l'allarme"
       }
     }
   },
@@ -203,13 +212,13 @@
     "button": {
       "immediate_emergency": "Invia immediatamente Emergenza"
     },
-    "content": "Attivato accidentalmente? Nessun problema, inserisci il tuo PIN per annullare.<br/><br/>Per inviare un messaggio, lascia scadere il tempo o clicca sul pulsante qui sopra"
+    "content": "Attivato accidentalmente? Nessun problema, inserisci il tuo PIN per annullare. Per inviare un messaggio, lascia scadere il tempo o clicca sul pulsante qui sopra"
   },
   "TUTORIAL": {
     "slide": {
       "0": {
         "title": "Benvenuto",
-        "content": "Questa applicazione è per coloro che vogliono sentirsi al sicuro in ogni momento, se sei in difficoltà puoi tenere premuto il bottone sul gioiello per inviare un S.O.S. con la tua posizione"
+        "content": "Questa applicazione è per coloro che vogliono sentirsi al sicuro in ogni momento, se sei in difficoltà puoi tenere premuto il bottone sul gioiello per almeno 4 secondi così invierai un S.O.S. con la tua posizione"
       },
       "1": {
         "title": "Come funziona",
@@ -233,11 +242,11 @@
     },
     "qr": {
       "title": "QR",
-      "content": "Puoi aprire una pagina dove puoi vedere un elenco dei tuoi QR e scansionarne uno"
+      "content": "Puoi aprire una pagina dove puoi vedere un elenco dei tuoi QR forniti da snap4city e scansionarne uno"
     },
     "nfc": {
       "title": "NFC",
-      "content": "Puoi aprire una pagina dove puoi vedere una lista dei tuoi tag NFC e scansionarne uno"
+      "content": "Puoi aprire una pagina dove puoi vedere una lista dei tuoi tag NFC forniti da snap4city e scansionarne uno"
     },
     "emergency": {
       "title": "Emergenza",
@@ -296,6 +305,7 @@
     "registration": {
       "success": "Registrato con successo. Controlla la tua email e finalizza la registrazione, quindi torna nell'app e accedi",
       "error": "Errore nella registrazione ",
+      "user_already_present":"L'email è gia registrata. Accedi con span4city",
       "form": {
         "checkbox": "Devi accettare tutte le regole per registrarti ",
         "data": "Inserisci un nome e un'email validi",
@@ -309,6 +319,8 @@
     "limit_upper_contacts": "Puoi registrare al massimo 5 persone!",
     "limit_lower_contacts": "Aggiungi almeno un contatto",
     "error_step": "Errore nel numero del passo ",
+    "send_emergency_now":"Veloce!",
+    "false_alarm":"Falso allarme",
     "already_paired": "Hai già accoppiato 2 dispositivi!",
     "send_emergency": "Invio emergenza...",
     "send_emergency_succ": "Emergenza inviata con successo",
@@ -326,8 +338,8 @@
     "pin_wrong": "Pin sbagliato",
     "generic_error":"Errore generico",
     "deleting_device":"Elimino device...",
-    "fixing_problems":"Correggo numero errato di devices..."
-
+    "fixing_problems":"Correggo numero errato di devices...",
+    "retrive_status":"Errore recupero stato"
   },
   "DIALOG": {
     "CONTACT": {
