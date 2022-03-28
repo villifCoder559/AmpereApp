@@ -25,7 +25,7 @@ export class TutorialPage implements AfterContentChecked {
   goToLoginPage() {
     this.storage.set('tutorial_read', true).then((value) => {
       if (this.auth.isAuthenticated.getValue())
-        this.router.navigateByUrl('profile/homepage/faq', { replaceUrl: true })
+        this.router.navigateByUrl('/profile/menu/faq', { replaceUrl: true })
       else
         this.router.navigateByUrl('/login', { replaceUrl: true })
     },err=>console.log(err))
