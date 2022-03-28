@@ -55,7 +55,7 @@ export class DialogImportContactsComponent implements OnInit {
     });
   }
   intervall = null;
-  find_contact(ev) {
+  async find_contact(ev) {
     if (this.intervall != null)
       clearTimeout(this.intervall);
     $('#spinnerInput').css('visibility', 'visible')
