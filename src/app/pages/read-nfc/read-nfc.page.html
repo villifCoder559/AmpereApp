@@ -25,7 +25,7 @@
             <ion-item-sliding id="slidingItem{{i}}" style="background-color: #fff;">
               <ion-item *ngIf="item.id !=-1" class="ion-no-padding" id="item{{i}}">
                 <ion-label class="label" class="label_code">
-                  <h2>{{this.shared_data?.localStorage[StorageNameType.NFC_CODE][i]?.name || this.shared_data.user_data?.nfc_code[i]}}</h2>
+                  <h2 style="background-color: #4472C4;">{{this.shared_data?.localStorage[StorageNameType.NFC_CODE][i]?.name || this.shared_data.user_data?.nfc_code[i]}}</h2>
                 </ion-label>
               </ion-item>
               <ion-item-options side="end" class="bluetooth_item_options">
