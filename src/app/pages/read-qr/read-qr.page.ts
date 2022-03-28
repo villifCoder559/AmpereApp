@@ -23,27 +23,8 @@ export class ReadQRPage implements OnInit {
   isOn = false;
   eventBackButton;
   constructor(private translate: TranslateService, private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: BarcodeScanner) {
-    // document.addEventListener('ionBackButton', () => {
-    //   this.backButtonEvent();
-    // })
-  }
-  private backButtonEvent() {
-    // if (this.previewCamera) {
-    //   console.log('backbutton');
-    //   this.closePreviewCamera();
-    //   $("ion-app").show(500);
-    // }
-  }
-  ionViewWillLeave() {
-    //document.removeEventListener('ionBackButton', () => { this.backButtonEvent() })
-  }
-  closePreviewCamera() {
-    // this.previewCamera = false;
-    // this.qrScanner.hide();
-    // this.qrScanner.destroy();
   }
   scanCode() {
-
     this.qrScanner.scan().then((element) => {
       //this.closePreviewCamera();
       //this.changeRef.detectChanges();

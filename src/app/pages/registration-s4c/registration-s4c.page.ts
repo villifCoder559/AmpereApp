@@ -21,7 +21,7 @@ export class RegistrationS4cPage implements OnInit {
     privacyPolicyCheckbox: false,
     cookiesPolicyCheckbox: false
   }
-  constructor(private translate:TranslateService,private sharedData: SharedDataService, private _formBuilder: FormBuilder, private inAppBrowser: InAppBrowser, private router: Router) { }
+  constructor(private translate: TranslateService, private sharedData: SharedDataService, private _formBuilder: FormBuilder, private inAppBrowser: InAppBrowser, private router: Router) { }
 
   ngOnInit() {
   }
@@ -37,10 +37,10 @@ export class RegistrationS4cPage implements OnInit {
     var ok = true;
     Object.keys(this.registrationGroup.controls).forEach(element => {
       console.log(element)
-      const controlErrors:ValidationErrors=this.registrationGroup.get(element).errors;
+      const controlErrors: ValidationErrors = this.registrationGroup.get(element).errors;
       if (controlErrors) {
         Object.keys(controlErrors).forEach((key) => {
-          console.log(element+' '+key+' '+controlErrors[key])
+          console.log(element + ' ' + key + ' ' + controlErrors[key])
           if (controlErrors[key])
             ok = false;
         })
@@ -54,42 +54,47 @@ export class RegistrationS4cPage implements OnInit {
     var form = this.validForm();
     console.log(form)
     if (checkbox && form)
-    this.sharedData.presentLoading(this.translate.instant('ALERT.registration.wait')).then(()=>{
-      $.ajax({
-        url: "https://www.snap4city.org/drupal/api/user/register",
-        method: "POST",
-        async: true,
-        contentType: "application/json",
-        timeout: 3000,
-        data: JSON.stringify({
-          "name": this.registrationGroup.get('name').value,
-          "mail": this.registrationGroup.get('email').value,
-          "legal_accept": "true",
-          "extras-1": "true",
-          "extras-2": "true",
-          "og_user_node": {
-            "und": [{
-              "default": 765 //AMPERE
-            }]
+      this.sharedData.presentLoading(this.translate.instant('ALERT.registration.wait')).then(() => {
+        $.ajax({
+          url: "https://www.snap4city.org/drupal/api/user/register",
+          method: "POST",
+          async: true,
+          contentType: "application/json",
+          timeout: 3000,
+          data: JSON.stringify({
+            "name": this.registrationGroup.get('name').value,
+            "mail": this.registrationGroup.get('email').value,
+            "legal_accept": "true",
+            "extras-1": "true",
+            "extras-2": "true",
+            "og_user_node": {
+              "und": [{
+                "default": 765 //AMPERE
+              }]
+            }
+          }),
+          success: (data) => {
+            alert(this.translate.instant('ALERT.check'))
+            this.sharedData.createToast(this.translate.instant('ALERT.registration.success'))
+            console.log('SUCCESS_REGISTATION')
+            this.router.navigateByUrl('/login', { replaceUrl: true })
+            console.log(data);
+          },
+          error: (err) => {
+            if (err.status == 406) {
+              this.sharedData.createToast(this.translate.instant('ALERT.registration.user_already_present'))
+              this.router.navigateByUrl('/login', { replaceUrl: true })
+            }
+            else
+              this.sharedData.createToast(this.translate.instant('ALERT.registration.error'))
+            console.log('ERROR_REGISTRATION')
+            console.log(err)
+          },
+          complete: () => {
+            this.sharedData.dismissLoading();
           }
-        }),
-        success: (data) => {
-          alert(this.translate.instant('ALERT.check'))
-          this.sharedData.createToast(this.translate.instant('ALERT.registration.success'))
-          console.log('SUCCESS_REGISTATION')
-          this.router.navigateByUrl('/login', { replaceUrl: true })
-          console.log(data);
-        },
-        error: (err) => {
-          this.sharedData.createToast(this.translate.instant('ALERT.registration.error'))
-          console.log('ERROR_REGISTRATION')
-          console.log(err)
-        },
-        complete:()=>{
-          this.sharedData.dismissLoading();
-        }
-      });
-    })
+        });
+      })
     else {
       var txt = '';
       if (!checkbox)
