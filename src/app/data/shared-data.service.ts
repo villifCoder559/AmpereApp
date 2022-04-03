@@ -4,8 +4,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, LoadingController, Platform, ToastController } from '@ionic/angular';
-import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
-//import BackgroundMode from 'cordova-plugin-advanced-background-mode';
+//import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
+import BackgroundMode from 'cordova-plugin-advanced-background-mode';
 // import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { Storage } from '@ionic/storage-angular'
@@ -278,43 +278,29 @@ export class SharedDataService {
   async setTextLoading(text) {
     $('.loading-content').html(text);
   }
-  showAlert(id) {
-    console.log(id)
-    let navigationExtras: NavigationExtras = {
-      state: {
-        deviceID: id
-      },
-      replaceUrl: true
-    };
-    this.moveAppToForeground();
+  showAlertPage() {
+    // console.log(id)
+    // let navigationExtras: NavigationExtras = {
+    //   state: {
+    //     deviceID: id
+    //   },
+    //   replaceUrl: true
+    // };
+    //this.moveAppToForeground();
     this.nativeAudio.play('alert');
-    this.router.navigate(['/show-alert'], navigationExtras)
+    if (!this.backgroundMode_enabled)
+      this.router.navigateByUrl('/show-alert', { replaceUrl: true })
   }
+  backgroundMode_enabled = false;
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
-    // /*Background mode from cordova-plugin-advanced-background-mode*/
-    // BackgroundMode.enable();
-    // BackgroundMode.disableWebViewOptimizations()
-    // BackgroundMode.disableBatteryOptimizations();
-    // BackgroundMode.overrideBackButton();
-    // BackgroundMode.on('activate', () => {
-    //   if (this.tourService.getStatus() != 0) {
-    //     this.tourService.end();
-    //     this.tour_enabled = false;
-    //   }
-    //   console.log('ActivateBackground')
-    //   this.checkPermissionAlreadyMake = false;
-    //   if (this.enabled_test_battery_mode.getValue())
-    //     this.enabled_test_battery_mode.next(false)
-    //   if (!this.authService.isAuthenticated.getValue())
-    //     BackgroundMode.disable();
-    // })
-    //Plugin background mode from @awesome
-    this.backgroundMode.enable();
-    this.backgroundMode.disableWebViewOptimizations();
-    this.backgroundMode.disableBatteryOptimizations();
-    this.foregroundService.start('AMPERE','Ampere is running');
-    this.backgroundMode.on('activate').subscribe(() => {
+    /*Background mode from cordova-plugin-advanced-background-mode*/
+    BackgroundMode.enable();
+    BackgroundMode.disableWebViewOptimizations()
+    BackgroundMode.disableBatteryOptimizations();
+    BackgroundMode.overrideBackButton();
+    BackgroundMode.on('activate', () => {
+      this.backgroundMode_enabled = true;
       if (this.tourService.getStatus() != 0) {
         this.tourService.end();
         this.tour_enabled = false;
@@ -324,8 +310,35 @@ export class SharedDataService {
       if (this.enabled_test_battery_mode.getValue())
         this.enabled_test_battery_mode.next(false)
       if (!this.authService.isAuthenticated.getValue() || this.user_data.paired_devices.length == 0)
-        this.backgroundMode.disable();
+        BackgroundMode.disable();
     })
+    BackgroundMode.on('deactivate', () => {
+      this.backgroundMode_enabled = false;
+      if (this.is_sending_emergency.getValue())
+        this.router.navigateByUrl('/show-alert')
+    })
+    //Plugin background mode from @awesome
+    // this.backgroundMode.enable();
+    // this.backgroundMode.disableWebViewOptimizations();
+    // this.backgroundMode.disableBatteryOptimizations();
+    // this.backgroundMode.on('activate').subscribe(() => {
+    //   this.backgroundMode_enabled = true;
+    //   if (this.tourService.getStatus() != 0) {
+    //     this.tourService.end();
+    //     this.tour_enabled = false;
+    //   }
+    //   console.log('ActivateBackground')
+    //   this.checkPermissionAlreadyMake = false;
+    //   if (this.enabled_test_battery_mode.getValue())
+    //     this.enabled_test_battery_mode.next(false)
+    //   if (!this.authService.isAuthenticated.getValue() || this.user_data.paired_devices.length == 0)
+    //     this.backgroundMode.disable();
+    // })
+    // this.backgroundMode.on('deactivate').subscribe(() => {
+    //   this.backgroundMode_enabled = false;
+    //   if (this.is_sending_emergency.getValue())
+    //     this.router.navigateByUrl('/show-alert')
+    // })
   }
   setNameDevice(device, type: StorageNameType, name = '') {
     var app = { id: '', name: '' };
@@ -636,8 +649,8 @@ export class SharedDataService {
     })
   }
   moveAppToForeground() {
-    //BackgroundMode.moveToForeground();
-    this.backgroundMode.moveToForeground();
+    BackgroundMode.moveToForeground();
+    //this.backgroundMode.moveToForeground();
   }
   startTour() {
     this.tour_enabled = true;
