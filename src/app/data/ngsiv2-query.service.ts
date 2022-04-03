@@ -3,7 +3,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { AlertEvent, DeviceType, QRNFCEvent, SharedDataService } from '../data/shared-data.service'
 import { Snap4CityService } from '../data/snap4-city.service'
 import { JwtHelperService } from '@auth0/angular-jwt'
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
+import { LocalNotifications } from '@awesome-cordova-plugins/local-notifications/ngx'
 const helper = new JwtHelperService();
 declare var cordovaHTTP: any;
 
@@ -150,7 +150,7 @@ export class NGSIv2QUERYService {
           resolve(true)
         }, err => {
           console.log(err)
-          this.localNotification.schedule({ title: 'Ampere token expired', text: 'Login to continue using this app!' })
+          //this.localNotification.schedule({ title: 'Ampere token expired', text: 'Login to continue using this app!' })
           reject(false)
         })
       else
@@ -209,11 +209,12 @@ export class NGSIv2QUERYService {
   }
   getEntity(id_device, type: DeviceType, broker = 'orionAMPERE-UNIFI') {
     return new Promise((resolve, reject) => {
+      console.log(this.shared_data.accessToken)
       $.ajax({
         url: "https://iot-app.snap4city.org/orionfilter/" + broker + "/v2/entities/" + id_device + "?elementid=" + id_device + "&type=" + type,
         type: "GET",
         headers: {
-          'Authorization': 'Bearer ' + this.shared_data.accessToken
+          //'Authorization': 'Bearer ' + this.shared_data.accessToken
         },
         async: true,
         dataType: 'json',
@@ -253,6 +254,31 @@ export class NGSIv2QUERYService {
             console.log('mydata')
             console.log(mydata)
             reject(mydata.error_msg)
+          }
+        },
+        error: function (xhr) {
+          reject(xhr.responseText)
+        }
+      });
+    })
+  }
+  getAllDictionarys(){
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: "https://www.disit.org/superservicemap/api/v1/?selection=42;11&requestFrom=user&categories=Service&maxResults=100&maxDists=0.0&format=json&lang=en&geometry=false&valueName=identifier",
+        type: "GET",
+        headers: {},
+        async: true,
+        dataType: 'json',
+        success: (mydata) => {
+          if (mydata.status != 'ko') {
+            console.log(mydata)
+            resolve(mydata)
+          }
+          else {
+            console.log('mydata')
+            console.log(mydata)
+            reject(mydata.msg)
           }
         },
         error: function (xhr) {
