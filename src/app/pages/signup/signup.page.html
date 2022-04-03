@@ -23,7 +23,7 @@
     </div>
   </mat-toolbar>
 </ion-header>
-<ion-content #content id="signup">
+<ion-content #content id="signup" style="--ion-background-color: #25288a;">
   <mat-stepper #stepper [linear]="this.authService.isAuthenticated.getValue()?false:true" orientation="vertical">
     <mat-step [stepControl]="firstFormGroup">
       <ng-template matStepLabel>{{'SIGNUP.form.title_1'|translate}}</ng-template>
@@ -54,7 +54,7 @@
             <mat-form-field appearance="fill">
               <mat-label>{{'SIGNUP.form.date_of_birth'|translate}}</mat-label>
               <input (input)="checkDate($event)" maxlength="10" matInput type="tel" formControlName="dateofborn"
-                placeholder="yyyy/mm/dd">
+                placeholder="yyyy-mm-dd">
             </mat-form-field>
             <mat-form-field appearance="fill">
               <mat-label>{{'SIGNUP.form.gender.label'|translate}}</mat-label>
@@ -78,10 +78,10 @@
             <mat-form-field appearance="fill">
               <mat-label>{{'SIGNUP.form.ethnicity.label'|translate}}</mat-label>
               <mat-select formControlName="ethnicity">
-                <mat-option [value]="0">{{'SIGNUP.form.ethnicity.option.european'|translate}}</mat-option>
-                <mat-option [value]="1">{{'SIGNUP.form.ethnicity.option.asian'|translate}}</mat-option>
-                <mat-option [value]="2">{{'SIGNUP.form.ethnicity.option.african'|translate}}</mat-option>
-                <mat-option [value]="3">{{'SIGNUP.form.ethnicity.option.american'|translate}}</mat-option>
+                <mat-option value="European">{{'SIGNUP.form.ethnicity.option.european'|translate}}</mat-option>
+                <mat-option value="Asian">{{'SIGNUP.form.ethnicity.option.asian'|translate}}</mat-option>
+                <mat-option value="African">{{'SIGNUP.form.ethnicity.option.african'|translate}}</mat-option>
+                <mat-option value="American">{{'SIGNUP.form.ethnicity.option.american'|translate}}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="fill" hintLabel="{{'SIGNUP.form.hint'|translate}}">
@@ -125,10 +125,11 @@
               <input matInput formControlName="city" placeholder="" required>
             </mat-form-field>
           </div>
-          <div class="tablet_view" style="justify-content: center;">
-            <button mat-button matStepperNext>{{'SIGNUP.form.button.next'|translate}}</button>
-          </div>
+          
         </form>
+        <div class="container_button_step">
+          <button class="bt_step" mat-button matStepperNext>{{'SIGNUP.form.button.next'|translate}}</button>
+        </div>
       </ng-template>
     </mat-step>
     <mat-step [stepControl]="secondFormGroup">
@@ -158,9 +159,9 @@
               <mat-hint align="end">{{medications.value?.length || 0}}/200</mat-hint>
             </mat-form-field>
           </div>
-          <div class="tablet_view" style="justify-content: center;">
-            <button mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
-            <button mat-button matStepperNext>{{'SIGNUP.form.button.next'|translate}}</button>
+          <div class="container_button_step">
+            <button mat-button class="bt_step" matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
+            <button mat-button class="bt_step" matStepperNext>{{'SIGNUP.form.button.next'|translate}}</button>
           </div>
         </form>
       </ng-template>
@@ -200,9 +201,9 @@
             <button class="btt_add_contact" *ngIf="this.shared_data.user_data.emergency_contacts.length < shared_data.MAX_EMERGENCY_CONTACTs" style="margin: 10px 0 10px;"
               mat-raised-button (click)="openDialogEmergencyContact(0,-1)">{{'SIGNUP.form.emergency_contact.button.add_contact'|translate}}</button>
           </div>
-          <div class="tablet_view" style="justify-content: center;">
-            <button mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
-            <button mat-button (click)="click_next()">{{'SIGNUP.form.button.next'|translate}}</button>
+          <div class="container_button_step">
+            <button mat-button class="bt_step" matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
+            <button mat-button class="bt_step" (click)="click_next()">{{'SIGNUP.form.button.next'|translate}}</button>
           </div>
         </div>
       </ng-template>
@@ -240,17 +241,17 @@
               </mat-card-content>
             </mat-card>
           </div>
-          <div class="tablet_view" style="justify-content: center;">
-            <button mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
-            <button mat-button matStepperNext>{{'SIGNUP.form.button.next'|translate}}</button>
+          <div class="container_button_step">
+            <button mat-button class="bt_step" matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
+            <button mat-button class="bt_step" matStepperNext>{{'SIGNUP.form.button.next'|translate}}</button>
           </div>
         </form>
       </ng-template>
     </mat-step>
 
 
-    <mat-step>
-      <ng-template matStepLabel>{{'SIGNUP.form.pairing.title'|translate}}</ng-template>
+    <mat-step [optional]="!this.authService.isAuthenticated.getValue()">
+      <ng-template matStepLabel>{{'SIGNUP.form.pairing.title'|translate}} </ng-template>
       <ng-template matStepContent>
         <mat-card tourAnchor="Pairing" appearance="fill" id="bluetooth">
           <mat-card-title class="mat-title">{{'SIGNUP.form.pairing.title'|translate}}</mat-card-title>
@@ -260,7 +261,7 @@
             <button mat-fab color="primary" (click)="openBeaconDialog()">
               <mat-icon>bluetooth</mat-icon> 
             </button>
-            <ion-list *ngFor="let device of this.shared_data.user_data.paired_devices;let i=index;">
+            <ion-list *ngFor="let device of this.shared_data.user_data.paired_devices;let i=index;" style="background-color: white;">
               <ion-item-sliding *ngIf="device?.id != '-1'" id="slidingItem{{i}}">
                 <ion-item class="ion-no-padding" class="bluetooth_item" id="device{{i}}">
                   <ion-label class="label_bluetooth_item">
@@ -286,11 +287,11 @@
             </ion-list>
           </mat-card-content>
         </mat-card>
-        <div class="tablet_view" style="justify-content: center;">
-          <button mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
-          <button *ngIf="!this.authService.isAuthenticated.getValue()" mat-button
+        <div class="container_button_step">
+          <button class="bt_step" mat-button matStepperPrevious>{{'SIGNUP.form.button.back'|translate}}</button>
+          <button class="bt_step" *ngIf="!this.authService.isAuthenticated.getValue()" mat-button
             (click)="register_user()">{{'SIGNUP.form.button.register'|translate}}</button>
-          <button *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">{{'SIGNUP.form.button.done'|translate}}</button>
+          <button class="bt_step" *ngIf="this.authService.isAuthenticated.getValue()" mat-button (click)="save_data()">{{'SIGNUP.form.button.done'|translate}}</button>
         </div>
       </ng-template>
     </mat-step>
