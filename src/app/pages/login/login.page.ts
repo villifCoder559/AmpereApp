@@ -44,7 +44,7 @@ export class LoginPage implements OnInit {
   }
   ionViewDidEnter() {
     console.log('LANGUAGE')
-    console.log(this.lng.selected)
+    console.log(this.lng.selected_language)
     this.storage.create().then(() => {
       this.storage.get('tutorial_read').then((read) => {
         if (read != true)
@@ -70,7 +70,7 @@ export class LoginPage implements OnInit {
   }
   loginTest() {
     this.authService.isAuthenticated.next(true);
-    this.sharedData.user_data.uuid = '615da79d-f33b-4e2e-95d3-c85aac6aaec6'
+    this.sharedData.user_data.uuid = '0dc2a433-239a-42bd-a96f-3dca0f62e3f7'
     this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
   }
   async login() {
@@ -88,10 +88,10 @@ export class LoginPage implements OnInit {
               console.log('Getting devices....')
               await this.ngsi.getOwnDevices().then(async (devices: any) => {
                 let index_profile = devices.findIndex((item) => item.model == DeviceType.PROFILE)
-                this.sharedData.user_data.uuid = devices[index_profile].id.substring(10, 10 + 36) //ampereuser=11 chars
                 console.log('GET_OWN_DEVICES')
                 console.log(devices);
                 if (index_profile != -1) {
+                  this.sharedData.user_data.uuid = devices[index_profile].id.substring(10, 10 + 36) //ampereuser=11 chars
                   let index_check = devices.findIndex((item) => item.model == DeviceType.ALERT_EVENT)
                   if (index_check == -1) {
                     this.sharedData.setTextLoading(this.translate.instant('ALERT.fixing_problems'))
@@ -122,7 +122,7 @@ export class LoginPage implements OnInit {
                       this.sharedData.dismissLoading();
                     })
                     console.log('END_ROUTER')
-                  }, err => alert(err))
+                  }, err => alert(this.translate.instant('ALERT.retrive_information')))
                 }
                 else {
                   this.router.navigateByUrl('/signup', { replaceUrl: true })
@@ -133,18 +133,18 @@ export class LoginPage implements OnInit {
                 alert(this.translate.instant('ALERT.generic_error') + ': ' + err?.configuration);
                 this.sharedData.dismissLoading();
               })
-            }, err => alert(err));
+            }, err => alert(this.translate.instant('ALERT.error_login')));
           }
         }, async (err) => {
           console.log('ERR_SNAP4City')
-          console.log(err)
           if (err != 'closed_by_user')
-            alert(err === undefined ? this.translate.instant('ALERT.internet_connection_fail') : err)
+            alert(err === undefined ? this.translate.instant('ALERT.internet_connection_fail') : this.translate.instant('ALERT.error_login'))
           await this.sharedData.dismissLoading();
         });
       } catch (e) {
+        console.log(e)
         await this.sharedData.dismissLoading();
-        alert((e as Error).message)
+        alert(this.translate.instant('ALERT.error_login'))
       }
     }
     else
