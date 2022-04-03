@@ -11,7 +11,7 @@
         <div class="text">{{'LOGIN.button.signup'|translate}}</div>
       </div>
     </button>
-    <button mat-raised-button class="bt" (click)="openTutorial()">
+    <!-- <button mat-raised-button class="bt" (click)="openTutorial()">
       <div class='button'>
         <img src="assets/images/s4c.png" class="img">
         <div class="text">Open Tutorial</div>
@@ -22,11 +22,11 @@
         <img src="assets/images/s4c.png" class="img">
         <div class="text">Fast Login</div>
       </div>
-    </button>
+    </button> -->
   </div>
   <div class="language-popover">
     <span style="color: #fff;">{{'LOGIN.language'|translate}}</span>
     <button class="language_button" mat-button (click)="openLanguagePopover($event)">
-      <img src="/assets/flags/{{lng.selected?.img}}.svg">
+      <img src="/assets/flags/{{lng.selected_language?.img}}.svg">
     </button>
   </div>
