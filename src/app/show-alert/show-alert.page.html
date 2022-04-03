@@ -14,7 +14,8 @@
         {{'SHOW_ALERT.content'|translate}}
       </div>
       <div class="section number">
-        <countdown #countdown [config]="config" (event)="send_Emergency($event)"></countdown>
+        <!-- <countdown #countdown [config]="config"></countdown> -->
+        <h1 style="font-size: 50px;">{{this.valueTimer}}</h1>
       </div>
       <div tourAnchor="Pin" class="container-box section">
         <input class="box" (keyup)="onDigitInput($event)" name="0" id="0" matInput type='number' [(ngModel)]="pin[0]">

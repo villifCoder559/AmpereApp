@@ -6,6 +6,7 @@ import { AlertEvent, SharedDataService } from './shared-data.service';
 import { AuthenticationService } from '../services/authentication.service'
 import { NGSIv2QUERYService } from './ngsiv2-query.service';
 import { TranslateService } from '@ngx-translate/core';
+import { EmergencyService } from './emergency.service';
 /** save data
  * DD:31:A4:AD:A3:05
  */
@@ -18,7 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class BluetoothService {
   detectedValue = new BehaviorSubject(null);
-  constructor(private translate:TranslateService,private authService: AuthenticationService, private ble: BLE, private ibeacon: IBeacon, private shared_data: SharedDataService) {
+  constructor(private translate:TranslateService,private authService: AuthenticationService, private ble: BLE, private ibeacon: IBeacon, private shared_data: SharedDataService,private emergencyService:EmergencyService) {
   }
   /*52414449-5553-4e45-5457-4f524b53434f*/
   stopScan() {
@@ -98,8 +99,11 @@ export class BluetoothService {
               if (this.shared_data.user_data.paired_devices[index] === data.region.identifier)
                 found = true;
             }
-            if (found)
-              this.shared_data.showAlert(this.shared_data.user_data.paired_devices[index - 1]);
+            if (found){
+              this.emergencyService.details_emergency.deviceID=data.region.identifier;
+              this.emergencyService.send_Emergency()
+              this.shared_data.showAlertPage()}
+              //this.shared_data.showAlert(this.shared_data.user_data.paired_devices[index - 1]);
           }
         }, err => console.log(err)
       );

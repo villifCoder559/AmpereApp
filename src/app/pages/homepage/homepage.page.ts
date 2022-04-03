@@ -10,6 +10,7 @@ import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Storage } from '@ionic/storage-angular'
 import { TranslateService } from '@ngx-translate/core';
+import { EmergencyService } from 'src/app/data/emergency.service';
 
 @Component({
   selector: 'app-homepage',
@@ -19,7 +20,7 @@ import { TranslateService } from '@ngx-translate/core';
 export class HomepagePage implements OnInit {
 
   gps_enable = true;
-  constructor(private translate: TranslateService, private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient, private ngsi: NGSIv2QUERYService, public sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private emergencyService:EmergencyService,private translate: TranslateService, private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient, private ngsi: NGSIv2QUERYService, public sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
   }
   ngOnInit() {
     // this.ngsi.getStatus().then((value: any) => {
@@ -127,11 +128,13 @@ export class HomepagePage implements OnInit {
     })
   }
   openAlertPage() {
-    let navigationExtras: NavigationExtras = {
-      state: { deviceID: 'APP' },
-      replaceUrl: true
-    };
-    this.router.navigate(['/show-alert'], navigationExtras)
+    // let navigationExtras: NavigationExtras = {
+    //   state: { deviceID: 'APP' },
+    //   replaceUrl: true
+    // };
+    this.emergencyService.details_emergency.deviceID='APP';
+    this.emergencyService.send_Emergency()
+    this.sharedData.showAlertPage()
   }
   getDictionaries() {
     this.ngsi.getAllDictionarys().then((response) => {

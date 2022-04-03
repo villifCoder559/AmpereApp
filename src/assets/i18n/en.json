@@ -377,6 +377,10 @@
         "yes": "yes",
         "no": "no"
     },
+    "NOTIFICATION":{
+        "receive_alert":"False alarm? Click to open the app and insert PIN to disable alert",
+        "send_alert":"Emergenza inviata!"
+    },
     "TERM_OF_USE": {},
     "PRIVACY_POLICY": {}
 }
