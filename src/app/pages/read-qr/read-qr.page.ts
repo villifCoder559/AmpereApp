@@ -24,15 +24,22 @@ export class ReadQRPage implements OnInit {
   eventBackButton;
   constructor(private translate: TranslateService, private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: BarcodeScanner) {
   }
+  testQR(){
+    this.readCode.readURLFromServer('pluto12345',typeChecking.QR_CODE).then((response)=>{
+      console.log(response)
+    },err=>console.log(err))
+  }
   scanCode() {
     this.qrScanner.scan().then((element) => {
       //this.closePreviewCamera();
       //this.changeRef.detectChanges();
       $("ion-app").show(500);
-      if (element != null)
+      console.log(element)
+      console.log(element!=undefined)
+      if (element != undefined)
         this.shared_data.presentLoading(this.translate.instant('ALERT.get_info_from_server')).then(() => {
           this.readCode.readURLFromServer(element.text, typeChecking.QR_CODE).then(() => {
-            this.shared_data.createToast('ALERT.qr_scan')
+            //this.shared_data.createToast('ALERT.qr_scan')
             this.shared_data.dismissLoading();
           }, err => {
             this.shared_data.createToast(err?.msg)
@@ -40,20 +47,13 @@ export class ReadQRPage implements OnInit {
           })
         })
     }, err => console.log(err));
-    //     })
-    //   } else if (status.denied) {
-    //     this.qrScanner.openSettings()
-    //   } else {
-    //     alert('Grant the permission')
-    //   }
-    // }).catch((e: any) => alert('Error is ' + e));
   }
   modifyNameDevice(i) {
     const dialogRef = this.dialog.open(DialogModifyNameComponent, {
       maxWidth: '90vw',
       minWidth: '40vw',
       data: {
-        id: this.shared_data.user_data.qr_code[i],
+        id: this.shared_data.user_data.qr_code[i].identifier,
         name: '',
       }
     })
