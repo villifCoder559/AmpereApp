@@ -224,13 +224,17 @@ export class Snap4CityService {
           break;
         }
         case 'qr_code': {
-          for (var i = 0; i < this.shared_data.MAX_QRs; i++)
-            newUser.push(this.createField('QR' + (i + 1)))
+          for (var i = 0; i < this.shared_data.MAX_QRs; i++){
+            newUser.push(this.createField('QR' + (i + 1)+'_action'))
+            newUser.push(this.createField('QR' + (i + 1)+'_identifier'))
+          }
           break;
         }
         case 'nfc_code': {
-          for (var i = 0; i < this.shared_data.MAX_NFCs; i++)
-            newUser.push(this.createField('NFC' + (i + 1)))
+          for (var i = 0; i < this.shared_data.MAX_NFCs; i++){
+            newUser.push(this.createField('NFC' + (i + 1)+'_action'))
+            newUser.push(this.createField('NFC' + (i + 1)+'_identifier'))
+          }
           break;
         }
         case 'public_emergency_contacts': {
