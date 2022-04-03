@@ -4,10 +4,11 @@ import { AlertController, Platform } from '@ionic/angular';
 import { CountdownComponent, CountdownConfig, CountdownModule } from 'ngx-countdown';
 import { AlertEvent, DeviceType, SharedDataService, UserData } from '../data/shared-data.service'
 import { DeviceMotion, DeviceMotionAccelerationData } from '@awesome-cordova-plugins/device-motion/ngx'
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
+import { LocalNotifications } from '@awesome-cordova-plugins/local-notifications/ngx'
 import { NGSIv2QUERYService } from '../data/ngsiv2-query.service'
 import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@awesome-cordova-plugins/background-geolocation/ngx';
 import { TranslateService } from '@ngx-translate/core';
+import { ThisReceiver } from '@angular/compiler';
 
 @Component({
   selector: 'app-show-alert',
@@ -36,28 +37,10 @@ export class ShowAlertPage implements OnInit {
     fastestInterval: 4000,
     activitiesInterval: 1500
   };
-  constructor(private translate: TranslateService, private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, public shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
-    if (!this.shared_data.enabled_test_battery_mode && !this.shared_data.tour_enabled) {
-      this.localNotifications.addActions('fast-pin', [
-        { id: 'fast', title: this.translate.instant('ALERT.send_emergency_now') },
-        { id: 'pin', title: this.translate.instant('ALERT.false_alarm') }])
-      this.localNotifications.on('fast').subscribe(()=>{
-        this.immediateEmergency();
-      })
-      this.localNotifications.on('pin').subscribe(()=>{
-        this.shared_data.moveAppToForeground();
-      })
-      this.localNotifications.schedule({
-        id: 1,
-        text: 'Emergency notification, click to open and insert PIN to disable alert or click the button to send emergency immediatly',
-        data: "",
-        actions:'fast-pin'
-      });
-      this.backgroundGeolocation.configure(this.configGeolocation).then(() => {
-        console.log('Starting geolocation background...')
-        this.backgroundGeolocation.start();
-      })
-    }
+  constructor(private platfrom: Platform, private translate: TranslateService, private backgroundGeolocation: BackgroundGeolocation, private changeRef: ChangeDetectorRef, private NGSIv2Query: NGSIv2QUERYService, private localNotifications: LocalNotifications, private deviceMotion: DeviceMotion, public shared_data: SharedDataService, private alertController: AlertController, private router: Router) {
+    //this.shared_data.moveAppToForeground();
+    console.log('LOCAL_NOTIFICATION')
+    this.shared_data.is_sending_emergency.next(true)
   }
   ngAfterViewInit() {
     console.log(this.shared_data.enabled_test_battery_mode.getValue())
@@ -76,7 +59,31 @@ export class ShowAlertPage implements OnInit {
   }
   ngOnInit() {
     this.details_emergency.deviceID = this.router.getCurrentNavigation().extras?.state?.deviceID;
+    this.platfrom.ready().then(() => {
+      if (!this.shared_data.enabled_test_battery_mode.getValue() && !this.shared_data.tour_enabled) {
+        this.backgroundGeolocation.configure(this.configGeolocation).then(() => {
+          console.log('Starting geolocation background...')
+          this.backgroundGeolocation.start();
+        })
+        // this.localNotifications.addActions('fast-pin', [
+        //   { id: 'fast', title: this.translate.instant('ALERT.send_emergency_now') },
+        //   { id: 'pin', title: this.translate.instant('ALERT.false_alarm') }])
+        // this.localNotifications.on('fast').subscribe(() => {
+        //   this.immediateEmergency();
+        // })
+        // this.localNotifications.on('pin').subscribe(() => {
+        //   this.shared_data.moveAppToForeground();
+        // })
+        setTimeout(()=>{
+          this.localNotifications.schedule({
+            id: 0,
+            text: 'Emergency notification, click to open and insert PIN to disable alert or click the button to send emergency immediatly',
+            data: ""
+          });
+        },2000)
 
+      }
+    })
   }
 
   immediateEmergency() {
@@ -124,6 +131,7 @@ export class ShowAlertPage implements OnInit {
     }
     else {
       this.backgroundGeolocation.stop().catch((err) => console.log(err));
+      this.shared_data.is_sending_emergency.next(false)
       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
     }
   }
@@ -143,6 +151,7 @@ export class ShowAlertPage implements OnInit {
   send_Emergency(event) {
     console.log(event)
     if (event.action === 'done') {
+      //this.shared_data.moveAppToForeground();
       console.log('activateSensors')
       this.shared_data.createToast(this.translate.instant('ALERT.send_emergency'), 4000);
       this.activateSensors().then(() => {
@@ -154,12 +163,23 @@ export class ShowAlertPage implements OnInit {
             this.shared_data.createToast(this.translate.instant('ALERT.send_emergency_succ'))
           else
             this.shared_data.createToast(this.translate.instant('ALERT.end_battery_test'))
+          this.shared_data.is_sending_emergency.next(false)
         }, err => {
-          alert(err);
+          this.localNotifications.schedule({
+            id: 2,
+            text: this.translate.instant('SHOW-ALERT_error'),
+            data: ""
+          })
+          this.shared_data.is_sending_emergency.next(false)
           this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
         });
       }, err => {
-        alert(err);
+        this.localNotifications.schedule({
+          id: 2,
+          text: this.translate.instant('SHOW-ALERT_error'),
+          data: ""
+        })
+        this.shared_data.is_sending_emergency.next(false)
         this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
       })
     }
@@ -168,7 +188,7 @@ export class ShowAlertPage implements OnInit {
   getPosition() {
     return new Promise((resolve, reject) => {
       console.log('startwatchPosition')
-      this.backgroundGeolocation.getCurrentLocation().then((position) => {
+      this.backgroundGeolocation.getCurrentLocation({ maximumAge: 10000, enableHighAccuracy: true, timeout: 12000000 }).catch(err => reject(err)).then((position) => {
         console.log(position)
         this.setPositionToSend(position)
         if (this.checkingPositionInterval !== null)
@@ -212,6 +232,7 @@ export class ShowAlertPage implements OnInit {
     this.details_emergency.longitude = position.longitude;
     this.details_emergency.quote = position.altitude != undefined ? position.altitude : 0;
     this.details_emergency.velocity = position.speed != undefined ? position.speed : 0;
+    this.details_emergency.accuracy = position.accuracy;
     this.details_emergency.dateObserved = new Date().toISOString();
   }
   getAcceleration() {
@@ -243,7 +264,7 @@ export class ShowAlertPage implements OnInit {
           console.log('resolve')
           resolve(true)
         }, err => resolve(false))
-      }, err => { console.log(err) })
+      }, err => { this.activateSensors() })
     })
 
   }
@@ -273,8 +294,11 @@ export class ShowAlertPage implements OnInit {
             this.sendAlert().catch((err) => { console.log('ERROR->SendAlert'); reject(err) });
           else
             reject(err)
-        }, 2500)
+        }, 3500)
       })
     })
+  }
+  ngOnDestroy() {
+    console.log('SHOW_ALERT_DESTROIED')
   }
 }
