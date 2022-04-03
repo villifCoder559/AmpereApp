@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef, Input, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, ElementRef, Injectable } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, AbstractControl, ValidationErrors, ValidatorFn, FormControl } from '@angular/forms';
-import { MatStep, MatStepper, StepperOrientation } from '@angular/material/stepper';
+import { MatStep, MatStepper, MatStepperIntl, StepperOrientation } from '@angular/material/stepper';
 import { interval, Observable, timer } from 'rxjs';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { NgZone, ViewChild } from '@angular/core';
@@ -25,10 +25,18 @@ import { TranslateService } from '@ngx-translate/core';
 import { v4 as uuidv4 } from 'uuid';
 import { SendAuthService } from 'src/app/data/send-auth.service';
 
+@Injectable()
+export class StepperIntl extends MatStepperIntl {
+  // the default optional label text, if unspecified is "Optional
+  optionalLabel = 'OPTIONAL';
+}
+
+
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
   styleUrls: ['./signup.page.scss'],
+  providers: [{provide: MatStepperIntl, useClass: StepperIntl}],
 })
 export class SignupPage implements OnInit {
   StorageNameType = StorageNameType
@@ -76,7 +84,7 @@ export class SignupPage implements OnInit {
     call_118: [null, Validators.required]
   });
   readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.fourthFormGroup]
-  constructor(public sendAuth: SendAuthService, private translate: TranslateService, public authService: AuthenticationService, private geoLocation: Geolocation, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(private _matStepperIntl: MatStepperIntl,public sendAuth: SendAuthService, private translate: TranslateService, public authService: AuthenticationService, private geoLocation: Geolocation, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     console.log('From signup')
     console.log(this.shared_data.user_data)
   }
@@ -96,6 +104,7 @@ export class SignupPage implements OnInit {
       return 5;
   }
   ngOnInit() {
+    this._matStepperIntl.optionalLabel=this.translate.instant('SIGNUP.form.optional')
     console.log(this.shared_data.user_data.email)
     if (this.authService.isAuthenticated.getValue()) {
       var index = this.router.getCurrentNavigation().extras?.state?.page;
@@ -124,13 +133,13 @@ export class SignupPage implements OnInit {
           this.shared_data.dismissLoading();
         }, err => {
           this.shared_data.dismissLoading();
-          alert(err)
+          this.shared_data.createToast(this.translate.instant('ALERT.retrive_information'))
           this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
         })
       })
     }
     else {
-      alert(this.translate.instant('ALERT.permission_creating_device'));
+      //alert(this.translate.instant('ALERT.permission_creating_device'));
       this.shared_data.checkLocationEnabled().then(() => {
         this.getPosition();
       }, err => console.log(err))
@@ -233,7 +242,7 @@ export class SignupPage implements OnInit {
             this.saveUserProfile().then(() => {
               this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
             }, err => {
-              alert(err)
+              console.log(err)
               this.shared_data.createToast(this.translate.instant('ALERT.data_fail'))
             })
         }
@@ -472,7 +481,7 @@ export class SignupPage implements OnInit {
               this.saveUserProfile().then(() => {
                 this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
               }, err => {
-                alert(err)
+                console.log(err)
                 this.shared_data.createToast(this.translate.instant('ALERT.data_fail'))
               })
             else {
@@ -522,19 +531,13 @@ export class SignupPage implements OnInit {
           this.shared_data.deleteDeviceFromLocalStorage(el_deleted, StorageNameType.DEVICES);
           this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
         }, err => {
-          //alert(err)
-          console.log(this.shared_data.user_data)
+          console.log(err)
           this.shared_data.createToast(this.translate.instant('ALERT.data_fail'))
           this.shared_data.old_user_data.copyFrom(this.shared_data.user_data)
           this.changeDetection.detectChanges()
         })
-      //.then(()=>{ alert('Successfully updated)},err=>aler('Update error' + err))
-      //this.shared_data.user_data.paired_devices[index] = null;
-      //this.shared_data.saveData();
-      console.log(this.shared_data.user_data.paired_devices)
     })
   }
-
   openBeaconDialog() {
     //this.shared_data.user_data.paired_devices[0] == null || this.shared_data.user_data.paired_devices[1] == null
     console.log(this.shared_data.user_data.paired_devices)
@@ -561,9 +564,12 @@ export class SignupPage implements OnInit {
       if (this.authService.isAuthenticated.getValue())
         this.NGSIv2QUERY.sendUserProfile().then(() => {
           this.shared_data.setNameDevice(device, device);
+          this.shared_data.old_user_data.copyFrom(this.shared_data.user_data)
           this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
         }, err => {
-          alert(err)
+          console.log(err)
+          alert(this.translate.instant('ALERT.retrive_information'))
+          this.shared_data.user_data.paired_devices.pop();
           this.shared_data.createToast(this.translate.instant('ALERT.data_fail'))
         })
     }
@@ -571,6 +577,7 @@ export class SignupPage implements OnInit {
       alert(this.translate.instant('ALERT.device_connected_err'))
   }
 }
+
 export class SpecialCharValidator {
   static specialCharValidator(control: FormControl): { [key: string]: boolean } {
     const nameRegexp: RegExp = /[<>"'=;()]/;
@@ -579,6 +586,7 @@ export class SpecialCharValidator {
     }
   }
 }
+
 class DateValidator {
   static dateVaidator(AC: AbstractControl) {
     if (AC && AC.value && (!moment(AC.value, 'YYYY-MM-DD', true).isValid() || (moment().diff(AC.value) < 0 || moment().diff(AC.value, 'day') > 365 * 150))) {
