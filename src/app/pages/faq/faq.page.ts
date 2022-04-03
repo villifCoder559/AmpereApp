@@ -26,8 +26,8 @@ export class FaqPage implements OnInit {
         anchorId:'button_tour',
         title: this.translate.instant('FAQ.tour.button_tour.title'),
         content: this.translate.instant('FAQ.tour.button_tour.content'),
-        nextBtnTitle: this.translate.instant('TOUR.button.end'),
-        prevBtnTitle:'',
+        prevBtnTitle:this.translate.instant('TOUR.button.previous'),
+        endBtnTitle:this.translate.instant('TOUR.button.end'),
         enableBackdrop: true
       }])
       this.tourService.start();

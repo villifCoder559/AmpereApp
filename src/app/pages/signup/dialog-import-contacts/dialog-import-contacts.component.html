@@ -1,7 +1,7 @@
 <div class="containerDialog">
   <h1 mat-dialog-title>{{'DIALOG.IMPORT.title'|translate}}</h1>
   <mat-form-field appearance="outline" style="position: sticky;">
-    <mat-label>{{'DIALOG.CONTACT.subtitle'|translate}}</mat-label>
+    <mat-label>{{'DIALOG.IMPORT.subtitle'|translate}}</mat-label>
     <input #input matInput type="text" placeholder="" (keyup)="find_contact(input.value)"
       (ionInput)="find_contact(input.value)">
     <mat-spinner id="spinnerInput" [diameter]="20" style="visibility: hidden;"></mat-spinner>
@@ -17,7 +17,7 @@
     </mat-selection-list>
   </div>
   <div mat-dialog-actions >
-    <button mat-button mat-dialog-close>{{'DIALOG.CONTACT.close'|translate}}</button>
+    <button mat-button mat-dialog-close>{{'DIALOG.close'|translate}}</button>
     <button mat-button (click)="save_data" cdkFocusInitial>Ok</button>
   </div>
 </div>
