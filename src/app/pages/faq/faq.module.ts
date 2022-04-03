@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { FaqPageRoutingModule } from './faq-routing.module';
-
+import {TourMatMenuModule} from 'ngx-ui-tour-md-menu'
 import { FaqPage } from './faq.page';
 import { MaterialModule } from '../../material-module'
 import { TranslateModule } from '@ngx-translate/core';
@@ -16,7 +16,8 @@ import { TranslateModule } from '@ngx-translate/core';
     IonicModule,
     FaqPageRoutingModule,
     MaterialModule,
-    TranslateModule.forChild()
+    TranslateModule.forChild(),
+    TourMatMenuModule
   ],
   declarations: [FaqPage]
 })

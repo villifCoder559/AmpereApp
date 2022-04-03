@@ -9,7 +9,7 @@ const LNG_KEY = 'SELECTED_LANGUAGE';
   providedIn: 'root'
 })
 export class LanguageService {
-  selected:any;
+  selected_language:any;
   constructor(private translate: TranslateService, private storage: Storage, private plt: Platform) { 
     this.setInitialAppLanguage();
   }
@@ -39,7 +39,7 @@ export class LanguageService {
   }
   setLanguage(lng) {
     this.translate.use(lng.value)
-    this.selected = lng;
+    this.selected_language = lng;
     this.storage.set(LNG_KEY, lng)
   }
   getLanguages() {

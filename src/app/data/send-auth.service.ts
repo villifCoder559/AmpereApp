@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NGSIv2QUERYService } from './ngsiv2-query.service';
-import { DeviceType, SharedDataService } from './shared-data.service';
+import { DeviceType } from './shared-data.service';
 import { AuthenticationService } from '../services/authentication.service';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
 import BackgroundFetch from "cordova-plugin-background-fetch";
 
@@ -10,7 +9,7 @@ import BackgroundFetch from "cordova-plugin-background-fetch";
   providedIn: 'root'
 })
 export class SendAuthService {
-  constructor(private platform: Platform, private localNotifications: LocalNotifications, private ngsi: NGSIv2QUERYService, private authService: AuthenticationService) { }
+  constructor(private platform: Platform, private ngsi: NGSIv2QUERYService, private authService: AuthenticationService) { }
 
   private async onDeviceReady() {
     // Your BackgroundFetch event handler.
@@ -20,7 +19,7 @@ export class SendAuthService {
       var date = new Date().toISOString();
       console.log(date)
       if (this.authService.isAuthenticated) {
-        this.ngsi.updateBackgroundEntity({ "status": { "value": 'active' }, "dateObserved": { "value": date } }, DeviceType.PROFILE).catch((err) => console.log(err))
+        this.ngsi.updateBackgroundEntity({ "dateObserved": { "value": date } }, DeviceType.PROFILE).catch((err) => console.log(err))
       }
       else {
         console.log('Stop BACKGROUND_FETCH')
@@ -28,24 +27,16 @@ export class SendAuthService {
       }
       BackgroundFetch.finish(taskId);
     };
-
     // Timeout callback is executed when your Task has exceeded its allowed running-time.
     // You must stop what you're doing immediately BackgroundFetch.finish(taskId)
     let onTimeout = async (taskId) => {
       console.log('[BackgroundFetch] TIMEOUT: ', taskId);
       BackgroundFetch.finish(taskId);
     };
-    let status = await BackgroundFetch.configure({ minimumFetchInterval: 15 }, onEvent, onTimeout);
+    let status = await BackgroundFetch.configure({ minimumFetchInterval:120 }, onEvent, onTimeout);
     console.log('[BackgroundFetch] configure, status: ', status);
   }
-  startSendingValidStatus() {
+  startSendingStatus() {
     this.platform.ready().then(this.onDeviceReady.bind(this))
-  }
-  saveUserProfile() {
-    return new Promise((resolve, reject) => {
-      this.ngsi.sendUserProfile().then(() => {
-        resolve(true)
-      }, err => reject(err))
-    })
   }
 }

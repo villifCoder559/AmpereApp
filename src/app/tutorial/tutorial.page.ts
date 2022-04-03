@@ -1,6 +1,6 @@
 import { AfterContentChecked, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { SwiperComponent } from 'swiper/angular';
-import { Pagination } from 'swiper'
+import { Pagination, SwiperOptions } from 'swiper'
 import SwiperCore from 'swiper'
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
@@ -15,6 +15,7 @@ SwiperCore.use([Pagination]);
 })
 export class TutorialPage implements AfterContentChecked {
   @ViewChild('swiper') swiper: SwiperComponent;
+
   constructor(private storage: Storage, private router: Router, private auth: AuthenticationService) { }
   ngAfterContentChecked(): void {
     if (this.swiper) {
@@ -24,7 +25,7 @@ export class TutorialPage implements AfterContentChecked {
   goToLoginPage() {
     this.storage.set('tutorial_read', true).then((value) => {
       if (this.auth.isAuthenticated.getValue())
-        this.router.navigateByUrl('profile/homepage/faq', { replaceUrl: true })
+        this.router.navigateByUrl('/profile/menu/faq', { replaceUrl: true })
       else
         this.router.navigateByUrl('/login', { replaceUrl: true })
     },err=>console.log(err))
@@ -32,5 +33,10 @@ export class TutorialPage implements AfterContentChecked {
   ngOnInit() {
 
   }
-
+  next(){
+    this.swiper.swiperRef.slideNext();
+  }
+  back(){
+    this.swiper.swiperRef.slidePrev();
+  }
 }

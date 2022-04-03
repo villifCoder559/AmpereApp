@@ -1,11 +1,11 @@
 <div class="containerDialog">
-  <h1 mat-dialog-title>Modify Name</h1>
+  <h1 mat-dialog-title>{{'DIALOG.MODIFY_NAME.title'|translate}}</h1>
   <mat-form-field appearance="outline" style="position: sticky;">
-    <mat-label>New Name</mat-label>
+    <mat-label>{{'DIALOG.MODIFY_NAME.new_name'|translate}}</mat-label>
     <input matInput [(ngModel)]="name" minlength="1">
   </mat-form-field>
   <div mat-dialog-actions>
-    <button mat-button mat-dialog-close='' (click)="action('no')">Close</button>
-    <button mat-button [mat-dialog-close]="name" (click)="action('yes')" cdkFocusInitial>Ok</button>
+    <button mat-button mat-dialog-close='' (click)="action('no')">{{'DIALOG.close'|translate}}</button>
+    <button mat-button [mat-dialog-close]="name" (click)="action('yes')" cdkFocusInitial>{{'DIALOG.CONTACT.save'|translate}}</button>
   </div>
 </div>

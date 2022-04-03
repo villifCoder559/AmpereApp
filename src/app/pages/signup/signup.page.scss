@@ -1,54 +1,79 @@
-ion-content input{
-  color:#000;
+ion-content input {
+  color: #000;
 }
-.go_back_button{
+
+textarea,
+form span {
+  color: #000;
+}
+
+ion-content .mat-raised-button {
+  background-color: #fff;
+  color: #000;
+}
+
+.go_back_button {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .example-stepper {
-    margin-top: 8px;
-  }
-  
+  margin-top: 8px;
+}
+
+#content {
+  color: #000;
+}
+
 .mat-form-field {
   margin-top: 16px;
 }
+
 body {
   font-family: Roboto, Arial, sans-serif;
   margin: 0;
   padding: 30px;
-} 
+}
+
 .version-info {
   font-size: 8pt;
   float: right;
   margin: 8px;
 }
-ion-content{
+
+ion-content {
   --ion-background-color: #FAFAFA;
   color: #000;
 }
-mat-stepper{
+
+mat-stepper {
   background-color: #FAFAFA;
 }
-#emergency_contacts mat-card{
+
+#emergency_contacts mat-card {
   margin-top: 10px;
 }
 
-mat-card-title{
-  text-align: center; 
+mat-card-title {
+  text-align: center;
   padding-bottom: 10px;
 }
-ion-button{
+
+ion-button {
   font: 400 17px/12px Roboto, "Helvetica Neue", sans-serif;
 
 }
-.mat-title{
+
+.mat-title {
   text-align-last: center;
   padding: 10px 0px;
 }
-.mat-subtitle{
+
+.mat-subtitle {
   padding: 5px 15px;
 }
+
 // .toolbar{
 //     background-color: #3F51B5;
 //     color: white;
@@ -59,53 +84,88 @@ ion-button{
 //     padding: 5px 10px;
 //   }
 // }
-.matCardEmergencyContact{
+.matCardEmergencyContact {
   justify-content: center;
   display: flex;
   flex-direction: column;
 }
-mat-form-field{
+
+mat-form-field {
   width: 100%;
   max-width: 250px;
 }
-.container-button{
+
+.container-button {
   display: flex;
   justify-content: space-around;
 }
-.container_date{
+
+.container_date {
   display: flex;
   flex-direction: row;
 }
-.span_inline{
+
+.span_inline {
   width: fit-content;
 }
-.input_data{
+
+.input_data {
   //width: 40px;
   text-align: center;
 }
-.container_form{
+
+.container_form {
   display: flex;
   justify-content: space-around;
 }
+
 // ::ng-deep .mat-step-header{
 //   justify-content: center;
 // }
-.align_checkbox{
+.align_checkbox {
   align-items: center;
 }
-.field{
+
+.field {
   display: flex;
-  
 }
-@media screen and(min-width: 800px) { 
-  .tablet_view{
+
+// .tablet_view {
+//   text-align: center;
+//   // display: flex;
+//   // justify-content: center;
+// }
+
+@media(orientation:landscape) {
+  .mat-form-field {
+    margin-right: 10px;
+  }
+
+  #signup {
+    .tablet_view {
+      text-align: center;
+      // display: flex;
+      // justify-content: center;
+    }
+    .mat-vertical-content-container {
+      text-align: center;
+    }
+    .mat-card{
+      display: inline-block;
+    }
+  }
+}
+
+@media screen and(min-width: 800px) {
+  .tablet_view {
     justify-content: space-around;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     color: #000;
   }
-  ::ng-deep .mat-step-header{
+
+  ::ng-deep .mat-step-header {
     justify-content: center;
   }
 }

@@ -20,7 +20,7 @@ export class DialogAddEmergencyContactComponent implements OnInit {
     surname: '',
     number: ''
   }
-  setContactFromForm() {
+  getContactFromForm() {
     this.contact.name = this.contactCard.get('contactName').value;
     this.contact.surname = this.contactCard.get('contactSurname').value;
     this.contact.number = this.contactCard.get('contactNumber').value;
@@ -61,7 +61,7 @@ export class DialogAddEmergencyContactComponent implements OnInit {
     if (ok) {
       console.log('VALUE_CONFIRM')
       console.log(this.data)
-      this.setContactFromForm()
+      this.getContactFromForm()
       this.dialogRef.close({ data: this.contact, index: this.data.index });
     }
   }

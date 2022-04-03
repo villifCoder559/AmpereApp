@@ -66,14 +66,27 @@ export class BluetoothService {
     this.shared_data.user_data.paired_devices.forEach((element) => {
       this.startRegisterBeacon(element);
       console.log('enabled ' + element)
-    }, err => alert(err))
+    }, err => console.log(err))
   }
   private startRegisterBeacon(uuid) {
     var delegate = this.ibeacon.Delegate()
     let beaconRegion;
     beaconRegion = this.ibeacon.BeaconRegion(uuid, uuid);
     delegate.didRangeBeaconsInRegion()
-      .subscribe(() => { });
+      .subscribe(
+        data => {
+        //  console.log(data)
+        //   if (this.authService.isAuthenticated.value) {
+        //     var found = false;
+        //     for (var index = 0; index < this.shared_data.user_data.paired_devices.length && !found; index++) {
+        //       if (this.shared_data.user_data.paired_devices[index] === data.region.identifier)
+        //         found = true;
+        //     }
+        //     if (found)
+        //       this.shared_data.showAlert(this.shared_data.user_data.paired_devices[index - 1]);
+        //   }
+        // }, err => alert(err)
+        });
     delegate.didStartMonitoringForRegion()
       .subscribe(() => { });
     delegate.didEnterRegion()
@@ -88,7 +101,7 @@ export class BluetoothService {
             if (found)
               this.shared_data.showAlert(this.shared_data.user_data.paired_devices[index - 1]);
           }
-        }, err => alert(err)
+        }, err => console.log(err)
       );
     this.ibeacon.startAdvertising(beaconRegion).then((obj) => { }, err => console.log(err))
     this.ibeacon.startRangingBeaconsInRegion(beaconRegion).then((obj) => { }, err => console.log(err))

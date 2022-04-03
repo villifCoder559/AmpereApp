@@ -27,15 +27,15 @@ export class DialogScanBluetoothComponent implements OnInit {
       })
     })
   }
-  connectDevice(id) {
-    return new Promise((resolve, reject) => {
-      this.ble.connect(id).subscribe((peripheralData) => {
-        console.log('enable connection')
-        console.log(id)
-        resolve(peripheralData)
-      }, (err) => { reject(err) })
-    })
-  }
+  // connectDevice(id) {
+  //   return new Promise((resolve, reject) => {
+  //     this.ble.connect(id).subscribe((peripheralData) => {
+  //       console.log('enable connection')
+  //       console.log(id)
+  //       resolve(peripheralData)
+  //     }, (err) => { reject(err) })
+  //   })
+  // }
   scan() {
     this.devices = [];
     $('#matSpinner').show()

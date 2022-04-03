@@ -10,7 +10,7 @@
   </mat-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content id="registration_page">
   <div class="content">
     <form id="registration" [formGroup]="registrationGroup">
       <div class="form">
@@ -25,11 +25,11 @@
       </div>
     </form>
     <div class="list-checkbox">
-      <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.termsOfUseCheckbox"></mat-checkbox><a
+      <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.termsOfUseCheckbox"></mat-checkbox><a style="color: #fff;"
         (click)="openPage('https://www.snap4city.org/drupal/legal')">{{'REGISTRATION.checkbox.terms_of_use'|translate}}</a></div>
-      <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.privacyPolicyCheckbox"></mat-checkbox><a
+      <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.privacyPolicyCheckbox"></mat-checkbox><a style="color: #fff;"
         (click)="openPage('https://www.snap4city.org/drupal/node/49')">{{'REGISTRATION.checkbox.privacy_policy'|translate}}</a></div>
-      <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.cookiesPolicyCheckbox"></mat-checkbox><a
+      <div class="row"><mat-checkbox [(ngModel)]="this.list_checkbox.cookiesPolicyCheckbox"></mat-checkbox><a style="color: #fff;"
         (click)="openPage('https://www.snap4city.org/drupal/node/48')">{{'REGISTRATION.checkbox.cookies_policy'|translate}}</a></div> 
       <button class="buttonSIgnIn" mat-raised-button (click)="sendRegistration()">{{'REGISTRATION.button.registration'|translate}}</button>
     </div>

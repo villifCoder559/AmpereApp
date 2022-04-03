@@ -20,13 +20,19 @@
         "button": {
             "login": "Login with Snap4city",
             "signup": "Not yet a member? Sign up!"
-        }
+        },
+        "language": "Language"
     },
     "HOMEPAGE": {
         "button": {
             "emergency": "Emergency",
             "profile": "Profile",
-            "FAQ":"FAQ"
+            "FAQ": "FAQ"
+        },
+        "status": {
+            "label": "User status",
+            "active": "Active",
+            "not_active": "Not active"
         }
     },
     "CALL_CONTACTS": {
@@ -43,6 +49,12 @@
         }
     },
     "FAQ": {
+        "tour": {
+            "button_tour": {
+                "title": "Another round!",
+                "content": "Click it and you will take the tour of this app"
+            }
+        },
         "0": {
             "question": "What is the aim of this app?",
             "answer": "Click the button below and find out for who is designed this app",
@@ -52,6 +64,10 @@
             "question": "Can I see again the tour of the app?",
             "answer": "Certainly, you can click the button below and start a tour.",
             "button": "Start a tour"
+        },
+        "2": {
+            "question": "What does user status mean?",
+            "answer": "It describes your subscription, if you have a subscription you will see the status 'active' otherwise 'not active'. Remember if your status is 'not active' your alert emergency alert will be ignored by operator!"
         }
     },
     "MENU": {
@@ -90,12 +106,13 @@
             }
         },
         "form": {
-            "title_1":"Personal Information",
-            "title_2":"Medical Information",
+            "optional": "OPTIONAL",
+            "title_1": "Personal Information",
+            "title_2": "Medical Information",
             "button": {
                 "next": "Next",
                 "back": "Back",
-                "register": "Registrer",
+                "register": "Sign in!",
                 "done": "Done"
             },
             "name": "Name",
@@ -113,8 +130,16 @@
             },
             "height": "Height",
             "weight": "Weight",
-            "ethnicity": "Ethnicity",
-            "hint":"Max 200 characters",
+            "ethnicity": {
+                "label": "Nationality",
+                "option": {
+                    "european": "European",
+                    "asian": "Asian",
+                    "african": "African",
+                    "american": "American"
+                }
+            },
+            "hint": "Max 200 characters",
             "description": {
                 "label": "Description",
                 "placeholder": "brown hair,blue eyes..."
@@ -125,7 +150,7 @@
             },
             "pin": {
                 "label": "PIN",
-                "tooltip": "Use to cancel emergency call"
+                "tooltip": "Use to cancel emergency alert"
             },
             "native_language": "Native language",
             "address": "Address",
@@ -133,7 +158,8 @@
             "city": "City",
             "allergies": {
                 "label": "Allergies",
-                "placeholder": "pollen,Insect stings..."
+                "placeholder": "Cortisone,insect stings...",
+                "tooltip": "If not present write No"
             },
             "medications": {
                 "label": "Medications"
@@ -168,7 +194,7 @@
             },
             "pairing": {
                 "title": "Pairing",
-                "content": "Keep press your smart jewelry and then press the button below to pair it with the app (swipe to delete device or edit the name)"
+                "content": "Keep press your smart jewelry and then press the button below to pair it with the app by clicking the label called AMPERE (swipe to delete device or edit the name). In an emergency situation you can keep press the jewel for at least 5 seconds and send an emergency alert"
             }
         }
     },
@@ -176,11 +202,9 @@
         "toolbar": {
             "title": "Devices Status"
         },
-        "card": {
-            "battery": {
-                "title": "Test Battery",
-                "content": "Stay in this page and keep your phone and jewel close; click the button on the jewel and check if the app sends a test alert."
-            }
+        "battery": {
+            "title": "Test Battery",
+            "content": "Stay in this page and keep your phone and jewel close; click the button on the jewel and check if the app sends a test alert."
         }
     },
     "SHARED_VALUES": {
@@ -193,15 +217,16 @@
     },
     "SHOW_ALERT": {
         "button": {
-            "immediate_emergency": "Send immediatly Emergency"
+            "immediate_emergency": "Send immediatly Alert"
         },
-        "content": "Accidentally triggered? No problem,enter your PIN to cancel.<br><br>To send a message, please let the time expire or click the button above"
+        "content": "Accidentally triggered? No problem,enter your PIN to cancel. To send a message, please let the time expire or click the button above",
+        "error": "Error. I can't send emergency alert!!"
     },
     "TUTORIAL": {
         "slide": {
             "0": {
                 "title": "Welcome",
-                "content": "This app is for those who want to feel safe at all times, if you are in trouble you can keep press the charm to send an S.O.S. with your location"
+                "content": "This app is for those who want to feel safe at all times, if you are in trouble you can keep press the charm for at least 5 seconds to send an S.O.S. with your location"
             },
             "1": {
                 "title": "How it works",
@@ -209,13 +234,13 @@
             },
             "2": {
                 "title": "Other features",
-                "content": "If you usually forget how to take a medicine you can ask for a tag or a QRCode and simple scanning it you can see in the app all the procedure. In general you can personalize the code and see what you want"
+                "content": "If you usually forget how to take a medicine you can ask for an NFC-tag or a QRCode and simple scanning it you can see in the app all the procedure. In general you can personalize the code and see what you want"
             },
             "3": {
                 "title": "Ready to join?",
                 "content": "You can sign up for free trial without subscription, but remember that in this case your alerts will be rejected!"
             },
-            "button":"Start using the app"
+            "button": "Start using the app"
         }
     },
     "TOUR": {
@@ -225,19 +250,19 @@
         },
         "qr": {
             "title": "QR",
-            "content": "You can open a page where you can see a list of your QRs and scan one of it"
+            "content": "Here you can see a list of your personal QRs and scan one of it. Personal QR can be used for accessing to your personal information such as list of medicine,instruction..."
         },
         "nfc": {
             "title": "NFC",
-            "content": "You can open a page where you can see a list of your NFC-tags and scan one of it"
+            "content": "Here you can see a list of your personal NFCs and scan one of it. Personal NFC tag can be used for accessing to your personal information such as list of medicine,instruction..."
         },
         "emergency": {
             "title": "Emergency",
-            "content": "You can send an emergency directly from the app without using the charm"
+            "content": "Send an emergency alert directly from the app without using the charm"
         },
         "profile": {
             "title": "Profile",
-            "content": "In this section you can modify your personal informations"
+            "content": "In this section you can modify your personal informations and pair the device"
         },
         "faq": {
             "title": "FAQ",
@@ -253,95 +278,104 @@
         },
         "immediate": {
             "title": "Fast!",
-            "content": "Clicking it you can send immidiately the emergency, without waiting 20 seconds"
+            "content": "Clicking it you'll send immediately the emergency alert, without waiting 20 seconds"
         },
         "pin": {
             "title": "Pin Boxs",
-            "content": "If you insert the PIN that you chose in registration you will not send the alert"
+            "content": "Insert the PIN to avoid the app to send alert"
         },
         "test-device": {
             "title": "Device Page",
-            "content": "Selection this page from menu, you can test the barrery of your jewel"
+            "content": "This page is to test the battery of your jewel"
         },
         "battery": {
             "title": "Battery Test",
             "content": "Click this button and check the battery. We suggest to test it at least once per month"
         },
-        "end":"Tour ended. Enjoy using our app!",
-        "button":{
-            "next":"Next",
-            "previous":"Previous",
-            "start":"Start",
-            "end":"End"
+        "end": "Tour ended. Enjoy using our app!",
+        "button": {
+            "next": "Next",
+            "previous": "Previous",
+            "start": "Start",
+            "end": "End"
         }
     },
-    "ALERT":{
-        "permission_creating_device":"For a better registration we''ll use the localisation",
-        "geo_permission":"This app needs location access for all the time. Allow it so this app can work properly",
-        "internet_permission":"This app needs internet connection, enable it!",
-        "foreground_service":"Detecting charm",
-        "dialer_error":"error launching dialer",
-        "internet_connection_fail":"Check your internet connection",
-        "error":"Error ",
-        "enable_nfc":"Enable NFC from settings",
-        "qr_scan":"QR scanned succesfully",
-        "registration":{
-            "success":"Succesfully registrated",
-            "error":"Error in registration ",
-            "form":{
-                "checkbox":"You must accept all policy to sign-up ",
-                "data":"Insert valid name and email",
-                "and":"and"
+    "ALERT": {
+        "permission_creating_device": "For a better registration we'll use the location",
+        "geo_permission": "This app needs location access for all the time. Allow it so this app can work properly",
+        "internet_permission": "This app needs internet connection, enable it!",
+        "foreground_service": "Detecting charm",
+        "dialer_error": "error launching dialer",
+        "internet_connection_fail": "Check your internet connection",
+        "error": "Error ",
+        "enable_nfc": "Enable NFC from settings",
+        "qr_scan": "QR scanned successfully",
+        "registration": {
+            "success": "Successfully registered. Check your email and finalize the registration, then back in the app and login",
+            "error": "Error in registration ",
+            "user_already_present": "The e-mail is already registered. Log in with span4city",
+            "form": {
+                "checkbox": "You must accept all policy to sign-up ",
+                "data": "Insert valid name and email",
+                "and": "and"
             },
-            "wait":"Asking for registration",
-            "check":"Check your email with your credentials"
+            "wait": "Asking for registration",
+            "check": "Check your email with your credentials"
         },
-        "data_success":"Data saved succesfully",
-        "data_fail":"Error. Recovery old data",
-        "limit_upper_contacts":"You can register max 5 people!",
-        "limit_lower_contacts":"Add at least one contact",
-        "error_step":"Error in step number ",
-        "already_paired":"You have already paired 2 devices!",
-        "send_emergency":"Sending emergency...",
-        "send_emergency_succ":"Emergency sent successfully",
-        "end_battery_test":"Test battery completed succesfully",
-        "check_permission":"Checking permission...",
-        "check_data":"Checking data...",
-        "get_info_from_server":"Getting info from server",
-        "retrive_info":"Retrieving information...",
-        "send_data":"Sending data...",
-        "update_data":"Updating data...",
-        "create_device":"Creating device ",
-        "ble_scan_err":"Scan not working if bluetooth is off",
-        "device_connected_succ":"Properly connected. Stop keep press the button",
-        "device_connected_err":"Device already registred",
-        "pin_wrong":"Pin wrong",
-        "generic_error":"Generic error",
-        "deleting_device":"Deleting device...",
-        "fixing_problems":"Fixing wrong number of devices..."
-       },
-    "DIALOG":{
-        "CONTACT":{
-            "import":"Import",
-            "save":"Save"
+        "data_success": "Data saved successfully",
+        "data_fail": "Error. Recovery old data",
+        "limit_upper_contacts": "You can register max 5 people!",
+        "limit_lower_contacts": "Add at least one contact",
+        "error_step": "Error in step number ",
+        "already_paired": "You have already paired 2 devices!",
+        "send_emergency": "Sending emergency alert...",
+        "send_emergency_succ": "Emergency alert sent successfully",
+        "end_battery_test": "Test battery completed successfully",
+        "check_permission": "Checking permission...",
+        "check_data": "Checking data...",
+        "get_info_from_server": "Getting info from server",
+        "retrive_info": "Retrieving information...",
+        "send_data": "Sending data...",
+        "send_emergency_now": "Fast",
+        "false_alarm": "False alarm",
+        "update_data": "Updating data...",
+        "create_device": "Creating profile ",
+        "ble_scan_err": "Scan not working if bluetooth is off",
+        "device_connected_succ": "Properly connected. Stop keep press the button",
+        "device_connected_err": "Device already registred",
+        "pin_wrong": "Pin wrong",
+        "generic_error": "Something goes wrong. Retry",
+        "deleting_device": "Deleting device...",
+        "fixing_problems": "Fixing wrong number of devices...",
+        "retrive_information": "Error retrive information from server",
+        "scan_error": "Element not found",
+        "no_device_paired": "You have to pair a device,you can do it clicking the icon in the top right",
+        "error_import_contacts": "Can't import contact. Enable the permission",
+        "error_logout": "Error during logout",
+        "error_login": "Error during login"
+    },
+    "DIALOG": {
+        "CONTACT": {
+            "import": "Import",
+            "save": "Save"
         },
-        "IMPORT":{
-            "title":"Contact List",
-            "subtitle":"Find contact"
+        "IMPORT": {
+            "title": "Contact List",
+            "subtitle": "Find contact"
         },
-        "MODIFY_NAME":{
-            "title":"Modify Name",
-            "new_name":"New name"
+        "MODIFY_NAME": {
+            "title": "Modify Name",
+            "new_name": "New name"
         },
-        "SAVE":{
-            "title":"Do you want to save?"
+        "SAVE": {
+            "title": "Do you want to save?"
         },
-        "BLUETOOTH":{
-            "title":"Device List"
+        "BLUETOOTH": {
+            "title": "Device List"
         },
-        "close":"close",
-        "yes":"yes",
-        "no":"no"
+        "close": "close",
+        "yes": "yes",
+        "no": "no"
     },
     "TERM_OF_USE": {},
     "PRIVACY_POLICY": {}

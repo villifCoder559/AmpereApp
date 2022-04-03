@@ -14,7 +14,7 @@ export class LanguagePopoverPage implements OnInit {
 
   ngOnInit() {
     this.languages = this.languageService.getLanguages();
-    this.selected = this.languageService.selected;
+    this.selected = this.languageService.selected_language;
   }
   select(lng) {
     console.log(lng)

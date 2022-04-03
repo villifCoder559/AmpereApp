@@ -3,7 +3,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { AlertEvent, DeviceType, QRNFCEvent, SharedDataService } from '../data/shared-data.service'
 import { Snap4CityService } from '../data/snap4-city.service'
 import { JwtHelperService } from '@auth0/angular-jwt'
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx'
+import { LocalNotifications } from '@awesome-cordova-plugins/local-notifications/ngx'
 const helper = new JwtHelperService();
 declare var cordovaHTTP: any;
 
@@ -17,10 +17,10 @@ export class NGSIv2QUERYService {
   constructor(private localNotification: LocalNotifications, private authService: AuthenticationService, private s4c: Snap4CityService, private shared_data: SharedDataService) {
     console.log(this.authService.keycloak)
   }
-  sendQRNFCEvent(qrnfc_event: QRNFCEvent, name = '') {
+  sendQRNFCEvent(qrnfc_event: QRNFCEvent) {
     return new Promise((resolve, reject) => {
       this.checkANDupdateToken().then(() => {
-        var device_id = name + this.shared_data.user_data.uuid + DeviceType.QR_NFC_EVENT;
+        var device_id = 'ampereuser' + this.shared_data.user_data.uuid + DeviceType.QR_NFC_EVENT;
         var attrs: any = this.s4c.getEventPayload(false, qrnfc_event);
         $.ajax({
           url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + device_id + "/attrs?elementid=" + device_id + "&type=" + DeviceType.QR_NFC_EVENT,
@@ -52,7 +52,6 @@ export class NGSIv2QUERYService {
       }, err => reject({ msg: 'Error update token' }))
     })
   }
-
   sendUserProfile() {
     return new Promise((resolve, reject) => {
       this.checkANDupdateToken().then(() => {
@@ -84,9 +83,7 @@ export class NGSIv2QUERYService {
   sendAlertEvent(details_emergency: AlertEvent) {
     return new Promise((resolve, reject) => {
       this.checkANDupdateToken().then(() => {
-        var username = this.shared_data.user_data.uuid;
         var attr = this.s4c.getEventPayload(false, details_emergency);
-        console.log('TOKEN')
         console.log(this.shared_data.accessToken)
         var device_id = 'ampereuser' + this.shared_data.user_data.uuid + DeviceType.ALERT_EVENT;
         $.ajax({
@@ -153,7 +150,7 @@ export class NGSIv2QUERYService {
           resolve(true)
         }, err => {
           console.log(err)
-          this.localNotification.schedule({ title: 'Ampere token expired', text: 'Login to continue using this app!' })
+          //this.localNotification.schedule({ title: 'Ampere token expired', text: 'Login to continue using this app!' })
           reject(false)
         })
       else
@@ -210,12 +207,15 @@ export class NGSIv2QUERYService {
     })
 
   }
-  getEntity(id_entity, type: DeviceType, broker = 'orionAMPERE-UNIFI') {
+  getEntity(id_device, type: DeviceType, broker = 'orionAMPERE-UNIFI') {
     return new Promise((resolve, reject) => {
+      console.log(this.shared_data.accessToken)
       $.ajax({
-        url: "https://iot-app.snap4city.org/orionfilter/" + broker + "/v2/entities/" + id_entity + "?elementid=" + id_entity + "&type=" + type,
+        url: "https://iot-app.snap4city.org/orionfilter/" + broker + "/v2/entities/" + id_device + "?elementid=" + id_device + "&type=" + type,
         type: "GET",
-        headers: {},
+        headers: {
+          //'Authorization': 'Bearer ' + this.shared_data.accessToken
+        },
         async: true,
         dataType: 'json',
         success: (mydata) => {
@@ -226,6 +226,59 @@ export class NGSIv2QUERYService {
             console.log('mydata')
             console.log(mydata)
             reject(mydata.error_msg)
+          }
+        },
+        error: function (xhr) {
+          reject(xhr.responseText)
+        }
+      });
+    })
+  }
+  //https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/ampereuser10802ebe-06b9-4c74-9141-f3b48dbc37e8Profile/attrs/status/value?elementid=ampereuser10802ebe-06b9-4c74-9141-f3b48dbc37e8Profile
+  getStatus(){
+    return new Promise((resolve, reject) => {
+      var device_id = 'ampereuser' + this.shared_data.user_data.uuid + DeviceType.PROFILE;
+      $.ajax({
+        url: "https://iot-app.snap4city.org/orionfilter/orionAMPERE-UNIFI/v2/entities/" + device_id + "?elementid=" + device_id + "&type=" +DeviceType.PROFILE,
+        type: "GET",
+        headers: {
+          'Authorization': 'Bearer ' + this.shared_data.accessToken
+        },
+        async: true,
+        dataType: 'json',
+        success: (mydata) => {
+          if (mydata?.status != 'ko') {
+            resolve(mydata.status.value)
+          }
+          else {
+            console.log('mydata')
+            console.log(mydata)
+            reject(mydata.error_msg)
+          }
+        },
+        error: function (xhr) {
+          reject(xhr.responseText)
+        }
+      });
+    })
+  }
+  getAllDictionarys(){
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: "https://www.disit.org/superservicemap/api/v1/?selection=42;11&requestFrom=user&categories=Service&maxResults=100&maxDists=0.0&format=json&lang=en&geometry=false&valueName=identifier",
+        type: "GET",
+        headers: {},
+        async: true,
+        dataType: 'json',
+        success: (mydata) => {
+          if (mydata.status != 'ko') {
+            console.log(mydata)
+            resolve(mydata)
+          }
+          else {
+            console.log('mydata')
+            console.log(mydata)
+            reject(mydata.msg)
           }
         },
         error: function (xhr) {

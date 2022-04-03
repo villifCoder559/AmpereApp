@@ -1,32 +1,32 @@
-<div class="container_login">
-  <button mat-raised-button color="light" (click)="login()">
-    <div class='button'>
-      <img src="assets/images/s4c.png" class="img">
-      <div class="text">{{'LOGIN.button.login'|translate}}</div>
-    </div>
-  </button>
-  <button mat-button color="light" (click)="registration()">
-    <div class='button'>
-      <!-- <img src="assets/images/s4c.png" class="img"> -->
-      <div class="text">{{'LOGIN.button.signup'|translate}}</div>
-    </div>
-  </button>
-  <button mat-raised-button color="light" (click)="openTutorial()">
-    <div class='button'>
-      <img src="assets/images/s4c.png" class="img">
-      <div class="text">Open Tutorial</div>
-    </div>
-  </button>
-  <button mat-raised-button color="light" (click)="loginTest()">
-    <div class='button'>
-      <img src="assets/images/s4c.png" class="img">
-      <div class="text">Fast Login</div>
-    </div>
-  </button>
-</div>
-<span class="fi fi-gr"></span>
-<div class="language-popover">
-  <button class="language_button" mat-button (click)="openLanguagePopover($event)">
-      <img src="/assets/flags/{{lng.selected?.img}}.svg">
-  </button>
-</div>
+  <div class="container_login">
+    <button mat-raised-button class="bt" (click)="login()">
+      <div class='button'>
+        <img src="assets/images/s4c.png" class="img">
+        <div class="text">{{'LOGIN.button.login'|translate}}</div>
+      </div>
+    </button>
+    <button mat-button (click)="registration()">
+      <div class='button'>
+        <!-- <img src="assets/images/s4c.png" class="img"> -->
+        <div class="text">{{'LOGIN.button.signup'|translate}}</div>
+      </div>
+    </button>
+    <!-- <button mat-raised-button class="bt" (click)="openTutorial()">
+      <div class='button'>
+        <img src="assets/images/s4c.png" class="img">
+        <div class="text">Open Tutorial</div>
+      </div>
+    </button>
+    <button mat-raised-button class="bt" (click)="loginTest()">
+      <div class='button'>
+        <img src="assets/images/s4c.png" class="img">
+        <div class="text">Fast Login</div>
+      </div>
+    </button> -->
+  </div>
+  <div class="language-popover">
+    <span style="color: #fff;">{{'LOGIN.language'|translate}}</span>
+    <button class="language_button" mat-button (click)="openLanguagePopover($event)">
+      <img src="/assets/flags/{{lng.selected_language?.img}}.svg">
+    </button>
+  </div>

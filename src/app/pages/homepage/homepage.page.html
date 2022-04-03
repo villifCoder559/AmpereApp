@@ -1,72 +1,63 @@
-<ion-header>
-  <mat-toolbar class="toolbar">
-    <div class="toolbar_content">
-      <ion-buttons slot="start">
-        <ion-menu-button tourAnchor="Menu" #menu></ion-menu-button>
-      </ion-buttons>
-      <span>Homepage</span>
-      <div class="fake-icon"></div>
-    </div>
-  </mat-toolbar>
-</ion-header>
+<!-- <ion-header> -->
+
+<!-- </ion-header> -->
 <ng-template #counter let-step="step" let-total="total">
   {{ step }} of {{ total }} steps
 </ng-template>
+
 <ion-content>
-  <mat-grid-list cols="2" rowHeight='33%'>
+  <div class="content">
+    <div class="status">
+      <h2>{{'HOMEPAGE.status.label'|translate}}: {{'HOMEPAGE.status.'+this.sharedData.user_data.status|translate}}</h2>
+    </div>
     <div class="homepage_content">
-      <mat-grid-tile [colspan]="1" [rowspan]="1">
-        <button tourAnchor="QR" mat-raised-button class="buttons" routerLink="/profile/menu/read-qr">
-          <div class="homepage_button_content">
-            <mat-icon>qr_code_2</mat-icon>
-            <h3>QR</h3>
-          </div>
-        </button>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1">
-        <button tourAnchor="NFC" mat-raised-button class="buttons" routerLink="/profile/menu/read-nfc">
-          <div class="homepage_button_content">
-            <mat-icon>nfc</mat-icon>
-            <h3>NFC</h3>
-          </div>
-        </button>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1">
+      <div class="first_row">
         <button tourAnchor="Emergency" id="emergency" mat-raised-button class="buttons" (click)="openAlertPage()">
           <div class="homepage_button_content">
             <mat-icon>notifications</mat-icon>
-            <h3>{{'HOMEPAGE.button.emergency'|translate}}</h3>
+            <!-- <h3>{{'HOMEPAGE.button.emergency'|translate}}</h3> -->
           </div>
         </button>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1">
-        <button tourAnchor="Profile" mat-raised-button class="buttons" routerLink="/profile/menu/profile">
+      </div>
+      <div class="second_row">
+        <button tourAnchor="NFC" mat-button class="buttons" routerLink="/profile/menu/read-nfc">
           <div class="homepage_button_content">
-            <mat-icon>person</mat-icon>
-            <h3>{{'HOMEPAGE.button.profile'|translate}}</h3>
+            <mat-icon>nfc</mat-icon>
+            <!-- <h3>NFC</h3> -->
           </div>
         </button>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1">
-        <button tourAnchor="FAQ" mat-raised-button class="buttons " routerLink="/profile/menu/faq">
+        <button tourAnchor="QR" mat-button class="buttons" routerLink="/profile/menu/read-qr">
           <div class="homepage_button_content">
-            <mat-icon>help</mat-icon>
-            <h3>{{'HOMEPAGE.button.FAQ'|translate}}</h3>
+            <mat-icon>qr_code_2</mat-icon>
+            <!-- <h3>QR</h3> -->
           </div>
         </button>
-      </mat-grid-tile>
+      </div>
     </div>
-  </mat-grid-list>
-  <div class="centered-tour-element" tourAnchor="homepage"></div>
-  <button mat-raised-button (click)="startTour()">startTour</button>
-  <!-- <button mat-raised-button (click)="updateProfile()">updateProfile</button>
-  <button mat-raised-button (click)="checkANDupdateToken()">checkANDupdateToken</button> -->
-  <!-- <button mat-raised-button (click)="testEqualTo()">testEqualTo</button>
-  <button mat-raised-button (click)="askPermission()">askPermission</button> 
-  <button mat-raised-button (click)="checkAndroidPermission()">checkAndroidPermission</button>
-  <button mat-raised-button (click)="enableWatchPosition()">enableWatchPosition</button>
-  <button mat-raised-button (click)="testDeviceMotionEvent()">testDeviceMotionEvent</button>
-  <button mat-raised-button (click)="backgroundGeolocationMauron()">backgroundGeolocationMauron</button> -->
+
+    <div class="centered-tour-element" tourAnchor="homepage"></div>
+    <mat-toolbar class="toolbar">
+      <div class="toolbar_content">
+        <ion-buttons slot="start">
+          <ion-menu-button tourAnchor="Menu" #menu></ion-menu-button>
+        </ion-buttons>
+        <button tourAnchor="Profile" mat-button routerLink="/profile/menu/profile">
+          <div class="toolbar_button_content">
+            <mat-icon>person</mat-icon>
+            <!-- <h3>{{'HOMEPAGE.button.profile'|translate}}</h3> -->
+          </div>
+        </button>
+        <button tourAnchor="FAQ" mat-button routerLink="/profile/menu/faq">
+          <div class="toolbar_button_content">
+            <mat-icon>help</mat-icon>
+            <!-- <h3>{{'HOMEPAGE.button.FAQ'|translate}}</h3> -->
+          </div>
+        </button>
+        <!-- <div class="fake-icon"></div> -->
+      </div>
+    </mat-toolbar>
+  </div>
 </ion-content>
+
 <tour-step-template>
 </tour-step-template>

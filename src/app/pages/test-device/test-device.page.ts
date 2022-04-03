@@ -2,10 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { SharedDataService, StorageNameType } from '../../data/shared-data.service'
 import { NavigationExtras, Router } from '@angular/router'
 import { MatDialog } from '@angular/material/dialog';
-import { DialogModifyNameComponent } from '../signup/dialog-modify-name/dialog-modify-name.component';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { SendAuthService } from 'src/app/data/send-auth.service';
-import { DialogScanBluetoothComponent } from '../signup/dialog-scan-bluetooth/dialog-scan-bluetooth.component';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -15,10 +12,10 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class TestDevicePage implements OnInit {
   StorageNameType = StorageNameType
-  constructor(public authService: AuthenticationService,public shared_data: SharedDataService, private router: Router, public dialog: MatDialog,private changeDetection: ChangeDetectorRef) {
+  constructor(private translate: TranslateService,public authService: AuthenticationService,public shared_data: SharedDataService, private router: Router, public dialog: MatDialog,private changeDetection: ChangeDetectorRef) {
     if (this.shared_data.enabled_test_battery_mode.observers.length == 0)
       this.shared_data.enabled_test_battery_mode.subscribe(() => {
-        $('#batteryButton').css('background-color', !this.shared_data.enabled_test_battery_mode.getValue() ? '#fff' : '#82b74b')
+        $('#batteryButton').css('background-color', !this.shared_data.enabled_test_battery_mode.getValue() ? '#4472C4' : '#82b74b')
         $('#testDeviceCard').css('display', !this.shared_data.enabled_test_battery_mode.getValue() ? 'none' : 'flex')
       })
   }
@@ -38,7 +35,10 @@ export class TestDevicePage implements OnInit {
     this.router.navigate(['/profile/menu/profile'], param)
   }
   testBattery() {
-    this.shared_data.enabled_test_battery_mode.next(!this.shared_data.enabled_test_battery_mode.getValue())
+    if(this.shared_data.user_data.paired_devices.length>0)
+      this.shared_data.enabled_test_battery_mode.next(!this.shared_data.enabled_test_battery_mode.getValue())
+    else
+      this.shared_data.createToast(this.translate.instant('ALERT.no_device_paired'),4500)
   }
 
 }

@@ -4,13 +4,13 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, LoadingController, Platform, ToastController } from '@ionic/angular';
-//import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
-import BackgroundMode from 'cordova-plugin-advanced-background-mode';
+import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
+//import BackgroundMode from 'cordova-plugin-advanced-background-mode';
 // import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { Storage } from '@ionic/storage-angular'
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { LocalNotifications } from '@awesome-cordova-plugins/local-notifications/ngx';
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 import { Device } from '@awesome-cordova-plugins/device/ngx'
 import { BehaviorSubject } from 'rxjs';
@@ -57,15 +57,12 @@ export class Emergency_Contact {
 export enum typeChecking {
   NFC_CODE = 'nfc_code',
   QR_CODE = 'qr_code',
-  EMERGENCY_CONTACTS = 'emergency_contacts',
-  DISABILITIES = 'disabilities',
-  PUB_EMERGENCY_CONTACTS = 'public_emergency_contacts',
-  PAIRED_DEVICES = 'paired_devices'
+
 }
 export enum DeviceType {
   ALERT_EVENT = 'AmpereEvent',
   QR_NFC_EVENT = 'QR-NFC-Event',
-  DICTIONARY = 'QRNFCDictionary',
+  DICTIONARY = 'AmpereDictionary',
   PROFILE = 'Profile'
 }
 export enum StorageNameType {
@@ -73,10 +70,7 @@ export enum StorageNameType {
   NFC_CODE = 'nfc_code',
   DEVICES = 'paired_devices'
 }
-export class StorageName {
-  id: any = ''
-  name: any = ''
-}
+
 export class UserData {
   uuid: string = ''
   name: string = '';
@@ -105,7 +99,7 @@ export class UserData {
   paired_devices = []
   qr_code = []
   nfc_code = []
-  status = 'active'
+  status = 'not_active'
   constructor() { }
   copyFrom(data: UserData) {
     this.emergency_contacts = [];
@@ -142,6 +136,7 @@ export class UserData {
     var equal = true
     var fields = Object.keys(this);
     for (let i = 0; equal && i < fields.length; i++) {
+      console.log(fields[i])
       switch (fields[i]) {
         default: {
           if (this[fields[i]] != data[fields[i]])
@@ -149,10 +144,14 @@ export class UserData {
           break;
         }
         case 'disabilities': case 'public_emergency_contacts': {
-          Object.keys(this[fields[i]]).forEach((element) => {
-            if (this[fields[i]][element] != data[fields[i]][element])
+          let keys = Object.keys(this[fields[i]])
+          for (let j = 0; i < keys.length; j++) {
+            console.log(keys[j])
+            //Object.keys(this[fields[i]]).forEach((element) => {
+            if (this[fields[i]][keys[j]] != data[fields[i]][keys[j]])
               equal = false;
-          })
+          }
+          // })
           break;
         }
         case 'paired_devices': case 'qr_code': case 'nfc_code': {
@@ -208,6 +207,7 @@ export class AlertEvent {
   accelY = 0.0
   accelZ = 0.0
   status = 'alert'
+  accuracy = 10
 }
 export class QRNFCEvent {
   QRIDorNFC: string = ''
@@ -240,8 +240,12 @@ export class SharedDataService {
   old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   enabled_test_battery_mode = new BehaviorSubject(false);
+  is_sending_emergency = new BehaviorSubject(false);
   constructor(private authService: AuthenticationService, private translate: TranslateService, private foregroundService: ForegroundService, private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
+      window.addEventListener('offline', () => {
+        this.createToast(this.translate.instant('ALERT.internet_permission'));
+      })
       this.storage.create();
       console.log('StorageNameType')
       Object.keys(StorageNameType).forEach(element => {
@@ -282,17 +286,35 @@ export class SharedDataService {
       },
       replaceUrl: true
     };
+    this.moveAppToForeground();
     this.nativeAudio.play('alert');
     this.router.navigate(['/show-alert'], navigationExtras)
   }
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
-    //Background mode from cordova-plugin-advanced-background-mode
-    BackgroundMode.enable();
-    BackgroundMode.disableWebViewOptimizations()
-    BackgroundMode.disableBatteryOptimizations();
-    BackgroundMode.overrideBackButton();
-    BackgroundMode.on('activate', () => {
+    // /*Background mode from cordova-plugin-advanced-background-mode*/
+    // BackgroundMode.enable();
+    // BackgroundMode.disableWebViewOptimizations()
+    // BackgroundMode.disableBatteryOptimizations();
+    // BackgroundMode.overrideBackButton();
+    // BackgroundMode.on('activate', () => {
+    //   if (this.tourService.getStatus() != 0) {
+    //     this.tourService.end();
+    //     this.tour_enabled = false;
+    //   }
+    //   console.log('ActivateBackground')
+    //   this.checkPermissionAlreadyMake = false;
+    //   if (this.enabled_test_battery_mode.getValue())
+    //     this.enabled_test_battery_mode.next(false)
+    //   if (!this.authService.isAuthenticated.getValue())
+    //     BackgroundMode.disable();
+    // })
+    //Plugin background mode from @awesome
+    this.backgroundMode.enable();
+    this.backgroundMode.disableWebViewOptimizations();
+    this.backgroundMode.disableBatteryOptimizations();
+    this.foregroundService.start('AMPERE','Ampere is running');
+    this.backgroundMode.on('activate').subscribe(() => {
       if (this.tourService.getStatus() != 0) {
         this.tourService.end();
         this.tour_enabled = false;
@@ -301,34 +323,28 @@ export class SharedDataService {
       this.checkPermissionAlreadyMake = false;
       if (this.enabled_test_battery_mode.getValue())
         this.enabled_test_battery_mode.next(false)
-      if (!this.authService.isAuthenticated.getValue())
-        BackgroundMode.disable();
+      if (!this.authService.isAuthenticated.getValue() || this.user_data.paired_devices.length == 0)
+        this.backgroundMode.disable();
     })
-    /*//Plugin background mode from @awesome
-    this.backgroundMode.enable();
-    this.backgroundMode.disableWebViewOptimizations();
-    this.backgroundMode.disableBatteryOptimizations();
-    this.backgroundMode.on('activate').subscribe(() => {
-      if (this.tour.getStatus() != 0) {
-        this.tour.end();
-        this.tour_enabled = false;
-      }
-      console.log('ActivateBackground')
-      this.checkPermissionAlreadyMake = false;
-      if (this.enabled_test_battery_mode.getValue())
-        this.enabled_test_battery_mode.next(false)
-    })*/
   }
   setNameDevice(device, type: StorageNameType, name = '') {
     var app = { id: '', name: '' };
     app.id = device;
-    app.name = name === '' ? device : name;
+    app.name = name == '' ? (device?.identifier != undefined ? device.identifier : device) : name;
+    console.log(app.name)
     var check = true;
-    if (this.localStorage[type] === null)
+    console.log('LOCAL_STORAGE')
+    console.log(this.localStorage)
+    console.log(this.localStorage[type])
+    if (this.localStorage[type] == null)
       this.localStorage[type] = []
     if (this.localStorage[type].length != 0)
       this.localStorage[type].forEach(element => {
-        if (element.id === device) {
+        console.log('Cicle')
+        console.log(element)
+        console.log(device)
+        console.log(element.id.identifier)
+        if ((element.id.identifier == undefined ? element.id : element.id.identifier) == device) {
           element.name = name;
           check = false;
         }
@@ -347,6 +363,7 @@ export class SharedDataService {
       this.localStorage[type] = result;
       if (this.localStorage[type] == null) {
         this.user_data[type].forEach(element => {
+          console.log(element)
           this.setNameDevice(element, type)
         })
       }
@@ -356,7 +373,7 @@ export class SharedDataService {
     console.log(data)
     Object.keys(this.user_data).forEach((element) => {
       switch (element) {
-        case 'paired_devices': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'status':
+        case 'paired_devices': case 'uuid': case 'emergency_contacts': case 'nfc_code': case 'qr_code':
           break;
         case 'dateObserved': {
           this.user_data[element] = new Date().toISOString();
@@ -395,13 +412,13 @@ export class SharedDataService {
         this.user_data.emergency_contacts.push(new Emergency_Contact(name, surname, number))
     }
     for (var i = 0; i < this.MAX_QRs; i++) {
-      var qrcode = data['QR' + (i + 1)].value;
-      if (qrcode != '')
+      var qrcode = { 'identifier': data['QR' + (i + 1) + '_identifier'].value, 'action': data['QR' + (i + 1) + '_action'].value };
+      if (qrcode.action != '' && qrcode.identifier != '')
         this.user_data.qr_code.push(qrcode)
     }
     for (var i = 0; i < this.MAX_NFCs; i++) {
-      var nfccode = data['NFC' + (i + 1)].value;
-      if (nfccode != '')
+      var nfccode = { 'identifier': data['NFC' + (i + 1) + '_identifier'].value, 'action': data['NFC' + (i + 1) + '_action'].value };
+      if (nfccode.action != '' && nfccode.identifier != '')
         this.user_data.nfc_code.push(nfccode)
     }
     //this.user_data.public_emergency_contacts = { call_112: data.call_112.value, call_115: data.call_115.value, call_118: data.call_118.value }
@@ -412,7 +429,7 @@ export class SharedDataService {
     var newUser = {}
     Object.keys(this.user_data).forEach((field_name) => {
       switch (field_name) {
-        //case 'id': { break; }
+        case 'uuid': case 'qr_code': case 'nfc_code': { break; }
         case 'dateObserved': {
           newUser[field_name] = { value: new Date().toISOString() }
           break;
@@ -432,16 +449,16 @@ export class SharedDataService {
           })
           break;
         }
-        case 'qr_code': {
-          for (var i = 0; i < this.MAX_QRs; i++)
-            newUser['QR' + (i + 1)] = { value: this.user_data.qr_code[i] === undefined ? '' : this.user_data.qr_code[i] }
-          break;
-        }
-        case 'nfc_code': {
-          for (var i = 0; i < this.MAX_NFCs; i++)
-            newUser['NFC' + (i + 1)] = { value: this.user_data.nfc_code[i] === undefined ? '' : this.user_data.nfc_code[i] }
-          break;
-        }
+        // case 'qr_code': {
+        //   for (var i = 0; i < this.MAX_QRs; i++)
+        //     newUser['QR' + (i + 1)] = { value: this.user_data.qr_code[i] === undefined ? '' : this.user_data.qr_code[i] }
+        //   break;
+        // }
+        // case 'nfc_code': {
+        //   for (var i = 0; i < this.MAX_NFCs; i++)
+        //     newUser['NFC' + (i + 1)] = { value: this.user_data.nfc_code[i] === undefined ? '' : this.user_data.nfc_code[i] }
+        //   break;
+        // }
         case 'public_emergency_contacts': {
           Object.keys(this.user_data.public_emergency_contacts).forEach((element) => {
             newUser[element] = { value: this.user_data.public_emergency_contacts[element] + '' }
@@ -494,9 +511,10 @@ export class SharedDataService {
   enableAllPermission() {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
+        this.enableAllBackgroundMode();
         console.log('enableAllPermission')
-        // this.askForegroundService().then(() => {
-        this.checkLocationEnabled().then(() => {
+        //this.askForegroundService().then(() => {
+        this.checkLocationEnabled().then((result) => {
           this.enableBluetooth().then(() => {
             this.askGeoPermission().then(() => {
               console.log('ASK_PERMISSION')
@@ -512,7 +530,6 @@ export class SharedDataService {
           }, err => reject(err))
         }, err => reject(err + '. App can\'t work properly!'))
         //}, err => reject(err))
-        this.enableAllBackgroundMode();
       }, err => reject(err))
     })
   }
@@ -568,7 +585,7 @@ export class SharedDataService {
         () => {
           resolve(true)
         }, error => {
-          alert(JSON.stringify(error))
+          //alert(JSON.stringify(error))
           reject(false)
         })
     })
@@ -608,7 +625,7 @@ export class SharedDataService {
             this.locationAccPermission().then(() => {
               console.log('requestPermissionDone')
               resolve(true)
-            });
+            }, err => reject(false));
           }
         },
         error => {
@@ -617,6 +634,10 @@ export class SharedDataService {
         }
       );
     })
+  }
+  moveAppToForeground() {
+    //BackgroundMode.moveToForeground();
+    this.backgroundMode.moveToForeground();
   }
   startTour() {
     this.tour_enabled = true;
@@ -634,8 +655,7 @@ export class SharedDataService {
       content: this.translate.instant('TOUR.qr.content'),
       nextBtnTitle: this.translate.instant('TOUR.button.next'),
       prevBtnTitle: this.translate.instant('TOUR.button.previous'),
-      enableBackdrop: true,
-      route: 'profile/menu/homepage'
+      enableBackdrop: true
     }, {
       anchorId: 'NFC',
       title: this.translate.instant('TOUR.nfc.title'),
@@ -645,8 +665,8 @@ export class SharedDataService {
       enableBackdrop: true
     }, {
       anchorId: 'Emergency',
-      title: this.translate.instant('TOUR.nfc.title'),
-      content: this.translate.instant('TOUR.nfc.content'),
+      title: this.translate.instant('TOUR.emergency.title'),
+      content: this.translate.instant('TOUR.emergency.content'),
       nextBtnTitle: this.translate.instant('TOUR.button.next'),
       prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true
@@ -715,13 +735,15 @@ export class SharedDataService {
       route: '/profile/menu/test-device',
     }])
     this.tourService.start();
-    this.tourService.end$.subscribe(() => {
+    var end = this.tourService.end$.subscribe(() => {
+      console.log('END')
       this.tour_enabled = false;
       this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true });
       this.storage.set('tour', true).then(async () => {
         this.createToast(this.translate.instant('TOUR.end'))
         this.enableAllPermission();
         this.checkPermissionAlreadyMake = true;
+        end.unsubscribe()
       })
     })
   }
