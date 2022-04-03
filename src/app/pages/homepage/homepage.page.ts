@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
@@ -38,6 +38,10 @@ export class HomepagePage implements OnInit {
         }, err => { this.sharedData.dismissLoading().catch() })
       }, err => this.sharedData.dismissLoading().catch())
   }
+  @HostListener('unloaded')
+  ngOnDestroy() {
+    console.log('HOMEPAGE_DESTROIED')
+  }
   startTour() {
     this.sharedData.startTour();
   }
@@ -53,6 +57,11 @@ export class HomepagePage implements OnInit {
           this.sharedData.dismissLoading().catch((err) => console.log(err))
         }, err => { console.log(err); this.sharedData.dismissLoading().catch(err => console.log(err)) })
       }, err => console.log(err))
+    else
+      this.sharedData.enableAllPermission().then(() => {
+        console.log(this.sharedData.checkPermissionAlreadyMake)
+        this.sharedData.dismissLoading().catch((err) => console.log(err))
+      }, err => { console.log(err); this.sharedData.dismissLoading().catch(err => console.log(err)) })
   }
   enableGPS() {
     return new Promise((resolve, reject) => {
@@ -123,5 +132,10 @@ export class HomepagePage implements OnInit {
       replaceUrl: true
     };
     this.router.navigate(['/show-alert'], navigationExtras)
+  }
+  getDictionaries() {
+    this.ngsi.getAllDictionarys().then((response) => {
+      console.log(response)
+    }, err => console.log(err))
   }
 }
