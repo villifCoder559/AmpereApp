@@ -10,7 +10,7 @@ import BackgroundFetch from "cordova-plugin-background-fetch";
 })
 export class SendAuthService {
   constructor(private platform: Platform, private ngsi: NGSIv2QUERYService, private authService: AuthenticationService) { }
-  
+
   private async onDeviceReady() {
     // Your BackgroundFetch event handler.
     console.log('OnDeviceReady')
@@ -33,7 +33,7 @@ export class SendAuthService {
       console.log('[BackgroundFetch] TIMEOUT: ', taskId);
       BackgroundFetch.finish(taskId);
     };
-    let status = await BackgroundFetch.configure({ minimumFetchInterval: 60 }, onEvent, onTimeout);
+    let status = await BackgroundFetch.configure({ minimumFetchInterval:120 }, onEvent, onTimeout);
     console.log('[BackgroundFetch] configure, status: ', status);
   }
   startSendingStatus() {
