@@ -65,7 +65,8 @@ export class MenuPage implements OnInit {
         this.shared_data.dismissLoading()
       }, err => {
         this.shared_data.dismissLoading();
-        alert(err.msg);
+        console.log(err)
+        alert(this.translate.instant('ALERT.error_logout'));
       })
     })
   }
