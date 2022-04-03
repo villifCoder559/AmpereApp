@@ -24,6 +24,7 @@ export class ReadNFCPage implements OnInit {
     console.log(this.shared_data.localStorage)
   }
   ngOnInit() {
+    console.log(this.shared_data.user_data)
     this.nfc.enabled().then(() => {
       this.NFC_enable = true;
     }, err => {
@@ -47,7 +48,7 @@ export class ReadNFCPage implements OnInit {
           console.log(text);
           this.shared_data.presentLoading(this.translate.instant('ALERT.get_info_from_server')).then(() => {
             this.readCode.readURLFromServer(text, typeChecking.NFC_CODE).then(() => {
-              this.shared_data.createToast(this.translate.instant('ALERT.qr_scan'))
+              //this.shared_data.createToast(this.translate.instant('ALERT.qr_scan'))
               this.shared_data.dismissLoading();
             }, err => {
               this.shared_data.createToast(err?.msg)
@@ -64,11 +65,12 @@ export class ReadNFCPage implements OnInit {
       maxWidth: '90vw',
       minWidth: '40vw',
       data: {
-        id: this.shared_data.user_data.nfc_code[i],
+        id: this.shared_data.user_data.nfc_code[i].identifier,
         name: '',
       }
     })
     dialogRef.afterClosed().subscribe(result => {
+      console.log('CLOSE_NFC')
       console.log(result)
       this.shared_data.setNameDevice(result.value.id, StorageNameType.NFC_CODE, result.value.name);
       const slidingItem = document.getElementById('slidingItem' + i) as any;
