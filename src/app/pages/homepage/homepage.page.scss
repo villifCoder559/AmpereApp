@@ -1,56 +1,65 @@
-.second_row{
+.second_row {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     height: 25%;
     align-items: center;
 }
-.status{
+
+.status {
     margin-top: 5px;
     text-align-last: center;
 }
-.first_row{
+
+.first_row {
     display: flex;
     justify-content: center;
     font-size: 35vw;
     height: 75%;
     align-items: center;
 }
-.homepage_content{
+
+.homepage_content {
     display: flex;
     justify-content: space-evenly;
     height: 100%;
     flex-direction: column;
 }
 
-.row_content{
+.row_content {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
 }
-.content{
+
+.content {
     display: flex;
     flex-direction: column;
     height: 100%;
     justify-content: space-evenly;
 }
-.homepage{
+
+.homepage {
     display: flex;
     flex-direction: column;
 }
-.row{
+
+.row {
     display: flex;
     justify-content: space-evenly;
 }
-.homepage_button_content{
+
+.homepage_button_content {
     display: flex;
     flex-direction: column;
 }
-.toolbar_button_content .mat-icon{
+
+.toolbar_button_content .mat-icon {
     display: flex;
     font-size: inherit;
 }
-.buttons{
+
+.buttons {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -58,79 +67,101 @@
     height: fit-content;
     padding: 0px;
 }
-.button_bottom{
+
+.button_bottom {
     width: 98%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24vw;
 }
-#emergency{
+
+#emergency {
     background: #FF0000;
     //color: #000;
     border-style: solid;
     width: 260px;
     height: 260px;
     border-radius: 100%;
-    .mat-icon{
-        font-size: 230px;
+
+    .mat-icon {
+        font-size: 180px;
     }
 }
 
-.mat-icon{
+.mat-icon {
     font-size: 24vw;
     display: inherit;
     height: inherit;
     width: inherit;
 }
-.bottom_component{
+
+.bottom_component {
     display: flex;
     height: 20vw;
     width: 100%;
     margin-top: 35px;
 }
-.emergency_button{
+
+.emergency_button {
     padding-left: calc();
     background-color: #ff0000;
 }
-@media screen and (min-width: 568px){
-    .buttons{
+
+@media(orientation:landscape) {
+    #emergency {
+        width: 130px;
+        height: 130px;
+        .mat-icon {
+            font-size: 100px;
+        }
+    }
+
+}
+
+@media screen and (min-width: 568px) {
+    .buttons {
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 16vw;
-        
+
     }
-    .button_bottom{
+
+    .button_bottom {
         width: 98%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 16vw;
     }
-    .mat-icon{
-        font-size: 16vw;
+
+    .mat-icon {
+        font-size: 12vw;
         display: inherit;
         height: inherit;
         width: inherit;
     }
 }
-@media screen and (min-width: 800px){
-    .buttons{
+
+@media screen and (min-width: 800px) {
+    .buttons {
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 10vw;
-        
+
     }
-    .button_bottom{
+
+    .button_bottom {
         width: 98%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 10vw;
     }
-    .mat-icon{
+
+    .mat-icon {
         font-size: 10vw;
         display: inherit;
         height: inherit;

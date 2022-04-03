@@ -26,81 +26,144 @@
 @import "~@ionic/angular/css/flex-utils.css";
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import 'swiper/css';
-ion-content{
-    --ion-background-color:#25288A;
-    --ion-text-color:#fff;
-    --ion-item-background:#4472C4;
+
+ion-content {
+    --ion-background-color: #25288A;
+    --ion-text-color: #fff;
+    --ion-item-background: #4472C4;
 }
-ion-content .mat-raised-button{
+
+ion-content .mat-raised-button {
     background-color: #4472C4;
     color: #fff;
 }
+
 // .mat-step{
 //     background-color: #25288A;
 //     color: #FAFAFA;
 //   }
-button .mat-button-wrapper{
+button .mat-button-wrapper {
     display: contents;
 }
+
 // #content mat-form-field{
 //     background-color: #4472C4;
 //     padding-bottom: 0px;
 // }
 #signup {
-    ion-content{
-        --ion-background-color:#25288A;
+    ion-content {
+        --ion-background-color: #25288A;
     }
-    mat-stepper{
+
+    mat-stepper {
         background-color: #25288A;
     }
-    .mat-form-field-appearance-fill .mat-form-field-flex{
+
+    ion-item-sliding {
+        .item-native {
+            background-color: #fff;
+        }
+    }
+
+    .mat-step-optional {
+        color: yellowgreen;
+    }
+
+    .mat-form-field-appearance-fill .mat-form-field-flex {
         background-color: #4472C4;
     }
-    input,.mat-step-label,.mat-form-field-label,span,textarea,.mat-hint{
+
+    input,
+    .mat-step-label,
+    .mat-form-field-label,
+    span,
+    textarea,
+    .mat-hint {
         color: #fff;
     }
-    .container-button{
-        span{
+
+    .container-button {
+        span {
             color: #000;
         }
     }
-    #emergency_contacts{
+
+    .container_button_step {
+        padding-top: 10px;
+        text-align: center;
+
+        button {
+            margin-right: 25px;
+        }
+    }
+
+    .bt_step {
+        background-color: #fff;
+
+        span {
+            color: #000;
+        }
+    }
+
+    #emergency_contacts {
         .mat-form-field-appearance-fill .mat-form-field-flex {
-            background-color: rgba(0,0,0,.04);;
+            background-color: rgba(0, 0, 0, .04);
+            ;
         }
-        input,.mat-step-label,.mat-form-field-label,textarea,.mat-hint{
+
+        input,
+        .mat-step-label,
+        .mat-form-field-label,
+        textarea,
+        .mat-hint {
             color: #000;
         }
     }
-    #medical_information{
-        span{
+
+    #medical_information {
+        span {
             color: #000;
         }
-        button span{
-            color: #fff;
+    }
+    #bluetooth ion-item::part(native){
+        --ion-background-color: #fff !important;
+        background-color: #fff !important;
+        .item-native{
+            --ion-background-color: #fff !important;
+            background-color: #fff !important;
         }
     }
-    .btt_add_contact{
-        span{
+    .btt_add_contact {
+        span {
             color: #000;
         }
     }
 }
-#registration{
-    input,.mat-step-label,.mat-form-field-label,span,textarea,.mat-hint{
+
+#registration {
+
+    input,
+    .mat-step-label,
+    .mat-form-field-label,
+    span,
+    textarea,
+    .mat-hint {
         color: #fff;
     }
-    .mat-form-field-flex{
+
+    .mat-form-field-flex {
         background: #4472C4;
         color: #fff;
     }
 }
-#registration_page{
-    .mat-checkbox-layout{
+
+#registration_page {
+    .mat-checkbox-layout {
         background-color: #fff;
     }
 }
-.alert-msg{
+
+.alert-msg {
     text-align: center;
     padding: 8px 0px;
     background-color: red;
@@ -108,25 +171,30 @@ button .mat-button-wrapper{
     // margin-bottom: 15px;
 }
 
-ion-item{
-    --ion-background-color:#fff;
+ion-item {
+    --ion-background-color: #fff;
 }
 
-h2,h3,p{
+h2,
+h3,
+p {
     margin: 0px !important
 }
-.toolbar{
+
+.toolbar {
     background-color: #25288A;
     color: white;
     justify-content: space-between;
     display: flex;
     align-items: center;
 }
-.toolbar .mat-icon{
+
+.toolbar .mat-icon {
     align-items: center;
     text-align: center;
 }
-.toolbar .toolbar_content{
+
+.toolbar .toolbar_content {
     height: 100%;
     width: 100%;
     display: flex;
@@ -136,134 +204,168 @@ h2,h3,p{
     //font-size: 10vw;
 }
 
-.toolbar button{
+.toolbar button {
     display: flex;
-   // height: 100%;
+    // height: 100%;
     align-items: center;
     justify-content: center;
     font-size: 30px;
 }
-.fake-icon{ // for style of toolbar
-    width: 48px;height: 48px;display: flex;
+
+.fake-icon {
+    // for style of toolbar
+    width: 48px;
+    height: 48px;
+    display: flex;
 }
-.containerDialog .mat-form-field-infix{
+
+.containerDialog .mat-form-field-infix {
     display: flex;
     flex-direction: row;
 }
-#mat-dialog-content{
+
+#mat-dialog-content {
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 1;
     overflow: auto;
-  }
-.bluetooth_item{
+}
+
+.bluetooth_item {
     //height: 65px;
     padding-left: 15px;
     background-color: #fff;
+    //background-color: #4472C4;
 }
-.icon-reader{
+
+.icon-reader {
     text-align: center;
 }
-.sliding-item{
+
+.sliding-item {
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
-#bluetooth .label_bluetooth_item{
+
+#bluetooth .label_bluetooth_item {
     background-color: #fff;
+    color: #000;
     margin: 0px;
     height: 55px;
     align-items: center;
     display: flex;
 }
-.bluetooth_item_options{
+
+.bluetooth_item_options {
     background-color: #fff;
 }
-.bluetooth_item_option{
+
+.bluetooth_item_option {
     display: flex;
     flex-direction: row;
 }
-.trash_icon{
+
+.trash_icon {
     width: 20px;
     height: 20px;
 }
-#bluetooth mat-card-content{
+
+#bluetooth mat-card-content {
     text-align: center;
     align-items: center;
     display: flex;
     flex-direction: column;
-  }
-  #bluetooth button{
+}
+
+#bluetooth button {
     margin: 13px;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  #bluetooth mat-icon{
+}
+
+#bluetooth mat-icon {
     display: flex;
     width: 100%;
     height: 100%;
-  }
-  #bluetooth ion-list{
+}
+
+#bluetooth ion-list {
     padding: 0px;
     width: 100%;
-  }
-ngx-qrcode{
+}
+
+ngx-qrcode {
     text-align: center;
 }
-.ion_item{
+
+.ion_item {
     padding-left: 15px;
     background-color: #fff;
 }
-.ion_item_sliding{
+
+.ion_item_sliding {
     background-color: white;
     margin: 0px;
 }
-.reader{
+
+.reader {
     display: flex;
     flex-direction: column;
     margin-top: 20px;
     width: 85vw;
     height: 100%;
 }
-.title_list_Code{
+
+.title_list_Code {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-.container_icon{
+
+.container_icon {
     display: flex;
     align-items: center;
     flex-direction: column;
 }
-.scannerCode{
+
+.scannerCode {
     display: flex;
     justify-content: center;
     margin-top: 30px;
 }
-.content{
+
+.content {
     display: flex;
     justify-content: center;
 }
-.label_code{//rq and nfc
+
+.label_code {
+    //rq and nfc
     background-color: white;
-     margin: 15px 0px;
+    margin: 15px 0px;
 }
-.icon_code{
-    width: 30px; 
+
+.icon_code {
+    width: 30px;
     height: 30px;
 }
-.custom-mat-card{
+
+.custom-mat-card {
     background-color: #fff;
 }
+
 mat-dialog-container {
     display: contents;
 }
-.ngx-ui-tour_backdrop{
+
+.ngx-ui-tour_backdrop {
     border-radius: 5%;
 }
+
 .centered-tour-element {
     position: fixed;
     left: 50%;
@@ -272,49 +374,75 @@ mat-dialog-container {
     /* For example, if your tour step has dimensions of 280 × 156 px, you have to translate by (-140px, -78px) */
     transform: translate(-140px, -78px);
 }
-.next mat-icon,.prev mat-icon{
+
+.bottom-tour-element {
+    position: fixed;
+    left: 50%;
+    bottom: 0%;
+    /* The anchor should be translated to the left by half of your step width and half height  */
+    /* For example, if your tour step has dimensions of 280 × 156 px, you have to translate by (-140px, -78px) */
+    transform: translate(-140px, -78px);
+}
+
+.next mat-icon,
+.prev mat-icon {
     height: 100%;
     display: flex;
 }
-.next span,.prev span{
+
+.next span,
+.prev span {
     display: flex;
     align-items: center;
 }
-.prev mat-icon{
+
+.prev mat-icon {
     height: auto;
 }
-.close mat-icon{
+
+.close mat-icon {
     height: 100%;
     width: 100%;
     display: flex;
     justify-content: center;
     place-items: center;
 }
-button .prev .mat-button-wrapper{
+
+button .prev .mat-button-wrapper {
     display: flex;
     align-items: center;
 }
-ion-popover{
+
+ion-popover {
+
     // ion-backdrop{
     // opacity: 0.5 !important;
     // }
-    .popover-wrapper{
-    .popover-content{
-        width: auto;
+    .popover-wrapper {
+        .popover-content {
+            width: auto;
+        }
     }
-  }
 }
+
 // .backdrop-target{
 //     border-radius: 20%;
 // }
-@media(min-width:800px){ //mediaQueries also in signup.scss,signup.ts constructor, homepage.scss
-    .reader{
-        width:60%;
+@media(orientation:landscape) {
+
+}
+
+@media(min-width:800px) {
+
+    //mediaQueries also in signup.scss,signup.ts constructor, homepage.scss
+    .reader {
+        width: 60%;
         display: flex;
         justify-content: center;
     }
-    .homepage_button{
-       
+
+    .homepage_button {
+
         height: 20vw;
         width: 20vw;
         font-size: 16vw;

@@ -13,3 +13,11 @@ mat-card-header{
     display: flex;
     flex-direction: column;
 }
+@media(orientation:landscape){
+    .mat-card{
+        display: inline-block;
+    }
+    #emergency_contacts{
+        text-align: center;
+    }
+}
