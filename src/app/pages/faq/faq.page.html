@@ -5,14 +5,17 @@
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
       <span>FAQ</span>
-      <div class="fake-icon"></div>
+        <button tourAnchor="button_tour" mat-icon-button (click)="startTour()">
+          <ion-icon name="bus-outline"></ion-icon>
+        </button>
     </div>
   </mat-toolbar>
 </ion-header>
 
 <ion-content>
-  <mat-accordion>
-    <mat-expansion-panel>
+  <iframe id="" height="100%" width="100%" style="border: 0;" [src]="urlSafe"></iframe>
+  <!-- <mat-accordion>
+    <mat-expansion-panel >
       <mat-expansion-panel-header [collapsedHeight]="collapsedHeight">
         <mat-panel-title>
           <span>{{'FAQ.0.question'|translate}}</span>
@@ -110,6 +113,7 @@
         Vivamus sed
         molestie leo. Sed tristique convallis dignissim. </p>
     </mat-expansion-panel>
-  </mat-accordion>
-
+  </mat-accordion> -->
 </ion-content>
+<tour-step-template>
+</tour-step-template>
