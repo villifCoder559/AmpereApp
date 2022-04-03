@@ -52,7 +52,7 @@
     "tour":{
       "button_tour":{
         "title":"Altro giro!",
-        "content":"Cliccando questo bottone rifarai il tour di questa app"
+        "content":"Cliccando questo bottone ripeterai il tour di questa app"
       }
     },
     "0": {
@@ -357,7 +357,7 @@
   },
   "DIALOG": {
     "CONTACT": {
-      "import": "Importare",
+      "import": "Importa da rubrica",
       "save": "Salva"
     },
     "IMPORT": {
