@@ -26,14 +26,14 @@
               <ion-item *ngIf="item.id !=-1 " class="ion-no-padding" id="item{{i}}">
                 <ion-label class="label_code" >
                   <h2 style="background-color: #4472C4;">{{this.shared_data?.localStorage[StorageNameType.QR_CODE][i]?.name ||
-                    this.shared_data.user_data?.qr_code[i]}}</h2>
+                    this.shared_data.user_data?.qr_code[i].identifier}}</h2>
                 </ion-label>
               </ion-item>
               <ion-item-options side="end" class="bluetooth_item_options">
                 <ion-item-option color="primary" (click)="modifyNameDevice(i)" expandable class="bluetooth_item_option">
                   <div class="icon-reader">
                     <ion-icon name="cog" class="trash_icon"></ion-icon>
-                    <p>{{'QR.card.modify'|translate}}</p>
+                    <p>{{'SHARED_VALUES.modify'|translate}}</p>
                   </div>
                 </ion-item-option>
               </ion-item-options>
@@ -47,6 +47,7 @@
           {{'QR.button.scan'|translate}}
         </button>
       </div>
+      <!-- <button mat-raised-button (click)="testQR()">Test QR</button> -->
     </div>
   </div>
 </ion-content>
