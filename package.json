@@ -36,6 +36,7 @@
     "@awesome-cordova-plugins/geolocation": "^5.39.1",
     "@awesome-cordova-plugins/http": "^5.40.0",
     "@awesome-cordova-plugins/in-app-browser": "^5.39.1",
+    "@awesome-cordova-plugins/local-notifications": "^5.40.0",
     "@awesome-cordova-plugins/lottie-splash-screen": "^5.40.0",
     "@awesome-cordova-plugins/network": "^5.40.0",
     "@ionic-native/android-permissions": "^5.36.0",
@@ -175,7 +176,6 @@
       "cordova-plugin-device-motion": {},
       "cordova-base64-to-gallery": {},
       "phonegap-nfc": {},
-      "cordova-plugin-local-notification": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-statusbar": {},
       "cordova-plugin-device": {},
@@ -205,7 +205,8 @@
       "cordova-plugin-advanced-http": {},
       "cordova-plugin-lottie-splashscreen": {},
       "phonegap-plugin-barcodescanner": {},
-      "cordova-plugin-network-information": {}
+      "cordova-plugin-network-information": {},
+      "cordova-plugin-local-notification": {}
     },
     "platforms": [
       "android"
