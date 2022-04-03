@@ -31,7 +31,7 @@ export class ShowAlertPage implements OnInit {
     desiredAccuracy: 10,
     stationaryRadius: 10,
     distanceFilter: 10,
-    debug: true, //  enable this hear sounds for background-geolocation life-cycle.
+    debug: false, //  enable this hear sounds for background-geolocation life-cycle.
     stopOnTerminate: true, // enable this to clear background location settings when the app terminates
     interval: 3000,
     fastestInterval: 4000,
