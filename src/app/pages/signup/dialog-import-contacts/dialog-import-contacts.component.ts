@@ -2,6 +2,7 @@ import { Component, OnInit, Inject, ChangeDetectorRef, ViewChild } from '@angula
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { Contacts, ContactName, ContactField } from '@ionic-native/contacts';
 import { LoadingController } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
 
 /*fix search name 
   fix view list of contact */
@@ -21,7 +22,7 @@ export class DialogImportContactsComponent implements OnInit {
   myContacts = [];
   selectedOptions;
   enableMatSpinner = true;
-  constructor(@Inject(MAT_DIALOG_DATA) public data, private dialog: MatDialogRef<DialogImportContactsComponent>, private contacts: Contacts, private changeDetection: ChangeDetectorRef, private loadingController: LoadingController) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data,private translate:TranslateService, private dialog: MatDialogRef<DialogImportContactsComponent>, private contacts: Contacts, private changeDetection: ChangeDetectorRef, private loadingController: LoadingController) {
     console.log(this.data)
     this.import_from_addressBook();
   }
@@ -51,7 +52,8 @@ export class DialogImportContactsComponent implements OnInit {
       console.log(this.myContacts);
     }, (err) => {
       $('#matSpinner').hide();
-      alert(err);
+      console.log(err)
+      alert(this.translate.instant('ALERT.error_import_contacts'));
     });
   }
   intervall = null;
