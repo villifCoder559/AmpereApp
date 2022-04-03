@@ -306,7 +306,7 @@
     "geo_permission": "Questa app ha bisogno dell'accesso alla posizione per tutto il tempo. Consentire ciò in modo che questa applicazione possa funzionare correttamente",
     "internet_permission":"Questa app necessita di connessione internet,attivala!",
     "foreground_service": "Rilevamento del fascino",
-    "dialer_error": "errore nel lancio del dialer",
+    "dialer_error": "Errore nel lancio del dialer",
     "internet_connection_fail": "Controlla la tua connessione internet",
     "error": "Errore ",
     "enable_nfc": "Abilitare NFC dalle impostazioni",
@@ -378,6 +378,10 @@
     "yes": "Sì",
     "no": "No"
   },
+  "NOTIFICATION":{
+    "receive_alert":"Falso allarme? Clicca la notifica per aprire l'app e disabilitare l'allerta inserendo il PIN",
+    "send_alert":"Emergency sent!"
+},
   "TERM_OF_USE": {},
   "PRIVACY_POLICY": {}
 }
