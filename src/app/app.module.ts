@@ -11,8 +11,8 @@ import {Contacts} from '@ionic-native/contacts'
 import {MaterialModule} from '../app/material-module';
 import { LocationAccuracy } from '@ionic-native/location-accuracy/ngx';
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
-import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
-//import BackgroundMode from 'cordova-plugin-advanced-background-mode';
+//import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
+import BackgroundMode from 'cordova-plugin-advanced-background-mode';
 import { LocalNotifications } from '@awesome-cordova-plugins/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { CountdownModule } from 'ngx-countdown';
@@ -42,6 +42,9 @@ import {TourMatMenuModule,TourService} from 'ngx-ui-tour-md-menu'
 import {TranslateModule,TranslateLoader} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {LanguageService} from '../app/data/language.service'
+import {EmergencyService} from '../app/data/emergency.service'
+import { BackgroundGeolocation, BackgroundGeolocationConfig } from '@awesome-cordova-plugins/background-geolocation/ngx';
+import { DeviceMotion, DeviceMotionAccelerationData } from '@awesome-cordova-plugins/device-motion/ngx';
 
 export function createTranslateLoader(http:HttpClient){
   return new TranslateHttpLoader(http,'assets/i18n/',".json");
@@ -85,7 +88,10 @@ export function createTranslateLoader(http:HttpClient){
     Storage,
     Network,
     TourService,
-    LanguageService
+    LanguageService,
+    EmergencyService,
+    BackgroundGeolocation,
+    DeviceMotion
   ],
   bootstrap: [AppComponent],
 })
