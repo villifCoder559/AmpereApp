@@ -25,7 +25,7 @@ export class ReadQRPage implements OnInit {
   constructor(private translate: TranslateService, private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private NGSIv2Query: NGSIv2QUERYService, private changeRef: ChangeDetectorRef, private qrScanner: BarcodeScanner) {
   }
   testQR(){
-    this.readCode.readURLFromServer('pluto12345',typeChecking.QR_CODE).then((response)=>{
+    this.readCode.searchCode('pluto12345',typeChecking.QR_CODE).then((response)=>{
       console.log(response)
     },err=>console.log(err))
   }
@@ -38,7 +38,7 @@ export class ReadQRPage implements OnInit {
       console.log(element!=undefined)
       if (element != undefined)
         this.shared_data.presentLoading(this.translate.instant('ALERT.get_info_from_server')).then(() => {
-          this.readCode.readURLFromServer(element.text, typeChecking.QR_CODE).then(() => {
+          this.readCode.searchCode(element.text, typeChecking.QR_CODE).then(() => {
             //this.shared_data.createToast('ALERT.qr_scan')
             this.shared_data.dismissLoading();
           }, err => {

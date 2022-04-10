@@ -47,7 +47,7 @@ export class ReadNFCPage implements OnInit {
           var text = this.nfc.bytesToString(tag.ndefMessage[0].payload).substring(3);
           console.log(text);
           this.shared_data.presentLoading(this.translate.instant('ALERT.get_info_from_server')).then(() => {
-            this.readCode.readURLFromServer(text, typeChecking.NFC_CODE).then(() => {
+            this.readCode.searchCode(text, typeChecking.NFC_CODE).then(() => {
               //this.shared_data.createToast(this.translate.instant('ALERT.qr_scan'))
               this.shared_data.dismissLoading();
             }, err => {
