@@ -11,6 +11,7 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Storage } from '@ionic/storage-angular'
 import { TranslateService } from '@ngx-translate/core';
 import { EmergencyService } from 'src/app/data/emergency.service';
+import { StorageService } from 'src/app/data/storage.service';
 
 @Component({
   selector: 'app-homepage',
@@ -20,17 +21,18 @@ import { EmergencyService } from 'src/app/data/emergency.service';
 export class HomepagePage implements OnInit {
 
   gps_enable = true;
-  constructor(private emergencyService:EmergencyService,private translate: TranslateService, private storage: Storage, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient, private ngsi: NGSIv2QUERYService, public sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
+  constructor(private emergencyService: EmergencyService, private translate: TranslateService, private storage: StorageService, private menu: MenuController, private authService: AuthenticationService, private http: HttpClient, private ngsi: NGSIv2QUERYService, public sharedData: SharedDataService, private platform: Platform, private router: Router, private locationAccuracy: LocationAccuracy, private geolocation: Geolocation, private androidPermissions: AndroidPermissions) {
   }
   ngOnInit() {
     // this.ngsi.getStatus().then((value: any) => {
     //   this.sharedData.user_data.status = value;
     // }, err => this.sharedData.createToast(this.translate.instant('ALERT.retrive_status')))
+    console.log('NgOnInit')
     if (!this.sharedData.tour_enabled)
       this.platform.ready().then(() => {
         this.storage.get('tour').then((value) => {
           if (!value && !this.sharedData.tour_enabled)
-            this.startTour();
+            this.startTour()
           else {
             //this.sharedData.tour_enabled = false;
             if (!this.sharedData.tour_enabled)
@@ -39,15 +41,19 @@ export class HomepagePage implements OnInit {
         }, err => { this.sharedData.dismissLoading().catch() })
       }, err => this.sharedData.dismissLoading().catch())
   }
-  @HostListener('unloaded')
+  //@HostListener('unloaded')
   ngOnDestroy() {
     console.log('HOMEPAGE_DESTROIED')
   }
   startTour() {
-    this.sharedData.startTour();
+    setTimeout(() => {
+      this.sharedData.startTour();
+    }, 500)
   }
   ionViewDidEnter() {
     console.log(this.sharedData.tour_enabled)
+    console.log('ViewDidEnter')
+    this.sharedData.enableAllBackgroundMode()
   }
   enableCheckPermission() {
     if (!this.sharedData.checkPermissionAlreadyMake)
@@ -132,13 +138,24 @@ export class HomepagePage implements OnInit {
     //   state: { deviceID: 'APP' },
     //   replaceUrl: true
     // };
-    this.emergencyService.details_emergency.deviceID='APP';
-    this.emergencyService.send_Emergency()
+    this.emergencyService.details_emergency.deviceID = 'APP';
+    this.emergencyService.sendEmergency()
     this.sharedData.showAlertPage()
   }
-  getDictionaries() {
-    this.ngsi.getAllDictionarys().then((response) => {
-      console.log(response)
-    }, err => console.log(err))
-  }
+
+  // openAppDetails(){
+  //   this.sharedData.openAppDetails();
+  // }
+  // openAppDevelop(){
+  //   this.sharedData.openAppDevelop();
+  // }
+  // openAppSettings(){
+  //   this.sharedData.openAppSettings()
+  // }
+  // openManageApp(){
+  //   this.sharedData.openManageApp();
+  // }
+  // openManageAllApp(){
+  //   this.sharedData.openManageAllApp()
+  // }
 }
