@@ -33,7 +33,7 @@ export class SendAuthService {
       console.log('[BackgroundFetch] TIMEOUT: ', taskId);
       BackgroundFetch.finish(taskId);
     };
-    let status = await BackgroundFetch.configure({ minimumFetchInterval:120 }, onEvent, onTimeout);
+    let status = await BackgroundFetch.configure({ minimumFetchInterval:30 }, onEvent, onTimeout);
     console.log('[BackgroundFetch] configure, status: ', status);
   }
   startSendingStatus() {
