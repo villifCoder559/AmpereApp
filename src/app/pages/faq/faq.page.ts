@@ -21,17 +21,17 @@ export class FaqPage implements OnInit {
   }
 
   ngOnInit() {
-    setTimeout(()=>{
-      this.tourService.initialize([{
-        anchorId:'button_tour',
-        title: this.translate.instant('FAQ.tour.button_tour.title'),
-        content: this.translate.instant('FAQ.tour.button_tour.content'),
-        prevBtnTitle:this.translate.instant('TOUR.button.previous'),
-        endBtnTitle:this.translate.instant('TOUR.button.end'),
-        enableBackdrop: true
-      }])
-      this.tourService.start();
-    },1200)
+    // setTimeout(()=>{
+    //   this.tourService.initialize([{
+    //     anchorId:'button_tour',
+    //     title: this.translate.instant('FAQ.tour.button_tour.title'),
+    //     content: this.translate.instant('FAQ.tour.button_tour.content'),
+    //     prevBtnTitle:this.translate.instant('TOUR.button.previous'),
+    //     endBtnTitle:this.translate.instant('TOUR.button.end'),
+    //     enableBackdrop: true
+    //   }])
+    //   this.tourService.start();
+    // },1200)
   }
   startTour() {
     this.router.navigateByUrl('profile/menu/homepage').finally(() => {
@@ -39,5 +39,8 @@ export class FaqPage implements OnInit {
         this.shared_data.startTour();
       }, 650)
     })
+  }
+  ngOnDestroy(){
+
   }
 }
