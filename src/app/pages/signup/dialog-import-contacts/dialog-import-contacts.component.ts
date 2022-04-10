@@ -91,7 +91,10 @@ export class DialogImportContactsComponent implements OnInit {
     var value = { name: '', surname: '', number: '' };
     value.name = app.splice(0, 1)[0]
     value.surname = app.join(' ')
-    value.number = this.selectedOptions[0].number.replace('(','').replace(')','');
+    value.number = this.selectedOptions[0].number;
+    for(let i=0;i<value.number.length;i++)
+      if(isNaN(parseInt(value.number[i])))
+        value.number=value.number.replace(value.number[i],'')
     console.log('value')
     console.log(value)
     this.dialog.close({ contact: value })
