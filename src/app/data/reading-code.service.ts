@@ -17,14 +17,14 @@ export class ReadingCodeService {
   readonly numQRNFC = 4;
   readonly array_id = ['broker', 'org', 'deviceID']
   constructor(private translate: TranslateService, private NGSIv2Query: NGSIv2QUERYService, private geolocation: Geolocation, private iab: InAppBrowser, private sharedData: SharedDataService) { }
-  readURLFromServer(scanned_text, type: typeChecking.NFC_CODE | typeChecking.QR_CODE) {
+  searchCode(scanned_text, type: typeChecking.NFC_CODE | typeChecking.QR_CODE) {
     return new Promise((resolve, reject) => {
-      let index = this.searchScannedValueInUserData(scanned_text, type);
+      let index = this.searchValueInUserData(scanned_text, type);
       if (index != -1)
         this.openUrlAndGenerateEvent(this.sharedData.user_data.qr_code[index].id, this.sharedData.user_data.qr_code[index].action, typeChecking.QR_CODE ? 'QR' : 'NFC').then(()=>resolve(true),err=>reject(err))
       else
-        this.getListFromServer(type).then(() => {
-          let index = this.searchScannedValueInUserData(scanned_text, type);
+        this.getUpdatedListFromServer(type).then(() => {
+          let index = this.searchValueInUserData(scanned_text, type);
           console.log('LISTFROMSERVER')
           if (index != -1)
             this.openUrlAndGenerateEvent(this.sharedData.user_data.qr_code[index].id, this.sharedData.user_data.qr_code[index].action, typeChecking.QR_CODE ? 'QR' : 'NFC').then(() => resolve(true), err => reject(err))
@@ -74,7 +74,7 @@ export class ReadingCodeService {
     // }
     // return null;
   }
-  searchScannedValueInUserData(value, type) {
+  searchValueInUserData(value, type) {
     for (let i = 0; i < this.sharedData.user_data[type].length; i++) {
       if (value == this.sharedData.user_data.qr_code[i].identifier)
         return i;
@@ -103,7 +103,7 @@ export class ReadingCodeService {
       }, err => reject(err))
     })
   }
-  private getListFromServer(type: typeChecking.NFC_CODE | typeChecking.QR_CODE) {
+  private getUpdatedListFromServer(type: typeChecking.NFC_CODE | typeChecking.QR_CODE) {
     return new Promise((resolve, reject) => {
       this.NGSIv2Query.getEntity('ampereuser' + this.sharedData.user_data.uuid + DeviceType.PROFILE, DeviceType.PROFILE).then((data) => {
         this.fillListCode(data, type);
