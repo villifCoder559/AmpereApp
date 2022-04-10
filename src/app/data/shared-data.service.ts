@@ -5,12 +5,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, LoadingController, Platform, ToastController } from '@ionic/angular';
 //import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
-import BackgroundMode from 'cordova-plugin-advanced-background-mode';
+//import BackgroundMode from 'cordova-plugin-advanced-background-mode'; UNINSTALLED
 // import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { Storage } from '@ionic/storage-angular'
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
-import { LocalNotifications } from '@awesome-cordova-plugins/local-notifications/ngx';
+import { ELocalNotificationTriggerUnit, LocalNotifications } from '@awesome-cordova-plugins/local-notifications/ngx';
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 import { Device } from '@awesome-cordova-plugins/device/ngx'
 import { BehaviorSubject } from 'rxjs';
@@ -20,6 +20,9 @@ import { TourService } from 'ngx-ui-tour-md-menu';
 import { ForegroundService } from '@awesome-cordova-plugins/foreground-service/ngx';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthenticationService } from '../services/authentication.service';
+import { StorageService } from './storage.service';
+declare var cordova: any;
+declare var window: any;
 
 //import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 /**fix logout */
@@ -224,11 +227,13 @@ export class QRNFCEvent {
     this.longitude = longitude
   }
 }
+
 @Injectable({
   providedIn: 'root'
 })
 export class SharedDataService {
   /**List of StorageNameType */
+  remember_test_battery = [];
   tour_enabled = false;
   readonly MAX_NFCs = 4;
   readonly MAX_QRs = 4;
@@ -237,24 +242,40 @@ export class SharedDataService {
   public accessToken;
   checkPermissionAlreadyMake = false;
   localStorage = {}
-  old_user_data: UserData = new UserData();
+  public old_user_data: UserData = new UserData();
   public user_data: UserData = new UserData();
   enabled_test_battery_mode = new BehaviorSubject(false);
   is_sending_emergency = new BehaviorSubject(false);
-  constructor(private authService: AuthenticationService, private translate: TranslateService, private foregroundService: ForegroundService, private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, private backgroundMode: BackgroundMode, private storage: Storage, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
+  constructor(private authService: AuthenticationService, private translate: TranslateService, private foregroundService: ForegroundService, private tourService: TourService, private locationAccuracy: LocationAccuracy, private ble: BLE, private geolocation: Geolocation, private localNotifications: LocalNotifications, private androidPermissions: AndroidPermissions, private device: Device, private loadingController: LoadingController, /*private backgroundMode: BackgroundMode,*/ private storage: StorageService, private toastCtrl: ToastController, private router: Router, private platform: Platform, private nativeAudio: NativeAudio) {
     this.platform.ready().then(() => {
       window.addEventListener('offline', () => {
         this.createToast(this.translate.instant('ALERT.internet_permission'));
       })
-      this.storage.create();
-      console.log('StorageNameType')
       Object.keys(StorageNameType).forEach(element => {
-        console.log(StorageNameType[element])
+        //   console.log('StorageNameType[element]')
+        //   console.log(StorageNameType[element])
         this.localStorage[StorageNameType[element]] = []
+        //   if (this.localStorage[StorageNameType[element]] == undefined)
+        //   this.storage.set(StorageNameType[element], this.localStorage[StorageNameType[element]])
       })
       this.nativeAudio.preloadSimple('alert', 'assets/sounds/alert.mp3').then(() => { }, (err) => console.log(err));
       this.nativeAudio.preloadSimple('sendData', 'assets/sounds/send_data.mp3').then(() => { }, (err) => console.log(err));
     })
+  }
+  setRememberTestNotification(device_id){
+    this.localNotifications.schedule({
+      id:device_id,
+      title: "AMPERE",
+      text:this.translate.instant('ALERT.notification_test_battery'),
+      trigger: { every: ELocalNotificationTriggerUnit.MONTH }
+    })
+  }
+  deleteRememberTestNotification(device_id){
+    this.localNotifications.cancel(device_id)
+  }
+  changeDateRememberTest(device_id){
+    this.localNotifications.cancel(device_id);
+    this.setRememberTestNotification(device_id)
   }
   async createToast(header, time = 3500) {
     let toast = await this.toastCtrl.create({
@@ -279,14 +300,6 @@ export class SharedDataService {
     $('.loading-content').html(text);
   }
   showAlertPage() {
-    // console.log(id)
-    // let navigationExtras: NavigationExtras = {
-    //   state: {
-    //     deviceID: id
-    //   },
-    //   replaceUrl: true
-    // };
-    //this.moveAppToForeground();
     this.nativeAudio.play('alert');
     if (!this.backgroundMode_enabled)
       this.router.navigateByUrl('/show-alert', { replaceUrl: true })
@@ -294,12 +307,15 @@ export class SharedDataService {
   backgroundMode_enabled = false;
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
-    /*Background mode from cordova-plugin-advanced-background-mode*/
-    BackgroundMode.enable();
-    BackgroundMode.disableWebViewOptimizations()
-    BackgroundMode.disableBatteryOptimizations();
-    BackgroundMode.overrideBackButton();
-    BackgroundMode.on('activate', () => {
+    //cordova-plugin-run-background
+    cordova.plugins.backgroundMode.enable();
+    //cordova.plugins.foregroundService.start('Ampere', this.translate.instant('ALERT.foreground_service'), 'myiconicon.png', 3, 10);
+    //cordova.plugins.backgroundMode.requestForegroundPermission();
+    //cordova.plugins.backgroundMode.overrideBackButton();
+    cordova.plugins.backgroundMode.on('activate', () => {
+      //cordova.plugins.backgroundMode.configure({icon: 'assets/icon/icon.png',title: 'Ampere sta lavorando',text:'Testo Prova',subText:'Sub text'});
+      cordova.plugins.backgroundMode.disableWebViewOptimizations()
+      cordova.plugins.backgroundMode.disableBatteryOptimizations();
       this.backgroundMode_enabled = true;
       if (this.tourService.getStatus() != 0) {
         this.tourService.end();
@@ -309,18 +325,45 @@ export class SharedDataService {
       this.checkPermissionAlreadyMake = false;
       if (this.enabled_test_battery_mode.getValue())
         this.enabled_test_battery_mode.next(false)
-      if (!this.authService.isAuthenticated.getValue() || this.user_data.paired_devices.length == 0)
-        BackgroundMode.disable();
+      if (!this.authService.isAuthenticated.getValue() || this.user_data.paired_devices.length == 0) {
+        console.log('Disable Backgorund Mode')
+        cordova.plugins.backgroundMode.disable();
+        //cordova.plugins.foregroundService.stop();
+      }
     })
-    BackgroundMode.on('deactivate', () => {
+    cordova.plugins.backgroundMode.on('deactivate', () => {
       this.backgroundMode_enabled = false;
       if (this.is_sending_emergency.getValue())
         this.router.navigateByUrl('/show-alert')
     })
+    /*Background mode from cordova-plugin-advanced-background-mode*/
+    // BackgroundMode.enable();
+    // BackgroundMode.disableWebViewOptimizations()
+    // BackgroundMode.disableBatteryOptimizations();
+    // //BackgroundMode.overrideBackButton();
+    // BackgroundMode.on('activate', () => {
+    //   this.backgroundMode_enabled = true;
+    //   if (this.tourService.getStatus() != 0) {
+    //     this.tourService.end();
+    //     this.tour_enabled = false;
+    //   }
+    //   console.log('ActivateBackground')
+    //   this.checkPermissionAlreadyMake = false;
+    //   if (this.enabled_test_battery_mode.getValue())
+    //     this.enabled_test_battery_mode.next(false)
+    //   if (!this.authService.isAuthenticated.getValue() || this.user_data.paired_devices.length == 0)
+    //     BackgroundMode.disable();
+    // })
+    // BackgroundMode.on('deactivate', () => {
+    //   this.backgroundMode_enabled = false;
+    //   if (this.is_sending_emergency.getValue())
+    //     this.router.navigateByUrl('/show-alert')
+    // })
     //Plugin background mode from @awesome
     // this.backgroundMode.enable();
     // this.backgroundMode.disableWebViewOptimizations();
     // this.backgroundMode.disableBatteryOptimizations();
+    // //this.backgroundMode.overrideBackButton();
     // this.backgroundMode.on('activate').subscribe(() => {
     //   this.backgroundMode_enabled = true;
     //   if (this.tourService.getStatus() != 0) {
@@ -339,6 +382,46 @@ export class SharedDataService {
     //   if (this.is_sending_emergency.getValue())
     //     this.router.navigateByUrl('/show-alert')
     // })
+  }
+  checkOtherBatteryOptimization() {
+    return new Promise((resolve) => {
+      cordova.plugins.PowerOptimization.HaveProtectedAppsCheck().then((result) => {
+        console.log(result);
+        if (!result.skip_message) {
+          alert(this.translate.instant('ALERT.protectedAppCheck'));
+          cordova.plugins.PowerOptimization.ProtectedAppCheck().then((result) => {
+            console.log(result);
+            resolve(true)
+          }, (err) => {
+            resolve(false)
+            console.error(err);
+          });
+        }
+        else
+          resolve(true)
+      }, (err) => {
+        resolve(false)
+        console.error(err);
+      });
+    })
+  }
+  disableBatteryOptimization() {
+    cordova.plugins.PowerOptimization.IsIgnoringBatteryOptimizations((responce) => {
+      console.log("IsIgnoringBatteryOptimizations: " + responce);
+      if (responce == "false") {
+        console.log('REQUEST OPTIMIZATION')
+        cordova.plugins.PowerOptimization.RequestOptimizations((responce) => {
+          console.log(responce);
+        }, (error) => {
+          console.log("BatteryOptimizations Request Error" + error);
+        });
+      }
+      else {
+        console.log("Application already Ignoring Battery Optimizations");
+      }
+    }, (error) => {
+      console.log(error)
+    })
   }
   setNameDevice(device, type: StorageNameType, name = '') {
     var app = { id: '', name: '' };
@@ -364,18 +447,24 @@ export class SharedDataService {
       })
     if (check)
       this.localStorage[type].push(app)
+    console.log(this.localStorage[type])
     this.storage.set(type, this.localStorage[type])
   }
   deleteDeviceFromLocalStorage(device, type: StorageNameType) {
+    console.log(this.localStorage[type])
     var index = this.localStorage[type].indexOf(device);
     this.localStorage[type].splice(index, 1)
     this.storage.set(type, this.localStorage[type])
   }
   getNameDevices(type: StorageNameType) {
+    console.log('GETTING_NAME_DEVICES')
     this.storage.get(type).then((result) => {
+      console.log('GET ' + type)
+      console.log(result)
       this.localStorage[type] = result;
       if (this.localStorage[type] == null) {
         this.user_data[type].forEach(element => {
+          console.log('FOREACH_')
           console.log(element)
           this.setNameDevice(element, type)
         })
@@ -386,7 +475,7 @@ export class SharedDataService {
     console.log(data)
     Object.keys(this.user_data).forEach((element) => {
       switch (element) {
-        case 'paired_devices': case 'uuid': case 'emergency_contacts': case 'nfc_code': case 'qr_code':
+        case 'paired_devices': case 'uuid': case 'emergency_contacts': case 'nfc_code': case 'qr_code': case 'id': case 'type':
           break;
         case 'dateObserved': {
           this.user_data[element] = new Date().toISOString();
@@ -414,6 +503,7 @@ export class SharedDataService {
         }
       }
     })
+    console.log('End switch')
     for (var i = 0; i < this.MAX_DEVICEs; i++)
       if (data['jewel' + (i + 1) + 'ID'].value != '')
         this.user_data.paired_devices.push(data['jewel' + (i + 1) + 'ID'].value)
@@ -484,7 +574,6 @@ export class SharedDataService {
           break;
         }
         default: {
-          console.log('default-> ' + field_name)
           console.log(newUser)
           newUser[field_name] = { value: this.user_data[field_name] === undefined ? '' : this.user_data[field_name] }
           break;
@@ -495,54 +584,48 @@ export class SharedDataService {
     return newUser;
   }
   enableBluetooth() {
-    return new Promise((resolve, reject) => {
-      this.ble.isEnabled().then(() => {
-        resolve(true)
-      }, err => {
-        this.ble.enable().then(() => resolve(true), err => reject(err))
-      })
-    })
-  }
-  askForegroundService() {
-    return new Promise((resolve, reject) => {
-      this.androidPermissions.checkPermission("android.permission.FOREGROUND_SERVICE").then((enabled) => {
-        console.log('ForegroundService')
-        if (!enabled?.hasPermission)
-          this.androidPermissions.requestPermission("android.permission.FOREGROUND_SERVICE").then(() => {
-            console.log('Permission foreground')
-            this.foregroundService.start('Ampere', 'Detecting charm')
-            resolve(true)
-          }, err => reject(err)).catch(err => console.log(err))
-        else {
-          this.foregroundService.start('Ampere', 'Detecting charm')
-          console.log('Permission foreground ' + enabled?.hasPermission)
-          resolve(true)
-        }
-      }, err => reject(err))
+    return new Promise((resolve) => {
+      this.ble.isEnabled().then(() => { resolve(true) 
+      }, (err) => {
+          this.ble.enable().then(() => {resolve(true) },
+            (err) => {
+              alert(this.translate.instant('ALERT.ble_disable'));
+              resolve(false)
+            })
+        })
     })
   }
   enableAllPermission() {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
         this.enableAllBackgroundMode();
-        console.log('enableAllPermission')
-        //this.askForegroundService().then(() => {
-        this.checkLocationEnabled().then((result) => {
-          this.enableBluetooth().then(() => {
-            this.askGeoPermission().then(() => {
-              console.log('ASK_PERMISSION')
-              this.localNotifications.hasPermission().then(result => {
-                if (!result.valueOf())
-                  this.localNotifications.requestPermission().then(() => {
+        //this.disableBatteryOptimization().then(() => {
+        console.log('ASK for location')
+        this.checkLocationEnabled().then(() => {
+          this.askGeoPermission().then(() => {
+            console.log('ASK_PERMISSION_battery')
+            setTimeout(() => {
+              this.checkOtherBatteryOptimization().then(() => {
+                //this.checkConnection().then(() => {
+                if (this.user_data.paired_devices?.length > 0)
+                  this.enableBluetooth().catch(err => console.log(err))
+                console.log('END_PERMISSION_Battery')
+                this.localNotifications.hasPermission().then(result => {
+                  if (!result.valueOf())
+                    this.localNotifications.requestPermission().then(() => {
+                      resolve(true)
+                    }).catch(err => reject(err))
+                  else
                     resolve(true)
-                  }).catch(err => reject(err))
-                else
-                  resolve(true)
-              }, (err) => reject(err))
-            }, err => { reject(err) })
-          }, err => reject(err))
+                }, (err) => reject(err))
+                //});
+              })
+            }, 1500);
+          }, err => { reject(err) })
+          //}, err => reject(err))
         }, err => reject(err + '. App can\'t work properly!'))
-        //}, err => reject(err))
+        //})
+        console.log('enableAllPermission')
       }, err => reject(err))
     })
   }
@@ -556,7 +639,7 @@ export class SharedDataService {
             console.log(coarseLocation);
             if (!fineLocation.hasPermission || !backgroundLocation.hasPermission || !coarseLocation.hasPermission) {
               console.log('GetPosition')
-              this.geolocation.getCurrentPosition({ timeout: 3500 }).then((position) => {
+              this.geolocation.getCurrentPosition({ timeout: 2500 }).then((position) => {
                 this.dismissLoading().catch(err => console.log(err));
                 this.askGeoLocationPermissions().then(() => resolve(true), err => resolve(false))
               }, err => {
@@ -649,7 +732,11 @@ export class SharedDataService {
     })
   }
   moveAppToForeground() {
-    BackgroundMode.moveToForeground();
+    console.log('MOVE_to_foreground')
+    //cordova.plugins.backgroundMode.moveToForeground();
+    cordova.plugins.backgroundMode.wakeUp();
+    cordova.plugins.backgroundMode.unlock();
+    //BackgroundMode.moveToForeground();
     //this.backgroundMode.moveToForeground();
   }
   startTour() {
@@ -673,6 +760,14 @@ export class SharedDataService {
       anchorId: 'NFC',
       title: this.translate.instant('TOUR.nfc.title'),
       content: this.translate.instant('TOUR.nfc.content'),
+      nextBtnTitle: this.translate.instant('TOUR.button.next'),
+      prevBtnTitle: this.translate.instant('TOUR.button.previous'),
+      enableBackdrop: true
+    },
+    {
+      anchorId: 'status',
+      title: this.translate.instant('TOUR.status.title'),
+      content: this.translate.instant('TOUR.status.content'),
       nextBtnTitle: this.translate.instant('TOUR.button.next'),
       prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true
@@ -736,13 +831,13 @@ export class SharedDataService {
       content: this.translate.instant('TOUR.test-device.content'),
       nextBtnTitle: this.translate.instant('TOUR.button.next'),
       prevBtnTitle: this.translate.instant('TOUR.button.previous'),
-      route: '/profile/menu/test-device'
+      route: '/profile/menu/test-device',
     },
     {
       anchorId: 'Battery',
       title: this.translate.instant('TOUR.battery.title'),
       content: this.translate.instant('TOUR.battery.content'),
-      nextBtnTitle: this.translate.instant('TOUR.button.end'),
+      endBtnTitle: this.translate.instant('TOUR.button.end'),
       prevBtnTitle: this.translate.instant('TOUR.button.previous'),
       enableBackdrop: true,
       route: '/profile/menu/test-device',
@@ -752,12 +847,32 @@ export class SharedDataService {
       console.log('END')
       this.tour_enabled = false;
       this.router.navigateByUrl('profile/menu/homepage', { replaceUrl: true });
-      this.storage.set('tour', true).then(async () => {
-        this.createToast(this.translate.instant('TOUR.end'))
-        this.enableAllPermission();
-        this.checkPermissionAlreadyMake = true;
-        end.unsubscribe()
-      })
+      this.storage.set('tour', true)
+      this.createToast(this.translate.instant('TOUR.end'))
+      this.enableAllPermission();
+      this.checkPermissionAlreadyMake = true;
+      end.unsubscribe()
     })
   }
+  checkConnection() {
+    return new Promise((resolve) => {
+      cordova.plugins.PowerOptimization.IsIgnoringDataSaver().then((result) => {
+        console.log('Connection')
+        console.log(result);
+        if (result) {
+          cordova.plugins.PowerOptimization.RequestDataSaverMenu().then((result) => {
+            resolve(true)
+            console.log('ok');
+          }, (err) => {
+            console.error(err);
+          });
+        }
+        else
+          resolve(true)
+      }, (err) => {
+        console.error(err);
+      });
+    })
+  }
+
 }
