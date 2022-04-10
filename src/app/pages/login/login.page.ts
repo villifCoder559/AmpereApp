@@ -14,6 +14,7 @@ import { LanguagePopoverPage } from './language-popover/language-popover.page';
 import { LanguageService } from 'src/app/data/language.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Snap4CityService } from 'src/app/data/snap4-city.service';
+import { StorageService } from 'src/app/data/storage.service';
 
 @Component({
   selector: 'app-login',
@@ -31,7 +32,7 @@ export class LoginPage implements OnInit {
     private bluetoothService: BluetoothService,
     private ngsi: NGSIv2QUERYService,
     private sendAuth: SendAuthService,
-    private storage: Storage,
+    private storage: StorageService,
     private popoverCtrl: PopoverController,
     private network: Network,
     public lng: LanguageService,
@@ -45,12 +46,10 @@ export class LoginPage implements OnInit {
   ionViewDidEnter() {
     console.log('LANGUAGE')
     console.log(this.lng.selected_language)
-    this.storage.create().then(() => {
       this.storage.get('tutorial_read').then((read) => {
         if (read != true)
           this.router.navigateByUrl('/tutorial', { replaceUrl: true })
-      })
-    }, err => console.log(err))
+      },err=>console.log(err))
   }
   async openLanguagePopover(ev) {
     const popover = await this.popoverCtrl.create({
@@ -115,14 +114,16 @@ export class LoginPage implements OnInit {
                     console.log('END_ENABLE_BEACON')
                     console.log('Start_Sendig_Valid_Status')
                     this.sendAuth.startSendingStatus()
+                    // console.log('GETTING_NAME_DEVICES')
                     Object.keys(this.sharedData.localStorage).forEach((element: StorageNameType) => {
                       this.sharedData.getNameDevices(element);
+                      //console.log(element)
                     })
                     this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true }).then(() => {
                       this.sharedData.dismissLoading();
                     })
                     console.log('END_ROUTER')
-                  }, err => alert(this.translate.instant('ALERT.retrive_information')))
+                  }, err => {alert(this.translate.instant('ALERT.retrive_information'));this.sharedData.dismissLoading()})
                 }
                 else {
                   this.router.navigateByUrl('/signup', { replaceUrl: true })
