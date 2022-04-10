@@ -50,11 +50,27 @@ button .mat-button-wrapper {
 //     background-color: #4472C4;
 //     padding-bottom: 0px;
 // }
+
+//  .close mat-icon {
+//     top: auto;
+//     display: flex;
+//     position: relative;
+//     width: 40px;
+// }
+
+.cdk-overlay-container {
+    .close {
+        width: 40px;
+        top: auto;
+    display: flex;
+    position: relative;
+    }
+}
+
 #signup {
     ion-content {
         --ion-background-color: #25288A;
     }
-
     mat-stepper {
         background-color: #25288A;
     }
@@ -125,14 +141,17 @@ button .mat-button-wrapper {
             color: #000;
         }
     }
-    #bluetooth ion-item::part(native){
+
+    #bluetooth ion-item::part(native) {
         --ion-background-color: #fff !important;
         background-color: #fff !important;
-        .item-native{
+
+        .item-native {
             --ion-background-color: #fff !important;
             background-color: #fff !important;
         }
     }
+
     .btt_add_contact {
         span {
             color: #000;
@@ -428,9 +447,7 @@ ion-popover {
 // .backdrop-target{
 //     border-radius: 20%;
 // }
-@media(orientation:landscape) {
-
-}
+@media(orientation:landscape) {}
 
 @media(min-width:800px) {
 
