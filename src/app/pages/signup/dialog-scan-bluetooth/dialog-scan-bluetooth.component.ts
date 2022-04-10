@@ -23,7 +23,7 @@ export class DialogScanBluetoothComponent implements OnInit {
       this.scan();
       console.log('scanning...')
       this.dialogRef.afterClosed().subscribe(() => {
-        this.bluetoothService.stopScan();
+        //this.bluetoothService.stopScan();
       })
     })
   }
@@ -42,7 +42,7 @@ export class DialogScanBluetoothComponent implements OnInit {
     this.detectChange.detectChanges();
     console.log(this.devices)
     this.bluetoothService.detectedValue.subscribe((value) => {
-      if (value !== null) {
+      if (value?.name != null && value?.name!= undefined ) {
         this.devices.push(value);
         this.detectChange.detectChanges();
       }
