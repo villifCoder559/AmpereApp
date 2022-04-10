@@ -13,7 +13,7 @@ export class DialogAddEmergencyContactComponent implements OnInit {
   contactCard = this._formBuilder.group({
     contactName: ['', Validators.compose([Validators.required,SpecialCharValidator.specialCharValidator])],
     contactSurname: ['', Validators.compose([Validators.required,SpecialCharValidator.specialCharValidator])],
-    contactNumber: ['', Validators.compose([SpecialCharValidator.specialCharValidator,Validators.required, Validators.minLength(7), Validators.pattern('[- + 0-9]+')])]
+    contactNumber: ['', Validators.compose([SpecialCharValidator.specialCharValidator,Validators.required, Validators.minLength(7), Validators.pattern("^[0-9]*$")])]
   });
   contact = {
     name: '',

@@ -24,7 +24,9 @@ import { Geolocation } from '@ionic-native/geolocation/ngx'
 import { TranslateService } from '@ngx-translate/core';
 import { v4 as uuidv4 } from 'uuid';
 import { SendAuthService } from 'src/app/data/send-auth.service';
-
+import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@awesome-cordova-plugins/native-geocoder/ngx';
+import { LanguageService } from 'src/app/data/language.service';
+declare var window;
 @Injectable()
 export class StepperIntl extends MatStepperIntl {
   // the default optional label text, if unspecified is "Optional
@@ -36,7 +38,7 @@ export class StepperIntl extends MatStepperIntl {
   selector: 'app-signup',
   templateUrl: './signup.page.html',
   styleUrls: ['./signup.page.scss'],
-  providers: [{provide: MatStepperIntl, useClass: StepperIntl}],
+  providers: [{ provide: MatStepperIntl, useClass: StepperIntl }],
 })
 export class SignupPage implements OnInit {
   StorageNameType = StorageNameType
@@ -50,7 +52,7 @@ export class SignupPage implements OnInit {
   @ViewChild('tooltip_allergies') tooltip_allergies: MatTooltip;
   @ViewChild('stepper') stepper: MatStepper;
   @ViewChild('content') content: IonContent;
-  
+
   //add native-langauage field
   //fix dimension when resize the screen
   firstFormGroup = this._formBuilder.group({
@@ -58,7 +60,7 @@ export class SignupPage implements OnInit {
     surname: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     nickname: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
     //email: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator, Validators.email])],
-    phoneNumber: ['', Validators.compose([SpecialCharValidator.specialCharValidator, Validators.required, Validators.pattern('[- +()0-9]+')])],
+    phoneNumber: ['', Validators.compose([SpecialCharValidator.specialCharValidator, Validators.required, Validators.pattern("^[0-9]*$")])],
     dateofborn: ['', Validators.compose([SpecialCharValidator.specialCharValidator, DateValidator.dateVaidator])],
     gender: [''],
     language: ['', Validators.compose([Validators.required, SpecialCharValidator.specialCharValidator])],
@@ -84,7 +86,7 @@ export class SignupPage implements OnInit {
     call_118: [null, Validators.required]
   });
   readonly arrayFormGroup = [this.firstFormGroup, this.secondFormGroup, this.fourthFormGroup]
-  constructor(private _matStepperIntl: MatStepperIntl,public sendAuth: SendAuthService, private translate: TranslateService, public authService: AuthenticationService, private geoLocation: Geolocation, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
+  constructor(private languageService: LanguageService, private nativeGeocoder: NativeGeocoder, private _matStepperIntl: MatStepperIntl, public endAuth: SendAuthService, private translate: TranslateService, public authService: AuthenticationService, private geoLocation: Geolocation, private snap4CityService: Snap4CityService, private bluetoothService: BluetoothService, public NGSIv2QUERY: NGSIv2QUERYService, public http: HttpClient, private router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, public shared_data: SharedDataService, private changeDetection: ChangeDetectorRef) {
     console.log('From signup')
     console.log(this.shared_data.user_data)
   }
@@ -103,8 +105,18 @@ export class SignupPage implements OnInit {
     else
       return 5;
   }
+  setDefaultNativeLanguage(){
+    let lng = this.languageService.selected_language.text;
+    if (lng != 'Italiano' && lng != 'English')
+      lng = "Others"
+    console.log(lng)
+    this.firstFormGroup.get('language').setValue(lng);
+  }
+  readPhoneNumber(){
+    
+  }
   ngOnInit() {
-    this._matStepperIntl.optionalLabel=this.translate.instant('SIGNUP.form.optional')
+    this._matStepperIntl.optionalLabel = this.translate.instant('SIGNUP.form.optional')
     console.log(this.shared_data.user_data.email)
     if (this.authService.isAuthenticated.getValue()) {
       var index = this.router.getCurrentNavigation().extras?.state?.page;
@@ -140,8 +152,32 @@ export class SignupPage implements OnInit {
     }
     else {
       //alert(this.translate.instant('ALERT.permission_creating_device'));
+      this.setDefaultNativeLanguage();
+      // window.plugins.sim.hasReadPermission((permission => {
+      //   if (!permission)
+      //     window.plugins.sim.requestReadPermission(() => {
+      //       window.plugins.sim.getSimInfo((info) => {
+      //         console.log(info)
+      //         this.firstFormGroup.get('phoneNumber').setValue(info.phoneNumber);
+      //       }, (err) => console.log(err));
+      //     }, (err) => { console.log(err) });
+      //   else
+      //     window.plugins.sim.getSimInfo((info) => {
+      //       console.log(info)
+      //       this.firstFormGroup.get('phoneNumber').setValue(info.phoneNumber);
+      //     }, (err) => console.log(err));
+      // }), (err) => console.log(err))
       this.shared_data.checkLocationEnabled().then(() => {
-        this.getPosition();
+        this.getPosition().then((position) => {
+          if (position != [])
+            this.nativeGeocoder.reverseGeocode(position[0], position[1], { maxResults: 1, useLocale: true })
+              .then((result: NativeGeocoderResult[]) => {
+                // this.firstFormGroup.controls['locality'].setValue(result[0].locality);
+                // this.firstFormGroup.controls['locality'].setValue(result[0].locality);
+                console.log(JSON.stringify(result[0]))
+              })
+              .catch((error: any) => console.log(error));
+        })
       }, err => console.log(err))
     }
   }
@@ -276,7 +312,7 @@ export class SignupPage implements OnInit {
   }
   show_tooltip(name) {
     var tooltip = this.tooltip_pin;
-    console.log(name=='pin')
+    console.log(name == 'pin')
     if (name == 'pin')
       tooltip = this.tooltip_pin;
     else
@@ -392,10 +428,26 @@ export class SignupPage implements OnInit {
     return result;
   }
   getPosition() {
-    this.geoLocation.getCurrentPosition().then((position) => {
-      this.lat = position.coords.latitude;
-      this.lon = position.coords.longitude;
-    }, err => { console.log(err) })
+    /**{"latitude":43.7992279,"longitude":11.2432775,"countryCode":"IT","countryName":"Italia","postalCode":"50134"
+ * ,"administrativeArea":"Toscana",
+ * "subAdministrativeArea":"Città Metropolitana di Firenze","locality":"Firenze",
+ * "subLocality":"",
+ * "thoroughfare":"Viale Giovanni Battista Morgagni","subThoroughfare":"150","areasOfInterest":["33"]} */
+    return new Promise((resolve) => {
+      this.geoLocation.getCurrentPosition({ timeout: 7000 }).then((position) => {
+        this.lat = position.coords.latitude;
+        this.lon = position.coords.longitude;
+        this.nativeGeocoder.reverseGeocode(this.lat, this.lon, { maxResults: 1, useLocale: true })
+          .then((result: NativeGeocoderResult[]) => {
+            console.log(JSON.stringify(result[0]))
+            this.firstFormGroup.get('city').setValue(result[0].locality);
+            this.firstFormGroup.get('address').setValue(result[0].thoroughfare + ' ' + result[0].subThoroughfare);
+            this.firstFormGroup.get('locality').setValue(result[0].administrativeArea);
+            resolve([position.coords.latitude, position.coords.longitude])
+          })
+          .catch((error: any) => console.log(error));
+      }, err => { console.log(err); resolve([]) })
+    })
   }
   lat = 43.7;
   lon = 11.2;
@@ -410,7 +462,7 @@ export class SignupPage implements OnInit {
           this.snap4CityService.createDevice(DeviceType.ALERT_EVENT, this.lat, this.lon).then(() => {
             this.shared_data.setTextLoading(this.translate.instant('ALERT.create_device') + '3/3')
             this.snap4CityService.createDevice(DeviceType.QR_NFC_EVENT, this.lat, this.lon).then(() => {
-              this.shared_data.setTextLoading('Storing data...')
+              this.shared_data.setTextLoading(this.translate.instant('ALERT.storing_data'))
               this.NGSIv2QUERY.sendUserProfile().then(() => {
                 this.shared_data.dismissLoading();
                 this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
@@ -523,17 +575,19 @@ export class SignupPage implements OnInit {
     var a = $('#device' + index).hide(400, () => {
       //var data_to_send = this.NGSIv2QUERY.getEmergencyContactsToSend(newContacts);
       var el_deleted = this.shared_data.user_data.paired_devices.splice(index, 1);
+      this.shared_data.deleteRememberTestNotification(el_deleted);
       this.changeDetection.detectChanges()
       console.log(this.shared_data.user_data.paired_devices)
       //this.bluetoothservice.disableRegion(deviceDeleted)
       if (this.authService.isAuthenticated.getValue())
         this.NGSIv2QUERY.sendUserProfile().then(() => {
           this.shared_data.deleteDeviceFromLocalStorage(el_deleted, StorageNameType.DEVICES);
+          this.shared_data.old_user_data.copyFrom(this.shared_data.user_data)
           this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
         }, err => {
           console.log(err)
           this.shared_data.createToast(this.translate.instant('ALERT.data_fail'))
-          this.shared_data.old_user_data.copyFrom(this.shared_data.user_data)
+          this.shared_data.user_data.copyFrom(this.shared_data.old_user_data)
           this.changeDetection.detectChanges()
         })
     })
@@ -548,7 +602,7 @@ export class SignupPage implements OnInit {
         data: { result: '' }
       })
       dialogRef.afterClosed().subscribe((result) => {
-        if (result != '' && result !== undefined)
+        if (result != '' && result != undefined)
           this.addPairedDeviceANDregister(result);
       }, err => (console.log(err)));
     }
@@ -560,18 +614,24 @@ export class SignupPage implements OnInit {
     this.shared_data.user_data.paired_devices.push(device);
     console.log(this.shared_data.user_data.paired_devices.length)
     if (indexOf == -1) {
-      alert(this.translate.instant('ALERT.device_connected_succ'))
-      if (this.authService.isAuthenticated.getValue())
-        this.NGSIv2QUERY.sendUserProfile().then(() => {
-          this.shared_data.setNameDevice(device, device);
-          this.shared_data.old_user_data.copyFrom(this.shared_data.user_data)
-          this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
-        }, err => {
-          console.log(err)
-          alert(this.translate.instant('ALERT.retrive_information'))
-          this.shared_data.user_data.paired_devices.pop();
-          this.shared_data.createToast(this.translate.instant('ALERT.data_fail'))
-        })
+      this.shared_data.setRememberTestNotification(device)
+      this.shared_data.presentLoading(this.translate.instant('ALERT.update_data')).then(() => {
+        if (this.authService.isAuthenticated.getValue())
+          this.NGSIv2QUERY.sendUserProfile().then(() => {
+            console.log('SetNAmeDevice')
+            this.shared_data.dismissLoading();
+            this.shared_data.setNameDevice(device, device);
+            console.log('Set old data')
+            this.shared_data.old_user_data.copyFrom(this.shared_data.user_data)
+            this.shared_data.enableAllBackgroundMode()
+            this.shared_data.createToast(this.translate.instant('ALERT.data_success'))
+          }, err => {
+            console.log(err)
+            this.shared_data.dismissLoading();
+            this.shared_data.user_data.paired_devices.pop();
+            this.shared_data.createToast(this.translate.instant('ALERT.data_fail'))
+          })
+      })
     }
     else
       alert(this.translate.instant('ALERT.device_connected_err'))
