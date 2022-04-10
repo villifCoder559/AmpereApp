@@ -7,7 +7,7 @@
 
 <ion-content>
   <div class="content">
-    <div class="status">
+    <div class="status" tourAnchor="status">
       <h2>{{'HOMEPAGE.status.label'|translate}}: {{'HOMEPAGE.status.'+this.sharedData.user_data.status|translate}}</h2>
     </div>
     <div class="homepage_content">
@@ -57,7 +57,17 @@
       </div>
     </mat-toolbar>
   </div>
+   <!-- <button mat-raised-button (click)="backgroundEvent()">backgroundEvent</button> -->
+  <!-- <button mat-raised-button (click)="requestOptimiz()">requestOptimiz</button>
+  <button mat-raised-button (click)="goBatterySettings()">goBatterySettings</button>
+  <button mat-raised-button (click)="checkOptData()">checkOptData</button>
+  <button mat-raised-button (click)="goDataRestriction()">goDataRestriction</button>
+  <button mat-raised-button (click)="goCheckOthers()">goCheckOthers</button> -->
+  <!-- <button mat-raised-button (click)="openAppDetails()">openAppDetails</button>
+  <button mat-raised-button (click)="openAppDevelop()">openAppDevelop</button>
+  <button mat-raised-button (click)="openAppSettings()">openAppSettings</button>
+  <button mat-raised-button (click)="openManageApp()">openManageApp</button>
+  <button mat-raised-button (click)="openManageAllApp()">openManageAllApp</button> -->
+  <tour-step-template>
+  </tour-step-template>
 </ion-content>
-
-<tour-step-template>
-</tour-step-template>

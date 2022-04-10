@@ -67,6 +67,7 @@
               <mat-label>{{'SIGNUP.form.height'|translate}}</mat-label>
               <input matInput type="tel" maxlength="3" (input)="onlyNumbersAllowed($event,'height')"
                 formControlName="height" placeholder="">
+                <!-- <button mat-raised-button class="bt" (click)="openTutorial()">Button</button> -->
               <span matSuffix>cm</span>
             </mat-form-field>
             <mat-form-field appearance="fill" id="matcardResize">
@@ -265,7 +266,7 @@
               <ion-item-sliding *ngIf="device?.id != '-1'" id="slidingItem{{i}}">
                 <ion-item class="ion-no-padding" class="bluetooth_item" id="device{{i}}">
                   <ion-label class="label_bluetooth_item">
-                    <h2>{{this.shared_data?.localStorage[StorageNameType.DEVICES][i]?.name ||
+                    <h2>{{this.shared_data?.localStorage[StorageNameType.DEVICES]?.[i]?.name ||
                       this.shared_data.user_data?.paired_devices[i]}}</h2>
                   </ion-label>
                 </ion-item>
