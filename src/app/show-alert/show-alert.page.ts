@@ -16,7 +16,7 @@ import { EmergencyService } from '../data/emergency.service';
 })
 export class ShowAlertPage implements OnInit {
   pin = ['', '', '', '']
-  details_emergency = new AlertEvent();
+  //details_emergency = new AlertEvent();
   countFails = 0;
   valueTimer = 20;
   watchAccelerationFunction;
@@ -39,21 +39,26 @@ export class ShowAlertPage implements OnInit {
   }
   interval_coundown;
   ngAfterViewInit() {
-    console.log(this.shared_data.enabled_test_battery_mode.getValue())
+    console.log(this.shared_data.enabled_test_battery_mode.getValue()) 
     if (!this.shared_data.tour_enabled && !this.shared_data.enabled_test_battery_mode.getValue()) {
       console.log('LEFT')
       var left = (Math.floor((20000 - (Date.now() - this.emergencyService.timeout_start)) / 1000))
-      console.log(left)
-      console.log(typeof (left))
       //this.countdown.left=left;
-      this.valueTimer = left
-      this.interval_coundown = setInterval(() => {
-        console.log(this.valueTimer)
-        if (this.valueTimer > 0)
-          this.valueTimer--
-        else
-          clearInterval(this.interval_coundown);
-      }, 1000)
+      if (left <= 1)
+        this.valueTimer = 0;
+      else{
+        this.valueTimer=left;
+        this.interval_coundown = setInterval(() => {
+          console.log('timer ' + this.valueTimer)
+          if (this.valueTimer > 0)
+            this.valueTimer--;
+          else {
+            this.valueTimer = 0;
+            clearInterval(this.interval_coundown)
+          }
+        }, 1000)
+      }
+
       //this.changeRef.detectChanges();
     }
     if (this.shared_data.tour_enabled) {
@@ -61,9 +66,6 @@ export class ShowAlertPage implements OnInit {
     }
     if (this.shared_data.enabled_test_battery_mode.getValue()) {
       console.log('BATTERY')
-      this.details_emergency.status = 'testBattery'
-      this.details_emergency.evolution = 'end'
-      this.shared_data.enabled_test_battery_mode.next(false);
       this.valueTimer = 0;
       for (let i = 0; i < this.pin.length; i++)
         $('#' + i).attr('disabled', 'disabled')
@@ -103,7 +105,7 @@ export class ShowAlertPage implements OnInit {
   immediateEmergency() {
     this.valueTimer = 0;
     this.changeRef.detectChanges();
-    this.emergencyService.send_Emergency(0)
+    this.emergencyService.sendEmergencyImmediately()
   }
   onDigitInput(event) {
     console.log(event);
@@ -162,156 +164,6 @@ export class ShowAlertPage implements OnInit {
       alert.dismiss();
     });
   }
-  // send_Emergency(event) {
-  //   console.log(event)
-  //   if (event.action === 'done') {
-  //     //this.shared_data.moveAppToForeground();
-  //     console.log('activateSensors')
-  //     this.shared_data.createToast(this.translate.instant('ALERT.send_emergency'), 4000);
-  //     this.activateSensors().then(() => {
-  //       console.log('sendEmergency')
-  //       this.sendAlert().then(() => {
-  //         console.log('emergencySended')
-  //         this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-  //         if (!this.shared_data.enabled_test_battery_mode.getValue())
-  //           this.shared_data.createToast(this.translate.instant('ALERT.send_emergency_succ'))
-  //         else
-  //           this.shared_data.createToast(this.translate.instant('ALERT.end_battery_test'))
-  //         this.shared_data.is_sending_emergency.next(false)
-  //       }, err => {
-  //         this.localNotifications.schedule({
-  //           id: 2,
-  //           text: this.translate.instant('SHOW-ALERT_error'),
-  //           data: ""
-  //         })
-  //         this.shared_data.is_sending_emergency.next(false)
-  //         this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-  //       });
-  //     }, err => {
-  //       this.localNotifications.schedule({
-  //         id: 2,
-  //         text: this.translate.instant('SHOW-ALERT_error'),
-  //         data: ""
-  //       })
-  //       this.shared_data.is_sending_emergency.next(false)
-  //       this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-  //     })
-  //   }
-  // }
-
-  // getPosition() {
-  //   return new Promise((resolve, reject) => {
-  //     console.log('startwatchPosition')
-  //     this.backgroundGeolocation.getCurrentLocation({ maximumAge: 10000, enableHighAccuracy: true, timeout: 12000000 }).catch(err => reject(err)).then((position) => {
-  //       console.log(position)
-  //       this.setPositionToSend(position)
-  //       if (this.checkingPositionInterval !== null)
-  //         clearInterval(this.checkingPositionInterval)
-  //       this.checkingPositionInterval = this.setIntervalPositionCheck()
-  //       this.timeoutStopCheckPosition();
-  //       this.backgroundGeolocation.deleteAllLocations()
-  //       resolve(true)
-  //     }, err => reject(err))
-  //     // start recording location
-  //     console.log('getCurrentPosition')
-  //   })
-  // }
-  timeout_position;
-  // private timeoutStopCheckPosition() {
-  //   if (this.timeout_position != null)
-  //     clearTimeout(this.timeout_position)
-  //   this.timeout_position = setTimeout(() => {
-  //     clearInterval(this.checkingPositionInterval);
-  //     this.backgroundGeolocation.stop().catch(err => console.log(err))
-  //   }, this.offSensorsInterval)
-  // }
-  // private setIntervalPositionCheck() {
-  //   return setInterval(() => (
-  //     this.backgroundGeolocation.getCurrentLocation().then((position) => {
-  //       console.log('intervall')
-  //       console.log(position)
-  //       if (position.time != new Date(this.details_emergency.dateObserved).getTime()) {
-  //         var distance = this.distance(this.details_emergency.latitude, this.details_emergency.longitude, position.latitude, position.longitude);
-  //         if (distance >= 100) {
-  //           this.setPositionToSend(position)
-  //           this.send_Emergency('done')
-  //         }
-  //       }
-  //       console.log()
-  //     }, err => console.log(err))
-  //   ), 5000)
-  // }
-  // private setPositionToSend(position) {
-  //   this.details_emergency.latitude = position.latitude;
-  //   this.details_emergency.longitude = position.longitude;
-  //   this.details_emergency.quote = position.altitude != undefined ? position.altitude : 0;
-  //   this.details_emergency.velocity = position.speed != undefined ? position.speed : 0;
-  //   this.details_emergency.accuracy = position.accuracy;
-  //   this.details_emergency.dateObserved = new Date().toISOString();
-  // }
-  // getAcceleration() {
-  //   return new Promise((resolve, reject) => {
-  //     var freq = 1000;
-  //     this.watchAccelerationFunction = this.deviceMotion.watchAcceleration({ frequency: freq }).subscribe((acceleration: DeviceMotionAccelerationData) => {
-  //       this.details_emergency.accelX = acceleration.x;
-  //       this.details_emergency.accelY = acceleration.y;
-  //       this.details_emergency.accelZ = acceleration.z;
-  //       resolve(true);
-  //     }, (err) => {
-  //       console.log(err)
-  //       reject(err);
-  //     })
-  //   })
-  // }
-  timeout_watch_acceleration;
-  // private activateSensors() {
-  //   return new Promise((resolve) => {
-  //     console.log('GETPOSITION')
-  //     this.getPosition().then(() => {
-  //       console.log('GETACCELERATION')
-  //       this.getAcceleration().then(() => {
-  //         if (this.timeout_watch_acceleration != null)
-  //           clearTimeout(this.timeout_watch_acceleration);
-  //         this.timeout_watch_acceleration = setTimeout(() => {
-  //           this.watchAccelerationFunction.unsubscribe();
-  //         }, this.offSensorsInterval)
-  //         console.log('resolve')
-  //         resolve(true)
-  //       }, err => resolve(false))
-  //     }, err => { this.activateSensors() })
-  //   })
-
-  // }
-  // distance(lat1, lon1, lat2, lon2) {
-  //   var p = 0.017453292519943295;    // Math.PI / 180
-  //   var c = Math.cos;
-  //   var a = 0.5 - c((lat2 - lat1) * p) / 2 +
-  //     c(lat1 * p) * c(lat2 * p) *
-  //     (1 - c((lon2 - lon1) * p)) / 2;
-  //   return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
-  // }
-  // private sendAlert() {
-  //   return new Promise((resolve, reject) => {
-  //     this.NGSIv2Query.sendAlertEvent(this.details_emergency).then(() => {
-  //       this.localNotifications.schedule({
-  //         id: 2,
-  //         text: 'Emergency sent!',
-  //         data: ""
-  //       })
-  //       resolve(true);
-  //     }, err => {
-  //       console.log(err)
-  //       setTimeout(() => {
-  //         console.log('Fail nr. ' + this.countFails)
-  //         this.countFails++;
-  //         if (this.countFails < 5)
-  //           this.sendAlert().catch((err) => { console.log('ERROR->SendAlert'); reject(err) });
-  //         else
-  //           reject(err)
-  //       }, 3500)
-  //     })
-  //   })
-  // }
   ngOnDestroy() {
     console.log('SHOW_ALERT_DESTROIED')
   }
