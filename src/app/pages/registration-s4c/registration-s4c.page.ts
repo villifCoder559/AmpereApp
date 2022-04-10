@@ -74,8 +74,7 @@ export class RegistrationS4cPage implements OnInit {
             }
           }),
           success: (data) => {
-            alert(this.translate.instant('ALERT.check'))
-            this.sharedData.createToast(this.translate.instant('ALERT.registration.success'))
+            alert(this.translate.instant('ALERT.registration.success'))
             console.log('SUCCESS_REGISTATION')
             this.router.navigateByUrl('/login', { replaceUrl: true })
             console.log(data);
