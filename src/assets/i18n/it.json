@@ -19,7 +19,7 @@
   "LOGIN": {
     "button": {
       "login": "Accedi con Snap4city",
-      "signup": "Non sei ancora iscritto? Iscriviti!"
+      "signup": "Non sei ancora iscritto? Clicca qui ed iscriviti!"
     },
     "language":"Lingua"
   },
@@ -112,7 +112,7 @@
       "button": {
         "next": "Avanti",
         "back": "Indietro",
-        "register": "Registrarsi",
+        "register": "Registrati",
         "done": "Fatto"
       },
       "name": "Nome",
@@ -227,19 +227,19 @@
     "slide": {
       "0": {
         "title": "Benvenuto",
-        "content": "Questa applicazione è per coloro che vogliono sentirsi al sicuro in ogni momento, se sei in difficoltà puoi tenere premuto il bottone sul gioiello per almeno 5 secondi così invierai un S.O.S. con la tua posizione"
+        "content": "Questa applicazione è per coloro che vogliono sentirsi al sicuro in ogni momento, se sei in difficoltà puoi premere il bottone sul retro del gioiello, così invierai un S.O.S. con la tua posizione"
       },
       "1": {
         "title": "Come funziona",
-        "content": "Durante la registrazione puoi inserire fino a 5 contatti e in caso di emergenza, se hai un abbonamento, l'operatore chiamerà tutti i contatti impostati durante la registrazione.L'operatore può anche chiamare alcuni numeri pubblici di emergenza se lo hai abilitato in fase di registrazione."
+        "content": "Durante la registrazione puoi inserire fino a 5 contatti personali che, in caso di emergenza, l'operatore chiamerà appena ricevuto l'S.O.S .L'operatore inoltre può anche chiamare anche alcuni numeri pubblici di emergenza (112,115,118) se abilitato."
       },
       "2": {
         "title": "Altre caratteristiche",
-        "content": "Se di solito si dimentica come prendere una medicina si può chiedere un tag NFC o un QRCode e con una semplice scansione si può vedere nell'app tutta la procedura. In generale puoi personalizzare il codice e vedere quello che vuoi"
+        "content": "Se di solito si dimentica come prendere una medicina si può richiedere un tag NFC o un codice QR e tramite una semplice scansione effettuata dall'app si potranno vedere su chermo tutti i passi da eseguire!"
       },
       "3": {
         "title": "Pronto per iscriverti?",
-        "content": "Puoi iscriverti alla prova gratuita senza abbonamento, ma ricorda che in questo caso i tuoi avvisi di emergenza saranno respinti!"
+        "content": "Puoi iscriverti gratuitamente, ma ricorda che in questo caso i tuoi avvisi di emergenza saranno respinti!"
       },
       "button": "Inizia ad usare l'app"
     }
@@ -256,6 +256,10 @@
     "nfc": {
       "title": "NFC",
       "content": "Qui puoi vedere una lista dei tuoi tag NFC personali e scansionarne uno. Con questi tag puoi accedere a informazioni personali ad esempio liste di medicine, istruzioni..."
+    },
+    "status": {
+      "title": "Stato utente",
+      "content": "Qui viene indicato lo stato attuale dell'utente; se 'attivo' significa che è presente un abbonamento, altrimenti comparirà 'non attivo'. "
     },
     "emergency": {
       "title": "Emergenza",
@@ -303,9 +307,9 @@
   },
   "ALERT": {
     "permission_creating_device":"Useremo la localizzazione per una miglior registrazione",
-    "geo_permission": "Questa app ha bisogno dell'accesso alla posizione per tutto il tempo. Consentire ciò in modo che questa applicazione possa funzionare correttamente",
+    "geo_permission": "Questa app ha bisogno dell'accesso alla posizione per tutto il tempo. Consenti sempre in modo che questa applicazione possa funzionare correttamente",
     "internet_permission":"Questa app necessita di connessione internet,attivala!",
-    "foreground_service": "Rilevamento del fascino",
+    "foreground_service": "L'app sta lavorando correttamente",
     "dialer_error": "Errore nel lancio del dialer",
     "internet_connection_fail": "Controlla la tua connessione internet",
     "error": "Errore ",
@@ -314,7 +318,7 @@
     "registration": {
       "success": "Registrato con successo. Controlla la tua email e finalizza la registrazione, quindi torna nell'app e accedi",
       "error": "Errore nella registrazione ",
-      "user_already_present":"L'email è gia registrata. Accedi con span4city",
+      "user_already_present":"L'email è gia registrata. Accedi con snap4city",
       "form": {
         "checkbox": "Devi accettare tutte le regole per registrarti ",
         "data": "Inserisci un nome e un'email validi",
@@ -336,10 +340,11 @@
     "end_battery_test": "Test della batteria completato con successo",
     "check_permission": "Controllo dei permessi...",
     "check_data": "Controllo dei dati...",
+    "storing_data":"Salvo i dati...",
     "get_info_from_server": "Chiedendo informazioni al server...",
     "retrive_info": "Recupero le informazioni...",
     "send_data": "Invio dei dati...",
-    "update_data": "Aggiornare i dati...",
+    "update_data": "Aggiorno i dati...",
     "create_device": "Creazione del profilo ",
     "ble_scan_err": "La scansione non funziona se il bluetooth è spento",
     "device_connected_succ": "Collegato correttamente. Smettere di continuare a premere il pulsante",
@@ -353,7 +358,11 @@
     "no_device_paired":"Devi abbinare almeno un disposito, per farlo clicca l'icona in alto a destra",
     "error_import_contacts":"Errore nell'importare i contatti. Abilita il permesso",
     "error_logout":"Errore durante il logout",
-    "error_login":"Errore durante il login"
+    "error_login":"Errore durante il login",
+    "protectedAppCheck":"Rilevate restrizioni del dispositivo. Seleziona 'Nessuna restrizione' in modo che questa app possa funzionare correttamente",
+    "detect_position":"Rilevando posizione...",
+    "notification_test_battery":"Ricordati che devi testare se la batteria del tuo gioiello funziona ancora!",
+    "ble_disable":"L'app non può rilevare il tuo allarme senza bluetooth!"
   },
   "DIALOG": {
     "CONTACT": {
@@ -380,7 +389,7 @@
   },
   "NOTIFICATION":{
     "receive_alert":"Falso allarme? Clicca la notifica per aprire l'app e disabilitare l'allerta inserendo il PIN",
-    "send_alert":"Emergency sent!"
+    "send_alert":"Emergenza inviata!"
 },
   "TERM_OF_USE": {},
   "PRIVACY_POLICY": {}

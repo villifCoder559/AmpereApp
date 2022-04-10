@@ -19,7 +19,7 @@
     "LOGIN": {
         "button": {
             "login": "Login with Snap4city",
-            "signup": "Not yet a member? Sign up!"
+            "signup": "Not yet a member? Click here and sign up!"
         },
         "language": "Language"
     },
@@ -256,6 +256,10 @@
             "title": "NFC",
             "content": "Here you can see a list of your personal NFCs and scan one of it. Personal NFC tag can be used for accessing to your personal information such as list of medicine,instruction..."
         },
+        "status": {
+            "title": "Status user",
+            "content": "It shows the real state of the user; 'active' means there is a valid subscription, otherwise it will appear 'Not active'."
+        },
         "emergency": {
             "title": "Emergency",
             "content": "Send an emergency alert directly from the app without using the charm"
@@ -304,7 +308,7 @@
         "permission_creating_device": "For a better registration we'll use the location",
         "geo_permission": "This app needs location access for all the time. Allow it so this app can work properly",
         "internet_permission": "This app needs internet connection, enable it!",
-        "foreground_service": "Detecting charm",
+        "foreground_service": "App is working correctly",
         "dialer_error": "error launching dialer",
         "internet_connection_fail": "Check your internet connection",
         "error": "Error ",
@@ -313,7 +317,7 @@
         "registration": {
             "success": "Successfully registered. Check your email and finalize the registration, then back in the app and login",
             "error": "Error in registration ",
-            "user_already_present": "The e-mail is already registered. Log in with span4city",
+            "user_already_present": "The e-mail is already registered. Log in with snap4city",
             "form": {
                 "checkbox": "You must accept all policy to sign-up ",
                 "data": "Insert valid name and email",
@@ -336,6 +340,7 @@
         "get_info_from_server": "Getting info from server",
         "retrive_info": "Retrieving information...",
         "send_data": "Sending data...",
+        "storing_data":"STore the data...",
         "send_emergency_now": "Fast",
         "false_alarm": "False alarm",
         "update_data": "Updating data...",
@@ -349,10 +354,14 @@
         "fixing_problems": "Fixing wrong number of devices...",
         "retrive_information": "Error retrive information from server",
         "scan_error": "Element not found",
-        "no_device_paired": "You have to pair a device,you can do it clicking the icon in the top right",
+        "no_device_paired": "You have to pair a device, you can do it clicking the icon in the top right",
         "error_import_contacts": "Can't import contact. Enable the permission",
         "error_logout": "Error during logout",
-        "error_login": "Error during login"
+        "error_login": "Error during login",
+        "protectedAppCheck": "Detected device limitations. Select 'No restrictions' so this app can work properly",
+        "detect_position":"Detecting position...",
+        "notification_test_battery":"Remember that you need to test the battery of your jewel if it still works!",
+        "ble_disable":"App can't detect your emergency alert without bluetooth! "
     },
     "DIALOG": {
         "CONTACT": {
@@ -377,9 +386,9 @@
         "yes": "yes",
         "no": "no"
     },
-    "NOTIFICATION":{
-        "receive_alert":"False alarm? Click to open the app and insert PIN to disable alert",
-        "send_alert":"Emergenza inviata!"
+    "NOTIFICATION": {
+        "receive_alert": "False alarm? Click to open the app and insert PIN to disable alert",
+        "send_alert": "Emergenza inviata!"
     },
     "TERM_OF_USE": {},
     "PRIVACY_POLICY": {}
