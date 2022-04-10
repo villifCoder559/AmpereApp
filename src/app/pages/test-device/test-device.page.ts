@@ -12,7 +12,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class TestDevicePage implements OnInit {
   StorageNameType = StorageNameType
-  constructor(private translate: TranslateService,public authService: AuthenticationService,public shared_data: SharedDataService, private router: Router, public dialog: MatDialog,private changeDetection: ChangeDetectorRef) {
+  constructor(private translate: TranslateService,public shared_data: SharedDataService, private router: Router, public dialog: MatDialog) {
     if (this.shared_data.enabled_test_battery_mode.observers.length == 0)
       this.shared_data.enabled_test_battery_mode.subscribe(() => {
         $('#batteryButton').css('background-color', !this.shared_data.enabled_test_battery_mode.getValue() ? '#4472C4' : '#82b74b')
