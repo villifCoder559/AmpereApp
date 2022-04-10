@@ -15,6 +15,7 @@ import { DialogModifyNameComponent } from './dialog-modify-name/dialog-modify-na
 import { DialogImportContactsComponent } from './dialog-import-contacts/dialog-import-contacts.component';
 import { Geolocation } from '@ionic-native/geolocation/ngx'
 import { TranslateModule } from '@ngx-translate/core';
+import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@awesome-cordova-plugins/native-geocoder/ngx';
 
 @NgModule({
   imports: [
@@ -29,7 +30,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
   ],
   declarations: [SignupPage, DialogModifyNameComponent, DialogImportContactsComponent, DialogScanBluetoothComponent, DialogAddEmergencyContactComponent, DialogSaveComponent],
-  providers: [Contacts, BLE,Geolocation],
+  providers: [Contacts, BLE,Geolocation,NativeGeocoder],
   //entryComponents: [DialogExampleComponent, DialogScanBluetoothComponent,DialogSaveComponent]
 })
 export class SignupPageModule { }
