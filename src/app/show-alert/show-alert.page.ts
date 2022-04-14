@@ -44,8 +44,10 @@ export class ShowAlertPage implements OnInit {
       console.log('LEFT')
       var left = (Math.floor((20000 - (Date.now() - this.emergencyService.timeout_start)) / 1000))
       //this.countdown.left=left;
-      if (left <= 1)
+      if (left <= 1){
         this.valueTimer = 0;
+        this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+      }
       else{
         this.valueTimer=left;
         this.interval_coundown = setInterval(() => {
@@ -55,6 +57,7 @@ export class ShowAlertPage implements OnInit {
           else {
             this.valueTimer = 0;
             clearInterval(this.interval_coundown)
+            this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
           }
         }, 1000)
       }
