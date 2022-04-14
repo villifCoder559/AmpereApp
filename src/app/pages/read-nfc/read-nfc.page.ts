@@ -17,32 +17,35 @@ import { TranslateService } from '@ngx-translate/core';
 export class ReadNFCPage implements OnInit {
   StorageNameType = StorageNameType
   NFC_data = '';
-  NFC_enable = false;
+  NFC_enable = false; //show "nfc is not enable' alert"
   scannedCode = null;
-  constructor(private translate:TranslateService,private router:Router,private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private nfc: NFC, private platform: Platform) {
+  constructor(private translate: TranslateService, private router: Router, private changeDetection: ChangeDetectorRef, public dialog: MatDialog, private readCode: ReadingCodeService, public shared_data: SharedDataService, private nfc: NFC, private platform: Platform) {
     console.log(this.shared_data.user_data)
     console.log(this.shared_data.localStorage)
   }
   ngOnInit() {
     console.log(this.shared_data.user_data)
-    this.nfc.enabled().then(() => {
-      this.NFC_enable = true;
-    }, err => {
-      this.shared_data.createToast(this.translate.instant('ALERT.error') + err);
-      if (err != 'NO_NFC'){
-        alert(this.translate.instant('ALERT.enable_nfc'))
-        this.nfc.showSettings().then((result) => {
-          this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
-          console.log(result)
-          //this.read_NFC()
-        })
-      }
+    this.platform.ready().then(() => {
+      this.nfc.enabled().then(() => {
+        this.NFC_enable = true;
+        this.read_NFC();
+      }, err => {
+        this.shared_data.createToast(this.translate.instant('ALERT.error') + err);
+        if (err != 'NO_NFC') {
+          alert(this.translate.instant('ALERT.enable_nfc'))
+          this.nfc.showSettings().then((result) => {
+            this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+            console.log(result)
+            //this.read_NFC()
+          })
+        }
+      })
     })
   }
   async read_NFC() {
     if (this.platform.is('android')) {
       let flags = this.nfc.FLAG_READER_NFC_A | this.nfc.FLAG_READER_NFC_V;
-      var readerMode = this.nfc.readerMode(flags).subscribe(
+      this.nfc.readerMode(flags).subscribe(
         tag => {
           var text = this.nfc.bytesToString(tag.ndefMessage[0].payload).substring(3);
           console.log(text);
@@ -79,6 +82,8 @@ export class ReadNFCPage implements OnInit {
     });
   }
   ngOnDestroy() {
+    console.log('ngDestroy');
     this.nfc.close().catch(err => console.log(err))
+    this.nfc.cancelScan().catch(err=>console.log(err))
   }
 }
