@@ -1,7 +1,6 @@
 import { Injectable, NgModule } from '@angular/core';
 import { NGSIv2QUERYService } from './ngsiv2-query.service';
 import { DeviceType, QRNFCEvent, SharedDataService, typeChecking } from './shared-data.service';
-import { Snap4CityService } from './snap4-city.service';
 import { InAppBrowser } from '@awesome-cordova-plugins/in-app-browser/ngx';
 import { Geolocation } from '@awesome-cordova-plugins/geolocation/ngx';
 import { TranslateService } from '@ngx-translate/core';
