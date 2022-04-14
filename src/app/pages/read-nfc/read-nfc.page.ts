@@ -51,7 +51,6 @@ export class ReadNFCPage implements OnInit {
           console.log(text);
           this.shared_data.presentLoading(this.translate.instant('ALERT.get_info_from_server')).then(() => {
             this.readCode.searchCode(text, typeChecking.NFC_CODE).then(() => {
-              //this.shared_data.createToast(this.translate.instant('ALERT.qr_scan'))
               this.shared_data.dismissLoading();
             }, err => {
               this.shared_data.createToast(err?.msg)
