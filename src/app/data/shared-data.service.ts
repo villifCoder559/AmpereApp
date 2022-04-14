@@ -304,6 +304,9 @@ export class SharedDataService {
     if (!this.backgroundMode_enabled)
       this.router.navigateByUrl('/show-alert', { replaceUrl: true })
   }
+  playSound(){
+    this.nativeAudio.play('alert');
+  }
   backgroundMode_enabled = false;
   enableAllBackgroundMode() {
     console.log('enableBackgroundMode')
@@ -313,7 +316,7 @@ export class SharedDataService {
     //cordova.plugins.backgroundMode.requestForegroundPermission();
     //cordova.plugins.backgroundMode.overrideBackButton();
     cordova.plugins.backgroundMode.on('activate', () => {
-      //cordova.plugins.backgroundMode.configure({icon: 'assets/icon/icon.png',title: 'Ampere sta lavorando',text:'Testo Prova',subText:'Sub text'});
+      cordova.plugins.backgroundMode.configure({icon: 'assets/icon/icon.png',title: 'Ampere sta lavorando',text:'Mantenendo attivi processi in background'});
       cordova.plugins.backgroundMode.disableWebViewOptimizations()
       cordova.plugins.backgroundMode.disableBatteryOptimizations();
       this.backgroundMode_enabled = true;
