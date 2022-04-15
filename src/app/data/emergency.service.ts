@@ -66,7 +66,7 @@ export class EmergencyService {
     })
   }
   sendEmergency(timer = 20) {
-    this.shared_data.playSound();
+    //this.shared_data.playSound();
     this.startGeolocating();
     this.shared_data.moveAppToForeground();
     this.timeout_start = Date.now();

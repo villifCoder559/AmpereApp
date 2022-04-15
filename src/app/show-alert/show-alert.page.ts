@@ -56,8 +56,8 @@ export class ShowAlertPage implements OnInit {
             this.valueTimer--;
           else {
             this.valueTimer = 0;
-            clearInterval(this.interval_coundown)
             this.router.navigateByUrl('/profile/menu/homepage', { replaceUrl: true })
+            clearInterval(this.interval_coundown)
           }
         }, 1000)
       }

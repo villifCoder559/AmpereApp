@@ -53,6 +53,7 @@ export class ReadNFCPage implements OnInit {
             this.readCode.searchCode(text, typeChecking.NFC_CODE).then(() => {
               this.shared_data.dismissLoading();
             }, err => {
+              console.log(err)
               this.shared_data.createToast(err?.msg)
               this.shared_data.dismissLoading();
             })

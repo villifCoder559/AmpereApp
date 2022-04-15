@@ -104,8 +104,9 @@ export class BluetoothService {
             }
             if (found) {
               this.emergencyService.details_emergency.deviceID = data.region.identifier;
-              if (!this.shared_data.enabled_test_battery_mode.getValue())
-                this.emergencyService.sendEmergency()
+              if (!this.shared_data.enabled_test_battery_mode.getValue()){
+                this.shared_data.playSound();
+                this.emergencyService.sendEmergency()}
               else
                 this.emergencyService.sendTestBattery();
             }

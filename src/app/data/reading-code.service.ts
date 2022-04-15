@@ -20,19 +20,19 @@ export class ReadingCodeService {
     return new Promise((resolve, reject) => {
       let index = this.searchValueInUserData(scanned_text, type);
       if (index != -1)
-        this.openUrlAndGenerateEvent(this.sharedData.user_data.qr_code[index].id, this.sharedData.user_data.qr_code[index].action, typeChecking.QR_CODE ? 'QR' : 'NFC').then(()=>resolve(true),err=>reject(err))
+        this.openUrlAndGenerateEvent(this.sharedData.user_data[type][index].id, this.sharedData.user_data[type][index].action, typeChecking.QR_CODE ? 'QR' : 'NFC').then(()=>resolve(true),err=>{ reject({ msg: this.translate.instant('ALERT.retrive_information') }) })
       else
         this.getUpdatedListFromServer(type).then(() => {
           let index = this.searchValueInUserData(scanned_text, type);
           console.log('LISTFROMSERVER')
           if (index != -1)
-            this.openUrlAndGenerateEvent(this.sharedData.user_data.qr_code[index].id, this.sharedData.user_data.qr_code[index].action, typeChecking.QR_CODE ? 'QR' : 'NFC').then(() => resolve(true), err => reject(err))
+            this.openUrlAndGenerateEvent(this.sharedData.user_data[type][index].id, this.sharedData.user_data[type][index].action, typeChecking.QR_CODE ? 'QR' : 'NFC').then(() => resolve(true), err => { reject({ msg: this.translate.instant('ALERT.retrive_information') }) })
           else
             this.NGSIv2Query.getEntity('AmpereDictionary', DeviceType.DICTIONARY).then((dictionary: any) => {
               var code = this.getUrlFromDictionary(scanned_text, dictionary)
               if (code != null) {
                 console.log('DICTIONARY')
-                this.openUrlAndGenerateEvent(code.uuid, code.url, typeChecking.QR_CODE ? 'QR' : 'NFC').then(() => resolve(true), err => reject(err))
+                this.openUrlAndGenerateEvent(code.uuid, code.url, typeChecking.QR_CODE ? 'QR' : 'NFC').then(() => resolve(true), err => { reject({ msg: this.translate.instant('ALERT.retrive_information') }) })
               }
               else
                 reject({ msg: this.translate.instant('ALERT.scan_error') })
@@ -75,7 +75,7 @@ export class ReadingCodeService {
   }
   searchValueInUserData(value, type) {
     for (let i = 0; i < this.sharedData.user_data[type].length; i++) {
-      if (value == this.sharedData.user_data.qr_code[i].identifier)
+      if (value == this.sharedData.user_data[type][i].identifier)
         return i;
     }
     return -1;

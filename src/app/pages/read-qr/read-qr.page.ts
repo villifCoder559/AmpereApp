@@ -42,7 +42,7 @@ export class ReadQRPage implements OnInit {
             //this.shared_data.createToast('ALERT.qr_scan')
             this.shared_data.dismissLoading();
           }, err => {
-            this.shared_data.createToast(err?.msg)
+            this.shared_data.createToast(err)
             this.shared_data.dismissLoading();
           })
         })
