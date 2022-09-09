@@ -37,7 +37,7 @@ The flow chart is the following:
 ## Snapshots
 <img src="https://user-images.githubusercontent.com/1312740/189379876-56d86031-42a9-45b1-876a-e15b220e218e.png" width="20%"><!-- login_page -->
 <img src="https://user-images.githubusercontent.com/1312740/189379663-cc0f1729-ae1b-42c0-a01d-2712db7030a5.png" width="20%"><!-- tutorial1 -->
-<img src="https://user-images.githubusercontent.com/1312740/189379735-21ae2858-00fc-432d-b269-5c5c2c9b6ddc.png" width="20%"><!-- tutorial2 -->  
+<img src="https://user-images.githubusercontent.com/1312740/189379735-21ae2858-00fc-432d-b269-5c5c2c9b6ddc.png" width="20%"><!-- tutorial2 -->
 <img src="https://user-images.githubusercontent.com/1312740/189379769-bef5e836-d858-4e46-9645-6e3b9b1ff982.png" width="20%"><!-- tutorial3 -->
 <img src="https://user-images.githubusercontent.com/1312740/189379831-39cec95b-7989-486a-adc8-cade2149d49a.png" width="20%"><!-- home_page -->
 <img src="https://user-images.githubusercontent.com/1312740/189379958-a005249d-3312-4b80-b49d-f1d71740db02.png" width="20%"><!-- emergenza -->
