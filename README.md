@@ -1,5 +1,5 @@
 # AmpereApp
-The developed mobile app aims to offer a personal safety system for people who need assistance or who feel unsafe in particular circumstances. 
+The developed mobile app aims to offer a personal security system for people who need assistance or who feel insecure in particular circumstances; the whole system consists of a necklace with a circuit inside where the user can press the button above it and send a bluetooth signal to the Ampere app installed in the smartphone, the app will send an alert to the emergency station where a collaborator will handle the emergency. 
 A collaborator has designed a PCB that sends a signal to the smartphone, which detects this signal, and sends an alert (with position, accelerometer data, velocity, 
 and quote) to the central station where an operator will take charge of the emergency cases. The purpose of project Ampere is to design a platform for emergency cases. 
 In urgent situations, the user presses the button behind the jewel to send a Bluetooth signal to the mobile APP, which communicates with the Snap4city server. 
