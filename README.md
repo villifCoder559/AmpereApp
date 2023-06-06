@@ -1,4 +1,5 @@
 # AmpereApp
+## Introduction
 Developed a mobile app as part of Project Ampere, focusing on creating a personal security system for individuals requiring assistance or feeling insecure in specific situations. The app utilizes a circuit-integrated necklace, allowing users to send a Bluetooth signal to the Ampere app on their smartphone by pressing a button. This triggers an alert that is sent to a central station, where an operator handles emergency cases. Additionally, I collaborated with a team member who designed a PCB for signal transmission. The app captures essential data such as position, accelerometer data, velocity, and quotes to provide comprehensive information during emergencies. The project effectively leveraged the Snap4city platform for efficient data management. The app is available in both Italian and English languages.
 
 ## Alert Case
