@@ -1,12 +1,5 @@
 # AmpereApp
-The developed mobile app aims to offer a personal security system for people who need assistance or who feel insecure in particular circumstances; the whole system consists of a necklace with a circuit inside where the user can press the button above it and send a bluetooth signal to the Ampere app installed in the smartphone, the app will send an alert to the emergency station where a collaborator will handle the emergency. 
-A collaborator has designed a PCB that sends a signal to the smartphone, which detects this signal, and sends an alert (with position, accelerometer data, velocity, 
-and quote) to the central station where an operator will take charge of the emergency cases. The purpose of project Ampere is to design a platform for emergency cases. 
-In urgent situations, the user presses the button behind the jewel to send a Bluetooth signal to the mobile APP, which communicates with the Snap4city server. 
-In this way, the operator can monitor the alarm situation and call the involved people or public emergency contact like 112,115,118. 
-This project uses the platform Sna4city as support for managing all data. Snap4city is an architecture that consists of a set of tools to cope with concepts such as 
-collecting data, storing data, creating applications, creating services, and providing access. In this project, I took advantage of effective data management.
-The app is available in italian and english
+Developed a mobile app as part of Project Ampere, focusing on creating a personal security system for individuals requiring assistance or feeling insecure in specific situations. The app utilizes a circuit-integrated necklace, allowing users to send a Bluetooth signal to the Ampere app on their smartphone by pressing a button. This triggers an alert that is sent to a central station, where an operator handles emergency cases. Additionally, I collaborated with a team member who designed a PCB for signal transmission. The app captures essential data such as position, accelerometer data, velocity, and quotes to provide comprehensive information during emergencies. The project effectively leveraged the Snap4city platform for efficient data management. The app is available in both Italian and English languages.
 
 ## Alert Case
 When the user presses the button, the compacted platform sends a signal that the app will detect, and it initiates the process of sending an alarm, as demonstrated in Figure 1
